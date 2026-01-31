@@ -1,8 +1,9 @@
-import type { Link } from '@repo/api';
 import { Button } from '@repo/ui/button';
 import Image, { type ImageProps } from 'next/image';
 
 import styles from './page.module.css';
+
+import type { Link } from '@repo/api';
 
 type Props = Omit<ImageProps, 'src'> & {
   srcLight: string;
@@ -10,7 +11,7 @@ type Props = Omit<ImageProps, 'src'> & {
 };
 
 const ThemeImage = (props: Props) => {
-  const { srcLight, srcDark, ...rest } = props;
+  const { srcDark, srcLight, ...rest } = props;
 
   return (
     <>
@@ -30,7 +31,7 @@ async function getLinks(): Promise<Link[]> {
       throw new Error('Failed to fetch links');
     }
 
-    return res.json();
+    return (await res.json()) as Link[];
   } catch (error) {
     console.error('Error fetching links:', error);
     return [];
@@ -50,7 +51,7 @@ export default async function Home() {
           alt="Turborepo logo"
           width={180}
           height={38}
-          priority
+          preload
         />
         <ol>
           <li>

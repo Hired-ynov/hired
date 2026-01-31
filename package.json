@@ -11,6 +11,7 @@
     "test": "turbo run test",
     "test:e2e": "turbo run test:e2e",
     "lint": "turbo run lint",
+    "check-types": "turbo run check-types",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {

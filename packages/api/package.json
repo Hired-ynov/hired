@@ -4,9 +4,9 @@
   "private": true,
   "license": "MIT",
   "scripts": {
-    "dev": "pnpm build --watch",
+    "dev": "tsc -b -v --watch",
     "build": "tsc -b -v",
-    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\""
+    "lint": "eslint \"src/**/*.ts\""
   },
   "main": "./dist/entry.js",
   "types": "./dist/entry.d.ts",
@@ -35,6 +35,6 @@
     "@types/node": "^22.10.7",
     "ts-loader": "^9.4.3",
     "ts-node": "^10.9.2",
-    "typescript": "5.5.4"
+    "typescript": "5.8.2"
   }
 }
