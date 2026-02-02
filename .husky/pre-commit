@@ -1,0 +1,18 @@
+#!/bin/sh
+FILES=$(git diff --cached --name-only --diff-filter=ACMR | sed 's| |\\ |g')
+[ -z "$FILES" ] && exit 0
+
+# Prettify all selected files
+echo "$FILES" | xargs ./node_modules/.bin/prettier --ignore-unknown --write || exit 1
+
+# Lint the files that were modified
+LINT_FILES=$(echo "$FILES" | grep -E '\.(js|ts|jsx|tsx)$' || echo '')
+
+if [ -n "$LINT_FILES" ]; then
+  echo "$LINT_FILES" | xargs ./node_modules/.bin/eslint --fix || exit 1
+fi
+
+# Add back the modified/prettified files to staging
+echo "$FILES" | xargs git add
+
+exit 0
