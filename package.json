@@ -28,5 +28,9 @@
   "packageManager": "pnpm@8.15.5",
   "engines": {
     "node": ">=18"
+  },
+  "dependencies": {
+    "amqp-connection-manager": "^5.0.0",
+    "amqplib": "^0.10.9"
   }
 }
