@@ -30,6 +30,7 @@
     "node": ">=18"
   },
   "dependencies": {
+    "@nestjs/config": "^4.0.2",
     "amqp-connection-manager": "^5.0.0",
     "amqplib": "^0.10.9"
   }
