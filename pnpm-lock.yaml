@@ -205,15 +205,24 @@ importers:
       '@nestjs/common':
         specifier: ^11.1.11
         version: 11.1.11(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/config':
+        specifier: ^4.0.2
+        version: 4.0.2(@nestjs/common@11.1.11)(rxjs@7.8.2)
       '@nestjs/core':
         specifier: ^11.1.11
         version: 11.1.11(@nestjs/common@11.1.11)(@nestjs/microservices@11.1.12)(@nestjs/platform-express@11.1.11)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/microservices':
+        specifier: ^11.1.12
+        version: 11.1.12(@nestjs/common@11.1.11)(@nestjs/core@11.1.11)(amqp-connection-manager@5.0.0)(amqplib@0.10.9)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/platform-express':
         specifier: ^11.1.11
         version: 11.1.11(@nestjs/common@11.1.11)(@nestjs/core@11.1.11)
       '@repo/api':
         specifier: workspace:*
         version: link:../../packages/api
+      '@repo/rabbitmq-config':
+        specifier: workspace:*
+        version: link:../../packages/rabbitmq-config
       reflect-metadata:
         specifier: ^0.2.2
         version: 0.2.2

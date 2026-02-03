@@ -3,9 +3,10 @@ import { ConfigModule } from '@nestjs/config';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { LinksModule } from './links/links.module';
-import { MicroservicesModule } from './microservices/microservices.module';
-import { GatewayModule } from './gateway/gateway.module';
+import { CommunicationModule } from './communication/communication.module';
+import { AuthModule } from './auth/auth.module';
+import { CoreModule } from './core/core.module';
+import { FilesModule } from './files/files.module';
 
 @Module({
   controllers: [AppController],
@@ -14,9 +15,10 @@ import { GatewayModule } from './gateway/gateway.module';
       isGlobal: true,
       envFilePath: '.env',
     }),
-    LinksModule,
-    MicroservicesModule,
-    GatewayModule,
+    CommunicationModule,
+    AuthModule,
+    CoreModule,
+    FilesModule,
   ],
   providers: [AppService],
 })

@@ -1,67 +1,56 @@
-import { RmqOptions, Transport } from '@nestjs/microservices';
+import { ClientProvider, Transport } from '@nestjs/microservices';
 
-export const rabbitmqConfig: RmqOptions = {
-  transport: Transport.RMQ,
-  options: {
-    urls: [process.env.RABBITMQ_URL || 'amqp://localhost:5672'],
-    queue: 'gateway_queue',
-    queueOptions: {
-      durable: true,
-    },
-    noAck: false,
-    prefetchCount: 1,
+export const microservices = {
+  base: (envs: { [k: string]: any }) => {
+    return {
+      transport: Transport.RMQ,
+      options: {
+        urls: [envs.RABBITMQ_URL || 'amqp://localhost:5672'],
+        queueOptions: {
+          durable: true,
+        },
+        prefetchCount: 1,
+      },
+    };
+  },
+  AUTH_SERVICE: (envs: { [k: string]: any }) => {
+    const base = microservices.base(envs);
+    return {
+      ...base,
+      options: {
+        ...base.options,
+        queue: 'auth_queue',
+      },
+    } as ClientProvider & { transport: Transport };
+  },
+  COMMUNICATION_SERVICE: (envs: { [k: string]: any }) => {
+    const base = microservices.base(envs);
+    return {
+      ...base,
+      options: {
+        ...base.options,
+        queue: 'communication_queue',
+      },
+    } as ClientProvider & { transport: Transport };
+  },
+  CORE_SERVICE: (envs: { [k: string]: any }) => {
+    const base = microservices.base(envs);
+    return {
+      ...base,
+      options: {
+        ...base.options,
+        queue: 'core_queue',
+      },
+    } as ClientProvider & { transport: Transport };
+  },
+  FILES_SERVICE: (envs: { [k: string]: any }) => {
+    const base = microservices.base(envs);
+    return {
+      ...base,
+      options: {
+        ...base.options,
+        queue: 'files_queue',
+      },
+    } as ClientProvider & { transport: Transport };
   },
 };
-
-export const microservices = Object.freeze({
-  AUTH_SERVICE: {
-    transport: Transport.RMQ,
-    options: {
-      urls: [process.env.RABBITMQ_URL || 'amqp://localhost:5672'],
-      queue: 'auth_queue',
-      queueOptions: {
-        durable: true,
-      },
-    },
-  } as RmqOptions,
-  API_SERVICE: {
-    transport: Transport.RMQ,
-    options: {
-      urls: [process.env.RABBITMQ_URL || 'amqp://localhost:5672'],
-      queue: 'api_queue',
-      queueOptions: {
-        durable: true,
-      },
-    },
-  } as RmqOptions,
-  COMMUNICATION_SERVICE: {
-    transport: Transport.RMQ,
-    options: {
-      urls: [process.env.RABBITMQ_URL || 'amqp://localhost:5672'],
-      queue: 'communication_queue',
-      queueOptions: {
-        durable: true,
-      },
-    },
-  } as RmqOptions,
-  CORE_SERVICE: {
-    transport: Transport.RMQ,
-    options: {
-      urls: [process.env.RABBITMQ_URL || 'amqp://localhost:5672'],
-      queue: 'core_queue',
-      queueOptions: {
-        durable: true,
-      },
-    },
-  } as RmqOptions,
-  FILES_SERVICE: {
-    transport: Transport.RMQ,
-    options: {
-      urls: [process.env.RABBITMQ_URL || 'amqp://localhost:5672'],
-      queue: 'files_queue',
-      queueOptions: {
-        durable: true,
-      },
-    },
-  } as RmqOptions,
-});

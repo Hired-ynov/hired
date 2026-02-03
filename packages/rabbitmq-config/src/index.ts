@@ -1,1 +1,1 @@
-export { rabbitmqConfig, microservices } from './rabbitmq.config';
+export { microservices } from './rabbitmq.config';
