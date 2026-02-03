@@ -15,6 +15,8 @@
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\""
   },
   "dependencies": {
+    "@keyv/redis": "^5.1.6",
+    "@nestjs/cache-manager": "^3.1.0",
     "@nestjs/common": "^11.1.11",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.1.11",
@@ -22,6 +24,9 @@
     "@nestjs/platform-express": "^11.1.11",
     "@repo/api": "workspace:*",
     "@repo/rabbitmq-config": "workspace:*",
+    "@repo/redis-config": "workspace:^",
+    "cache-manager": "^7.2.8",
+    "keyv": "^5.6.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2"
   },
