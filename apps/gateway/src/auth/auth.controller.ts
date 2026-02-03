@@ -1,4 +1,4 @@
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Controller, Inject } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 

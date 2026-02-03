@@ -8,8 +8,6 @@ import { AuthModule } from './auth/auth.module';
 import { CoreModule } from './core/core.module';
 import { FilesModule } from './files/files.module';
 import { CacheModule } from '@nestjs/cache-manager';
-import { Keyv } from 'keyv';
-import KeyvRedis from '@keyv/redis';
 import { cache } from '@repo/redis-config';
 
 @Module({
