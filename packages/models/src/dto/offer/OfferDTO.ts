@@ -1,7 +1,10 @@
-import { CompanyDto } from '../company/CompanyDTO';
+import { CompanyDTO } from '../company/CompanyDTO';
 import { Skill } from '../../entry';
-import { BaseDTO } from '../baseDTO/BaseDTO';
+import { BaseDTO } from '../utils/BaseDTO';
 import { IsString } from 'class-validator/types/decorator/typechecker/IsString';
+import { Type } from 'class-transformer';
+import { IsArray, IsEnum, IsUUID } from 'class-validator';
+import { SalaryRangeDTO } from '../utils/SalaryRangeDTO';
 
 export class OfferDTO extends BaseDTO {
   @IsString()
@@ -16,14 +19,14 @@ export class OfferDTO extends BaseDTO {
   @Type(() => SalaryRangeDTO)
   salaryRange: SalaryRangeDTO;
 
-  @Type(() => CompanyDto)
-  company: CompanyDto;
+  @Type(() => CompanyDTO)
+  company: CompanyDTO;
 
   @IsArray()
   @IsEnum(Skill, { each: true })
   skills: Skill[];
 
   @IsArray()
-  @IsUUID({ each: true })
+  @IsUUID(4, { each: true })
   filesIds: string[];
 }

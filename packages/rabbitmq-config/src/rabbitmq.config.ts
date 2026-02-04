@@ -1,7 +1,7 @@
 import { ClientProvider, Transport } from '@nestjs/microservices';
 
 export const microservices = {
-  base: (envs: { [k: string]: any }) => {
+  base: (envs: NodeJS.ProcessEnv) => {
     return {
       transport: Transport.RMQ,
       options: {
@@ -13,7 +13,7 @@ export const microservices = {
       },
     };
   },
-  AUTH_SERVICE: (envs: { [k: string]: any }) => {
+  AUTH_SERVICE: (envs: NodeJS.ProcessEnv) => {
     const base = microservices.base(envs);
     return {
       ...base,
@@ -23,7 +23,7 @@ export const microservices = {
       },
     } as ClientProvider & { transport: Transport };
   },
-  COMMUNICATION_SERVICE: (envs: { [k: string]: any }) => {
+  COMMUNICATION_SERVICE: (envs: NodeJS.ProcessEnv) => {
     const base = microservices.base(envs);
     return {
       ...base,
@@ -33,7 +33,7 @@ export const microservices = {
       },
     } as ClientProvider & { transport: Transport };
   },
-  CORE_SERVICE: (envs: { [k: string]: any }) => {
+  CORE_SERVICE: (envs: NodeJS.ProcessEnv) => {
     const base = microservices.base(envs);
     return {
       ...base,
@@ -43,7 +43,7 @@ export const microservices = {
       },
     } as ClientProvider & { transport: Transport };
   },
-  FILES_SERVICE: (envs: { [k: string]: any }) => {
+  FILES_SERVICE: (envs: NodeJS.ProcessEnv) => {
     const base = microservices.base(envs);
     return {
       ...base,

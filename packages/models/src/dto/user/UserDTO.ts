@@ -8,7 +8,7 @@ import {
 } from 'class-validator';
 import { Skill } from '../../entities/Skill';
 import { Role } from '../../entities/Role';
-import { BaseDTO } from '../baseDTO/BaseDTO';
+import { BaseDTO } from '../utils/BaseDTO';
 
 export class UserDTO extends BaseDTO {
   @IsString()
@@ -41,4 +41,10 @@ export class UserDTO extends BaseDTO {
   @IsArray()
   @IsEnum(Skill, { each: true })
   skills: Skill[];
+}
+function IsPhoneNumber(): (
+  target: UserDTO,
+  propertyKey: 'phoneNumber',
+) => void {
+  throw new Error('Function not implemented.');
 }

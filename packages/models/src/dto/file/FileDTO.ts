@@ -1,5 +1,7 @@
 import { IsOptional, IsString } from 'class-validator';
-import { BaseDTO } from '../baseDTO/BaseDTO';
+import { BaseDTO } from '../utils/BaseDTO';
+import { Type } from 'class-transformer';
+import { MetadataDTO } from '../utils/MetadataDTO';
 
 export class FileDTO extends BaseDTO {
   @IsString()

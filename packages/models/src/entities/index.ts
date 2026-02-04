@@ -8,3 +8,4 @@ export * from './User';
 export * from './Skill';
 export * from './Role';
 export * from './BaseEntity';
+export * from './BaseType';

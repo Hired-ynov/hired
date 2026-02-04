@@ -2,13 +2,14 @@ import { Module } from '@nestjs/common';
 import { CoreController } from './core.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { CORE_SERVICE } from '../constants/microservices.constants';
 
 @Module({
   controllers: [CoreController],
   imports: [
     ClientsModule.registerAsync([
       {
-        name: 'CORE_SERVICE',
+        name: CORE_SERVICE,
         imports: [ConfigModule],
         useFactory: (configService: ConfigService) => ({
           transport: Transport.RMQ,

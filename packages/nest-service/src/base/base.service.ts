@@ -7,7 +7,7 @@ import {
   FindOptionsOrder,
   QueryDeepPartialEntity,
 } from 'typeorm';
-import { PaginationOptions, PaginationResult, SortOptions } from './base.types';
+import { PaginationOptions, PaginationResult, SortOptions } from '@repo/models';
 import { BaseEntity } from './base.entity';
 
 @Injectable()

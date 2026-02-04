@@ -1,5 +1,5 @@
 import { IsString, IsUUID } from 'class-validator';
-import { BaseDTO } from '../baseDTO/BaseDTO';
+import { BaseDTO } from '../utils/BaseDTO';
 
 export class MessageDTO extends BaseDTO {
   @IsUUID()
