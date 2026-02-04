@@ -95,20 +95,12 @@ export abstract class BaseService<T extends ObjectLiteral, ID = string> {
     await this.repository.delete(id as any);
   }
 
-  async softDelete(id: ID): Promise<void> {
-    await this.repository.softDelete(id as any);
-  }
-
   async restore(id: ID): Promise<void> {
     await this.repository.restore(id as any);
   }
 
   async removeMany(where: FindOptionsWhere<T>): Promise<void> {
     await this.repository.delete(where);
-  }
-
-  async softDeleteMany(where: FindOptionsWhere<T>): Promise<void> {
-    await this.repository.softDelete(where);
   }
 
   async count(options?: FindManyOptions<T>): Promise<number> {
