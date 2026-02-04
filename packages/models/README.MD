@@ -51,7 +51,7 @@ Les DTOs sont des classes avec décorateurs de validation pour garantir l'intég
 
 ### DTOs Utilisateur
 
-- **CreateUserDto** : Création d'utilisateur (email, password ≥ 8 caractères, nom, rôle, compétences)
+- **CreateUserDTO** : Création d'utilisateur (email, password ≥ 8 caractères, nom, rôle, compétences)
 - **UpdateUserDTO** : Mise à jour partielle (`PartialType` de `CreateUserDto`)
 - **UserDto** : Utilisateur complet avec validation de numéro de téléphone
 - **LoginDTO** : Authentification avec email et mot de passe fort

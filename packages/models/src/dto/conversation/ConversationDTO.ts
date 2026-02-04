@@ -2,7 +2,7 @@ import { IsUUID } from 'class-validator';
 import { BaseDTO } from '../baseDTO/BaseDTO';
 import { OfferDto } from '../offer/OfferDTO';
 
-export class ConversationDto extends BaseDTO {
+export class ConversationDTO extends BaseDTO {
   @IsArray()
   @IsUUID({ each: true })
   participantIds: string[];

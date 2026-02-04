@@ -3,7 +3,7 @@ import { Skill } from '../../entry';
 import { BaseDTO } from '../baseDTO/BaseDTO';
 import { IsString } from 'class-validator/types/decorator/typechecker/IsString';
 
-export class OfferDto extends BaseDTO {
+export class OfferDTO extends BaseDTO {
   @IsString()
   title: string;
 

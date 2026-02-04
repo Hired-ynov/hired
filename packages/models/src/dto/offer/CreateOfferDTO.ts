@@ -1,7 +1,7 @@
 import { IsString } from 'class-validator';
 import { Skill } from '../../entry';
 
-export class CreateOfferDto {
+export class CreateOfferDTO {
   @IsString()
   title: string;
 

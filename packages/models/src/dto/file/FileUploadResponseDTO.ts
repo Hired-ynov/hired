@@ -1,7 +1,7 @@
 import { IsString } from 'class-validator';
 import { BaseDTO } from '../baseDTO';
 
-export class FileUploadResponseDto extends BaseDTO {
+export class FileUploadResponseDTO extends BaseDTO {
   @IsString()
   name: string;
 

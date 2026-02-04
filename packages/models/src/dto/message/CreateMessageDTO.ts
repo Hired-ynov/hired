@@ -1,7 +1,7 @@
 import { Transform } from 'class-transformer';
 import { IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator';
 
-export class CreateMessageDto {
+export class CreateMessageDTO {
   @IsString()
   @IsNotEmpty({ message: 'Message content cannot be empty' })
   @MinLength(1, { message: 'Message must contain at least 1 character' })

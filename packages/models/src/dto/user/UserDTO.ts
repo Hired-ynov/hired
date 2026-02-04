@@ -10,7 +10,7 @@ import { Skill } from '../../entities/Skill';
 import { Role } from '../../entities/Role';
 import { BaseDTO } from '../baseDTO/BaseDTO';
 
-export class UserDto extends BaseDTO {
+export class UserDTO extends BaseDTO {
   @IsString()
   firstName: string;
 

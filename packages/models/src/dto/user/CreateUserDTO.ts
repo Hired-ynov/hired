@@ -9,7 +9,7 @@ import {
 import { Role } from '../../entities/Role';
 import { Skill } from '../../entities/Skill';
 
-export class CreateUserDto {
+export class CreateUserDTO {
   @IsString()
   firstName: string;
 
