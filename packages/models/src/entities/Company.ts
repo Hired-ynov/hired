@@ -1,8 +1,6 @@
-export interface Company {
-  id: string;
+import { BaseEntity } from './BaseEntity';
+export interface Company extends BaseEntity {
   name: string;
   description: string;
   website: string;
-  createdAt: Date;
-  updatedAt: Date;
 }

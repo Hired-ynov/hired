@@ -7,3 +7,4 @@ export * from './Company';
 export * from './User';
 export * from './Skill';
 export * from './Role';
+export * from './BaseEntity';

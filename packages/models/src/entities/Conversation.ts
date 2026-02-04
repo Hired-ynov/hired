@@ -1,7 +1,6 @@
-export interface Conversation {
-  id: string;
-  participants: string[]; // Array of user IDs
+import { BaseEntity } from './BaseEntity';
+
+export interface Conversation extends BaseEntity {
+  participants: string[];
   offerId: string;
-  createdAt: Date;
-  updatedAt: Date;
 }

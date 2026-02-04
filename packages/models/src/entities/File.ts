@@ -1,12 +1,8 @@
-export interface File {
-  id: string;
+import { BaseEntity } from './BaseEntity';
+
+export interface File extends BaseEntity {
   name: string;
   path: string;
   type: string;
-  createdAt: Date;
-  updatedAt: Date;
-  metadata?: {
-    size: number;
-    hash: string;
-  };
+  metadata?: Metadata;
 }
