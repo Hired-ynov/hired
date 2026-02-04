@@ -1,17 +1,11 @@
 import { Skill } from './Skill';
-
-export interface Offer {
-  id: string;
+import { BaseEntity } from './BaseEntity';
+export interface Offer extends BaseEntity {
   title: string;
   description: string;
   location: string;
-  salaryRange: {
-    min: number;
-    max: number;
-  };
+  salaryRange: SalaryRange;
   companyId: string;
   skills: Skill[];
-  createdAt: Date;
-  updatedAt: Date;
   filesIds: string[];
 }

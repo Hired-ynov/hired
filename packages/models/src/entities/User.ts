@@ -1,8 +1,7 @@
 import { Role } from './Role';
 import type { Skill } from './Skill';
-
-export interface User {
-  id: string;
+import { BaseEntity } from './BaseEntity';
+export interface User extends BaseEntity {
   firstName: string;
   lastName: string;
   email: string;
@@ -11,7 +10,5 @@ export interface User {
   location: string;
   phoneNumber: string;
   skills: Skill[];
-  createdAt: Date;
-  updatedAt: Date;
   companyId?: string;
 }

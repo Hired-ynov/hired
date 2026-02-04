@@ -1,8 +1,7 @@
-export interface Message {
-  id: string;
+import { BaseEntity } from './BaseEntity';
+
+export interface Message extends BaseEntity {
   conversationId: string;
   senderId: string;
   content: string;
-  createdAt: Date;
-  updatedAt: Date;
 }
