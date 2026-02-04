@@ -6,8 +6,6 @@ import { Message } from './message.entity';
 
 @Injectable()
 export class AppService extends BaseService<Message> {
-  protected entityName = 'Message';
-
   constructor(
     @InjectRepository(Message)
     messageRepository: Repository<Message>,
