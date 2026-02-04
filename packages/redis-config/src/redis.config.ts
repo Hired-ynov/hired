@@ -1,8 +1,8 @@
 import KeyvRedis from '@keyv/redis';
-import Keyv from 'keyv';
+import Keyv, { KeyvStoreAdapter } from 'keyv';
 
 export const cache = {
-  base: (store: any) => {
+  base: (store: KeyvStoreAdapter | Keyv) => {
     return {
       stores: [
         new Keyv({
@@ -11,12 +11,12 @@ export const cache = {
       ],
     };
   },
-  REDIS: (envs: { [k: string]: any }) => {
+  REDIS: (envs: NodeJS.ProcessEnv) => {
     return cache.base(
       new KeyvRedis(envs.REDIS_URL || 'redis://localhost:6379/0'),
     );
   },
-  LOCAL: (envs: { [k: string]: any }) => {
+  LOCAL: (envs: NodeJS.ProcessEnv) => {
     return cache.base(new Keyv());
   },
 };

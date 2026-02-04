@@ -1,5 +1,7 @@
-import { IsString } from 'class-validator';
+import { IsArray, IsEnum, IsString } from 'class-validator';
 import { Skill } from '../../entry';
+import { Type } from 'class-transformer';
+import { SalaryRangeDTO } from '../utils/SalaryRangeDTO';
 
 export class CreateOfferDTO {
   @IsString()

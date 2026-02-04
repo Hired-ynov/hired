@@ -5,12 +5,13 @@ import {
   FindManyOptions,
   DeepPartial,
   FindOptionsOrder,
-  ObjectLiteral,
+  QueryDeepPartialEntity,
 } from 'typeorm';
-import { PaginationOptions, PaginationResult, SortOptions } from './base.types';
+import { PaginationOptions, PaginationResult, SortOptions } from '@repo/models';
+import { BaseEntity } from './base.entity';
 
 @Injectable()
-export abstract class BaseService<T extends ObjectLiteral, ID = string> {
+export abstract class BaseService<T extends BaseEntity> {
   constructor(protected readonly repository: Repository<T>) {}
 
   async create(createDto: DeepPartial<T>): Promise<T> {
@@ -31,7 +32,7 @@ export abstract class BaseService<T extends ObjectLiteral, ID = string> {
     return await this.repository.findOne({ where });
   }
 
-  async findById(id: ID): Promise<T | null> {
+  async findById(id: string): Promise<T | null> {
     return await this.repository.findOneBy({ id } as FindOptionsWhere<T>);
   }
 
@@ -75,8 +76,11 @@ export abstract class BaseService<T extends ObjectLiteral, ID = string> {
     });
   }
 
-  async update(id: ID, updateDto: DeepPartial<T>): Promise<T> {
-    await this.repository.update(id as any, updateDto as any);
+  async update(id: string, updateDto: DeepPartial<T>): Promise<T> {
+    await this.repository.update(
+      { id } as FindOptionsWhere<T>,
+      updateDto as QueryDeepPartialEntity<T>,
+    );
     const entity = await this.findById(id);
     if (!entity) {
       throw new Error(`Entity with id ${id} not found after update`);
@@ -88,15 +92,15 @@ export abstract class BaseService<T extends ObjectLiteral, ID = string> {
     where: FindOptionsWhere<T>,
     updateDto: DeepPartial<T>,
   ): Promise<void> {
-    await this.repository.update(where, updateDto as any);
+    await this.repository.update(where, updateDto as QueryDeepPartialEntity<T>);
   }
 
-  async remove(id: ID): Promise<void> {
-    await this.repository.delete(id as any);
+  async remove(id: string): Promise<void> {
+    await this.repository.delete({ id } as FindOptionsWhere<T>);
   }
 
-  async restore(id: ID): Promise<void> {
-    await this.repository.restore(id as any);
+  async restore(id: string): Promise<void> {
+    await this.repository.restore({ id } as FindOptionsWhere<T>);
   }
 
   async removeMany(where: FindOptionsWhere<T>): Promise<void> {
@@ -120,7 +124,7 @@ export abstract class BaseService<T extends ObjectLiteral, ID = string> {
     return entity;
   }
 
-  async findByIdOrFail(id: ID): Promise<T> {
+  async findByIdOrFail(id: string): Promise<T> {
     const entity = await this.findById(id);
     if (!entity) {
       throw new Error(`Entity with id ${id} not found`);

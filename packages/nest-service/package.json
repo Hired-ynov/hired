@@ -38,6 +38,7 @@
     "@nestjs/common": "^11.1.11",
     "@nestjs/typeorm": "^11.0.0",
     "@repo/eslint-config": "workspace:*",
+    "@repo/models": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^22.10.7",
     "ts-loader": "^9.4.3",

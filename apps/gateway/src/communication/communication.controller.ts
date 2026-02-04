@@ -1,10 +1,11 @@
 import { Controller, Get, Post, Body, Inject } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
+import { COMMUNICATION_SERVICE } from '../constants/microservices.constants';
 
 @Controller('communication')
 export class CommunicationController {
   constructor(
-    @Inject('COMMUNICATION_SERVICE')
+    @Inject(COMMUNICATION_SERVICE)
     private readonly communicationService: ClientProxy,
   ) {}
 

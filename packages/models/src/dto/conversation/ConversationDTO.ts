@@ -1,16 +1,17 @@
-import { IsUUID } from 'class-validator';
-import { BaseDTO } from '../baseDTO/BaseDTO';
-import { OfferDto } from '../offer/OfferDTO';
+import { IsArray, IsUUID, ValidateNested } from 'class-validator';
+import { BaseDTO } from '../utils/BaseDTO';
+import { OfferDTO } from '../offer/OfferDTO';
+import { Type } from 'class-transformer';
 
 export class ConversationDTO extends BaseDTO {
   @IsArray()
-  @IsUUID({ each: true })
+  @IsUUID(4, { each: true })
   participantIds: string[];
 
   @IsUUID()
   offerId: string;
 
   @ValidateNested()
-  @Type(() => OfferDto)
-  offer: OfferDto;
+  @Type(() => OfferDTO)
+  offer: OfferDTO;
 }
