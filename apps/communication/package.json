@@ -23,6 +23,7 @@
     "@nestjs/typeorm": "^11.0.0",
     "@repo/api": "workspace:*",
     "@repo/rabbitmq-config": "workspace:*",
+    "@repo/nest-service": "workspace:*",
     "pg": "^8.18.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",

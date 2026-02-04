@@ -241,6 +241,9 @@ importers:
       '@repo/api':
         specifier: workspace:*
         version: link:../../packages/api
+      '@repo/nest-service':
+        specifier: workspace:*
+        version: link:../../packages/nest-service
       '@repo/rabbitmq-config':
         specifier: workspace:*
         version: link:../../packages/rabbitmq-config
