@@ -1,0 +1,48 @@
+{
+  "name": "@repo/nest-service",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "dev": "tsc -b -v --watch",
+    "build": "tsc -b -v",
+    "lint": "eslint \"src/**/*.ts\""
+  },
+  "main": "./dist/entry.js",
+  "types": "./dist/entry.d.ts",
+  "files": [
+    "./dist/**"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/entry.js",
+      "require": "./dist/entry.js"
+    },
+    "./*": {
+      "import": "./dist/*.js",
+      "require": "./dist/*.js"
+    }
+  },
+  "dependencies": {
+    "@nestjs/mapped-types": "*"
+  },
+  "peerDependencies": {
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/typeorm": "^11.0.0",
+    "typeorm": "^0.3.0"
+  },
+  "devDependencies": {
+    "@nestjs/common": "^11.1.11",
+    "@nestjs/typeorm": "^11.0.0",
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^22.10.7",
+    "ts-loader": "^9.4.3",
+    "ts-node": "^10.9.2",
+    "typeorm": "^0.3.28",
+    "typescript": "5.8.2"
+  }
+}

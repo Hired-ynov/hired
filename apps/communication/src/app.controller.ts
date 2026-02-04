@@ -1,7 +1,6 @@
-import { Controller, Get } from '@nestjs/common';
-
+import { Controller } from '@nestjs/common';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 import { AppService } from './app.service';
-import { MessagePattern } from '@nestjs/microservices';
 
 @Controller()
 export class AppController {
@@ -10,5 +9,15 @@ export class AppController {
   @MessagePattern('ping')
   ping() {
     return this.appService.getPing();
+  }
+
+  @MessagePattern('message.create')
+  async createMessage(@Payload() data: { content: string; sender: string }) {
+    return await this.appService.create(data);
+  }
+
+  @MessagePattern('message.findAll')
+  async getMessages() {
+    return await this.appService.findAll();
   }
 }
