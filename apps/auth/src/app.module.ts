@@ -4,6 +4,8 @@ import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
+import { ClientsModule } from '@nestjs/microservices';
+import { microservices } from '@repo/rabbitmq-config';
 
 @Module({
   controllers: [AppController],
@@ -25,6 +27,18 @@ import { AuthModule } from './auth/auth.module';
       }),
     }),
     AuthModule,
+    ClientsModule.registerAsync([
+      {
+        name: microservices.symbols.CORE_SERVICE,
+        imports: [ConfigModule],
+        useFactory: (configService: ConfigService) => {
+          return microservices.CORE_SERVICE({
+            RABBITMQ_URL: configService.get<string>('RABBITMQ_URL'),
+          });
+        },
+        inject: [ConfigService],
+      },
+    ]),
   ],
   providers: [AppService],
 })
