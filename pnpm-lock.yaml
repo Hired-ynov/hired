@@ -49,7 +49,7 @@ importers:
         version: 11.1.11(class-transformer@0.5.1)(class-validator@0.14.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/core':
         specifier: ^11.1.11
-        version: 11.1.11(@nestjs/common@11.1.11)(@nestjs/platform-express@11.1.11)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+        version: 11.1.11(@nestjs/common@11.1.11)(@nestjs/microservices@11.1.12)(@nestjs/platform-express@11.1.11)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/platform-express':
         specifier: ^11.1.11
         version: 11.1.11(@nestjs/common@11.1.11)(@nestjs/core@11.1.11)
@@ -83,7 +83,7 @@ importers:
         version: 11.0.9(typescript@5.8.2)
       '@nestjs/testing':
         specifier: ^11.1.11
-        version: 11.1.11(@nestjs/common@11.1.11)(@nestjs/core@11.1.11)(@nestjs/platform-express@11.1.11)
+        version: 11.1.11(@nestjs/common@11.1.11)(@nestjs/core@11.1.11)(@nestjs/microservices@11.1.12)(@nestjs/platform-express@11.1.11)
       '@repo/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
@@ -137,7 +137,7 @@ importers:
         version: 11.1.11(class-transformer@0.5.1)(class-validator@0.14.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/core':
         specifier: ^11.1.11
-        version: 11.1.11(@nestjs/common@11.1.11)(@nestjs/platform-express@11.1.11)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+        version: 11.1.11(@nestjs/common@11.1.11)(@nestjs/microservices@11.1.12)(@nestjs/platform-express@11.1.11)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/platform-express':
         specifier: ^11.1.11
         version: 11.1.11(@nestjs/common@11.1.11)(@nestjs/core@11.1.11)
@@ -171,7 +171,7 @@ importers:
         version: 11.0.9(typescript@5.8.2)
       '@nestjs/testing':
         specifier: ^11.1.11
-        version: 11.1.11(@nestjs/common@11.1.11)(@nestjs/core@11.1.11)(@nestjs/platform-express@11.1.11)
+        version: 11.1.11(@nestjs/common@11.1.11)(@nestjs/core@11.1.11)(@nestjs/microservices@11.1.12)(@nestjs/platform-express@11.1.11)
       '@repo/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
@@ -241,12 +241,21 @@ importers:
       '@repo/api':
         specifier: workspace:*
         version: link:../../packages/api
+      '@repo/models':
+        specifier: workspace:^
+        version: link:../../packages/models
       '@repo/nest-service':
         specifier: workspace:*
         version: link:../../packages/nest-service
       '@repo/rabbitmq-config':
         specifier: workspace:*
         version: link:../../packages/rabbitmq-config
+      class-transformer:
+        specifier: ^0.5.1
+        version: 0.5.1
+      class-validator:
+        specifier: ^0.14.1
+        version: 0.14.3
       pg:
         specifier: ^8.18.0
         version: 8.18.0
@@ -325,7 +334,7 @@ importers:
         version: 11.1.11(class-transformer@0.5.1)(class-validator@0.14.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/core':
         specifier: ^11.1.11
-        version: 11.1.11(@nestjs/common@11.1.11)(@nestjs/platform-express@11.1.11)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+        version: 11.1.11(@nestjs/common@11.1.11)(@nestjs/microservices@11.1.12)(@nestjs/platform-express@11.1.11)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/platform-express':
         specifier: ^11.1.11
         version: 11.1.11(@nestjs/common@11.1.11)(@nestjs/core@11.1.11)
@@ -371,7 +380,7 @@ importers:
         version: 11.0.9(typescript@5.8.2)
       '@nestjs/testing':
         specifier: ^11.1.11
-        version: 11.1.11(@nestjs/common@11.1.11)(@nestjs/core@11.1.11)(@nestjs/platform-express@11.1.11)
+        version: 11.1.11(@nestjs/common@11.1.11)(@nestjs/core@11.1.11)(@nestjs/microservices@11.1.12)(@nestjs/platform-express@11.1.11)
       '@repo/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
@@ -425,7 +434,7 @@ importers:
         version: 11.1.11(class-transformer@0.5.1)(class-validator@0.14.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/core':
         specifier: ^11.1.11
-        version: 11.1.11(@nestjs/common@11.1.11)(@nestjs/platform-express@11.1.11)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+        version: 11.1.11(@nestjs/common@11.1.11)(@nestjs/microservices@11.1.12)(@nestjs/platform-express@11.1.11)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/platform-express':
         specifier: ^11.1.11
         version: 11.1.11(@nestjs/common@11.1.11)(@nestjs/core@11.1.11)
@@ -459,7 +468,7 @@ importers:
         version: 11.0.9(typescript@5.8.2)
       '@nestjs/testing':
         specifier: ^11.1.11
-        version: 11.1.11(@nestjs/common@11.1.11)(@nestjs/core@11.1.11)(@nestjs/platform-express@11.1.11)
+        version: 11.1.11(@nestjs/common@11.1.11)(@nestjs/core@11.1.11)(@nestjs/microservices@11.1.12)(@nestjs/platform-express@11.1.11)
       '@repo/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
@@ -773,6 +782,9 @@ importers:
       '@nestjs/mapped-types':
         specifier: '*'
         version: 2.1.0(@nestjs/common@11.1.11)(class-transformer@0.5.1)(class-validator@0.14.3)(reflect-metadata@0.2.2)
+      '@nestjs/microservices':
+        specifier: ^11.0.0
+        version: 11.1.12(@nestjs/common@11.1.11)(@nestjs/core@11.1.11)(amqp-connection-manager@5.0.0)(amqplib@0.10.9)(cache-manager@7.2.8)(reflect-metadata@0.2.2)(rxjs@7.8.2)
     devDependencies:
       '@nestjs/common':
         specifier: ^11.1.11
@@ -3021,39 +3033,6 @@ packages:
       tslib: 2.8.1
       uid: 2.0.2
 
-  /@nestjs/core@11.1.11(@nestjs/common@11.1.11)(@nestjs/platform-express@11.1.11)(reflect-metadata@0.2.2)(rxjs@7.8.2):
-    resolution:
-      {
-        integrity: sha512-H9i+zT3RvHi7tDc+lCmWHJ3ustXveABCr+Vcpl96dNOxgmrx4elQSTC4W93Mlav2opfLV+p0UTHY6L+bpUA4zA==,
-      }
-    engines: { node: '>= 20' }
-    requiresBuild: true
-    peerDependencies:
-      '@nestjs/common': ^11.0.0
-      '@nestjs/microservices': ^11.0.0
-      '@nestjs/platform-express': ^11.0.0
-      '@nestjs/websockets': ^11.0.0
-      reflect-metadata: ^0.1.12 || ^0.2.0
-      rxjs: ^7.1.0
-    peerDependenciesMeta:
-      '@nestjs/microservices':
-        optional: true
-      '@nestjs/platform-express':
-        optional: true
-      '@nestjs/websockets':
-        optional: true
-    dependencies:
-      '@nestjs/common': 11.1.11(class-transformer@0.5.1)(class-validator@0.14.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)
-      '@nestjs/platform-express': 11.1.11(@nestjs/common@11.1.11)(@nestjs/core@11.1.11)
-      '@nuxt/opencollective': 0.4.1
-      fast-safe-stringify: 2.1.1
-      iterare: 1.2.1
-      path-to-regexp: 8.3.0
-      reflect-metadata: 0.2.2
-      rxjs: 7.8.2
-      tslib: 2.8.1
-      uid: 2.0.2
-
   /@nestjs/mapped-types@2.1.0(@nestjs/common@11.1.11)(class-transformer@0.5.1)(class-validator@0.14.3)(reflect-metadata@0.2.2):
     resolution:
       {
@@ -3135,7 +3114,7 @@ packages:
       '@nestjs/core': ^11.0.0
     dependencies:
       '@nestjs/common': 11.1.11(class-transformer@0.5.1)(class-validator@0.14.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)
-      '@nestjs/core': 11.1.11(@nestjs/common@11.1.11)(@nestjs/platform-express@11.1.11)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/core': 11.1.11(@nestjs/common@11.1.11)(@nestjs/microservices@11.1.12)(@nestjs/platform-express@11.1.11)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       cors: 2.8.5
       express: 5.2.1
       multer: 2.0.2
@@ -3203,28 +3182,6 @@ packages:
       tslib: 2.8.1
     dev: true
 
-  /@nestjs/testing@11.1.11(@nestjs/common@11.1.11)(@nestjs/core@11.1.11)(@nestjs/platform-express@11.1.11):
-    resolution:
-      {
-        integrity: sha512-Po2aZKXlxuySDEh3Gi05LJ7/BtfTAPRZ3KPTrbpNrTmgGr3rFgEGYpQwN50wXYw0pywoICiFLZSZ/qXsplf6NA==,
-      }
-    peerDependencies:
-      '@nestjs/common': ^11.0.0
-      '@nestjs/core': ^11.0.0
-      '@nestjs/microservices': ^11.0.0
-      '@nestjs/platform-express': ^11.0.0
-    peerDependenciesMeta:
-      '@nestjs/microservices':
-        optional: true
-      '@nestjs/platform-express':
-        optional: true
-    dependencies:
-      '@nestjs/common': 11.1.11(class-transformer@0.5.1)(class-validator@0.14.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)
-      '@nestjs/core': 11.1.11(@nestjs/common@11.1.11)(@nestjs/platform-express@11.1.11)(reflect-metadata@0.2.2)(rxjs@7.8.2)
-      '@nestjs/platform-express': 11.1.11(@nestjs/common@11.1.11)(@nestjs/core@11.1.11)
-      tslib: 2.8.1
-    dev: true
-
   /@nestjs/typeorm@11.0.0(@nestjs/common@11.1.11)(@nestjs/core@11.1.11)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@0.3.28):
     resolution:
       {
@@ -3238,7 +3195,7 @@ packages:
       typeorm: ^0.3.0
     dependencies:
       '@nestjs/common': 11.1.11(class-transformer@0.5.1)(class-validator@0.14.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)
-      '@nestjs/core': 11.1.11(@nestjs/common@11.1.11)(@nestjs/platform-express@11.1.11)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/core': 11.1.11(@nestjs/common@11.1.11)(@nestjs/microservices@11.1.12)(@nestjs/platform-express@11.1.11)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       reflect-metadata: 0.2.2
       rxjs: 7.8.2
       typeorm: 0.3.28(pg@8.18.0)(ts-node@10.9.2)
