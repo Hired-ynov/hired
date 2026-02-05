@@ -9,7 +9,7 @@ export class RabbitMQException extends RpcException {
   ) {
     super({
       statusCode,
-      message: body,
+      message: typeof body == 'string' ? { message: body } : body,
       options,
     });
     this.name = 'RabbitMQException';
