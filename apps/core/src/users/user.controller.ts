@@ -56,7 +56,7 @@ export class UserController {
 
   @Get('email/:email')
   async findOneByEmail(@Param('email') email: string): Promise<UserDTO | null> {
-    const user = await this.userService.findOneByEmail(email);
+    const user = await this.userService.findOne({ email });
     if (!user) {
       return null;
     }

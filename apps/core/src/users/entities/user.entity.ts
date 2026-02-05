@@ -1,9 +1,9 @@
 import { BaseEntity } from '@repo/nest-service';
-import { User as DomainUser, Skill, Role } from '@repo/models';
+import { User, Skill, Role } from '@repo/models';
 import { Entity, Column } from 'typeorm';
 
 @Entity('users')
-export class User extends BaseEntity implements DomainUser {
+export class UserEntity extends BaseEntity implements User {
   @Column()
   firstName!: string;
 

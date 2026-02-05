@@ -1,21 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import { User } from './models/user.entity';
+import { UserEntity } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 import { BaseService } from '@repo/nest-service';
 
 @Injectable()
-export class UserService extends BaseService<User> {
+export class UserService extends BaseService<UserEntity> {
   constructor(
-    @InjectRepository(User)
-    private readonly usersRepository: Repository<User>,
+    @InjectRepository(UserEntity)
+    private readonly usersRepository: Repository<UserEntity>,
   ) {
     super(usersRepository);
-  }
-
-  async findOneByEmail(email: string): Promise<User | null> {
-    return await this.findOne({ email });
   }
 
   async generatePasswordHash(password: string): Promise<string> {
