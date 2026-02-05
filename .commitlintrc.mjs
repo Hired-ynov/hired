@@ -43,6 +43,7 @@ const Configuration = {
         'models',
         'config',
         'ui',
+        'core',
       ],
     ],
     'subject-case': [0, 'always', 'lower-case'],
