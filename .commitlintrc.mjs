@@ -40,7 +40,7 @@ const Configuration = {
         'auth',
         'gateway',
         'packages',
-        'models',
+        'entities',
         'config',
         'ui',
         'core',
