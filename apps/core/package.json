@@ -3,8 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "nest build && node --watch dist/main.js",
-    "dev:watch": "nest build --watch",
+    "dev": "nest start --watch",
     "build": "nest build",
     "start": "nest start",
     "start:debug": "nest start --debug --watch",
