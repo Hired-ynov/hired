@@ -1,30 +1,21 @@
 import { Module } from '@nestjs/common';
 import { CoreController } from './core.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ClientsModule, Transport } from '@nestjs/microservices';
-import { CORE_SERVICE } from '../constants/microservices.constants';
+import { ClientsModule } from '@nestjs/microservices';
+import { microservices } from '@repo/rabbitmq-config';
 
 @Module({
   controllers: [CoreController],
   imports: [
     ClientsModule.registerAsync([
       {
-        name: CORE_SERVICE,
+        name: microservices.symbols.CORE_SERVICE,
         imports: [ConfigModule],
-        useFactory: (configService: ConfigService) => ({
-          transport: Transport.RMQ,
-          options: {
-            urls: [
-              configService.get<string>('RABBITMQ_URL') ||
-                'amqp://localhost:5672',
-            ],
-            queue: 'core_queue',
-            queueOptions: {
-              durable: true,
-            },
-            prefetchCount: 1,
-          },
-        }),
+        useFactory: (configService: ConfigService) => {
+          return microservices.CORE_SERVICE({
+            RABBITMQ_URL: configService.get<string>('RABBITMQ_URL'),
+          });
+        },
         inject: [ConfigService],
       },
     ]),

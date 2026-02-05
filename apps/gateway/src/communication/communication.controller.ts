@@ -1,11 +1,11 @@
 import { Controller, Get, Post, Body, Inject } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { COMMUNICATION_SERVICE } from '../constants/microservices.constants';
+import { microservices } from '@repo/rabbitmq-config';
 
 @Controller('communication')
 export class CommunicationController {
   constructor(
-    @Inject(COMMUNICATION_SERVICE)
+    @Inject(microservices.symbols.COMMUNICATION_SERVICE)
     private readonly communicationService: ClientProxy,
   ) {}
 

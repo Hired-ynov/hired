@@ -1,30 +1,21 @@
 import { Module } from '@nestjs/common';
 import { FilesController } from './files.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ClientsModule, Transport } from '@nestjs/microservices';
-import { FILES_SERVICE } from '../constants/microservices.constants';
+import { ClientsModule } from '@nestjs/microservices';
+import { microservices } from '@repo/rabbitmq-config';
 
 @Module({
   controllers: [FilesController],
   imports: [
     ClientsModule.registerAsync([
       {
-        name: FILES_SERVICE,
+        name: microservices.symbols.FILES_SERVICE,
         imports: [ConfigModule],
-        useFactory: (configService: ConfigService) => ({
-          transport: Transport.RMQ,
-          options: {
-            urls: [
-              configService.get<string>('RABBITMQ_URL') ||
-                'amqp://localhost:5672',
-            ],
-            queue: 'files_queue',
-            queueOptions: {
-              durable: true,
-            },
-            prefetchCount: 1,
-          },
-        }),
+        useFactory: (configService: ConfigService) => {
+          return microservices.COMMUNICATION_SERVICE({
+            RABBITMQ_URL: configService.get<string>('RABBITMQ_URL'),
+          });
+        },
         inject: [ConfigService],
       },
     ]),
