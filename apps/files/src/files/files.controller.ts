@@ -1,3 +1,5 @@
+/// <reference types="multer" />
+
 import {
   Controller,
   Post,
@@ -10,7 +12,10 @@ import {
   NotFoundException,
   HttpCode,
   HttpStatus,
+  StreamableFile,
+  Res,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { plainToInstance } from 'class-transformer';
 import { FilesService } from './files.service';
@@ -78,7 +83,7 @@ export class FilesController {
       throw new NotFoundException(`File with ID ${id} not found`);
     }
 
-    const fileName = file.path;
+    const fileName = file.metadata?.hash;
     if (!fileName) {
       throw new BadRequestException('File name not found in metadata');
     }
@@ -87,20 +92,50 @@ export class FilesController {
     return { url };
   }
 
+  @Get(':id/download')
+  async downloadFile(
+    @Param('id') id: string,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<StreamableFile> {
+    const file = await this.filesService.findOne({ id: id });
+    if (!file) {
+      throw new NotFoundException(`File with ID ${id} not found`);
+    }
+
+    const fileName = file.metadata?.hash;
+    if (!fileName) {
+      throw new BadRequestException('File name not found in metadata');
+    }
+
+    try {
+      const stream = await this.minioService.getFileStream(fileName);
+
+      res.set({
+        'Content-Type': file.type || 'application/octet-stream',
+        'Content-Disposition': `attachment; filename="${file.name}"`,
+      });
+
+      return new StreamableFile(stream);
+    } catch (error) {
+      throw new BadRequestException(
+        `Failed to download file: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
+    }
+  }
+
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(@Param('id') id: string): Promise<void> {
     const file = await this.filesService.findOne({ id: id });
     if (!file) {
-      const fileName = file!.path;
-      if (fileName) {
-        await this.minioService.deleteFile(fileName);
-      }
       throw new NotFoundException(`File with ID ${id} not found`);
     }
 
     try {
-      await this.minioService.deleteFile(file.path);
+      const fileName = file.metadata?.hash;
+      if (fileName) {
+        await this.minioService.deleteFile(fileName);
+      }
       await this.filesService.remove(id);
     } catch (error) {
       throw new BadRequestException(
