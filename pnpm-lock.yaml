@@ -49,7 +49,7 @@ importers:
         version: 11.1.11(class-transformer@0.5.1)(class-validator@0.14.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/core':
         specifier: ^11.1.11
-        version: 11.1.11(@nestjs/common@11.1.11)(@nestjs/platform-express@11.1.11)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+        version: 11.1.11(@nestjs/common@11.1.11)(@nestjs/microservices@11.1.14)(@nestjs/platform-express@11.1.11)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/platform-express':
         specifier: ^11.1.11
         version: 11.1.11(@nestjs/common@11.1.11)(@nestjs/core@11.1.11)
@@ -83,7 +83,7 @@ importers:
         version: 11.0.9(typescript@5.8.2)
       '@nestjs/testing':
         specifier: ^11.1.11
-        version: 11.1.11(@nestjs/common@11.1.11)(@nestjs/core@11.1.11)(@nestjs/microservices@11.1.12)(@nestjs/platform-express@11.1.11)
+        version: 11.1.11(@nestjs/common@11.1.11)(@nestjs/core@11.1.11)(@nestjs/microservices@11.1.14)(@nestjs/platform-express@11.1.11)
       '@repo/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
@@ -137,7 +137,7 @@ importers:
         version: 11.1.11(class-transformer@0.5.1)(class-validator@0.14.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/core':
         specifier: ^11.1.11
-        version: 11.1.11(@nestjs/common@11.1.11)(@nestjs/microservices@11.1.12)(@nestjs/platform-express@11.1.11)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+        version: 11.1.11(@nestjs/common@11.1.11)(@nestjs/microservices@11.1.14)(@nestjs/platform-express@11.1.11)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/platform-express':
         specifier: ^11.1.11
         version: 11.1.11(@nestjs/common@11.1.11)(@nestjs/core@11.1.11)
@@ -171,7 +171,7 @@ importers:
         version: 11.0.9(typescript@5.8.2)
       '@nestjs/testing':
         specifier: ^11.1.11
-        version: 11.1.11(@nestjs/common@11.1.11)(@nestjs/core@11.1.11)(@nestjs/microservices@11.1.12)(@nestjs/platform-express@11.1.11)
+        version: 11.1.11(@nestjs/common@11.1.11)(@nestjs/core@11.1.11)(@nestjs/microservices@11.1.14)(@nestjs/platform-express@11.1.11)
       '@repo/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
@@ -325,7 +325,10 @@ importers:
         version: 11.1.11(class-transformer@0.5.1)(class-validator@0.14.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/core':
         specifier: ^11.1.11
-        version: 11.1.11(@nestjs/common@11.1.11)(@nestjs/microservices@11.1.12)(@nestjs/platform-express@11.1.11)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+        version: 11.1.11(@nestjs/common@11.1.11)(@nestjs/microservices@11.1.14)(@nestjs/platform-express@11.1.11)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/microservices':
+        specifier: ^11.1.14
+        version: 11.1.14(@nestjs/common@11.1.11)(@nestjs/core@11.1.11)(amqp-connection-manager@5.0.0)(amqplib@0.10.9)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/platform-express':
         specifier: ^11.1.11
         version: 11.1.11(@nestjs/common@11.1.11)(@nestjs/core@11.1.11)
@@ -335,6 +338,21 @@ importers:
       '@repo/api':
         specifier: workspace:*
         version: link:../../packages/api
+      '@repo/models':
+        specifier: workspace:*
+        version: link:../../packages/models
+      '@repo/nest-service':
+        specifier: workspace:*
+        version: link:../../packages/nest-service
+      '@repo/rabbitmq-config':
+        specifier: workspace:^
+        version: link:../../packages/rabbitmq-config
+      bcrypt:
+        specifier: ^6.0.0
+        version: 6.0.0
+      class-transformer:
+        specifier: ^0.5.1
+        version: 0.5.1
       pg:
         specifier: ^8.18.0
         version: 8.18.0
@@ -359,7 +377,7 @@ importers:
         version: 11.0.9(typescript@5.8.2)
       '@nestjs/testing':
         specifier: ^11.1.11
-        version: 11.1.11(@nestjs/common@11.1.11)(@nestjs/core@11.1.11)(@nestjs/microservices@11.1.12)(@nestjs/platform-express@11.1.11)
+        version: 11.1.11(@nestjs/common@11.1.11)(@nestjs/core@11.1.11)(@nestjs/microservices@11.1.14)(@nestjs/platform-express@11.1.11)
       '@repo/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
@@ -413,10 +431,7 @@ importers:
         version: 11.1.11(class-transformer@0.5.1)(class-validator@0.14.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/core':
         specifier: ^11.1.11
-        version: 11.1.11(@nestjs/common@11.1.11)(@nestjs/microservices@11.1.12)(@nestjs/platform-express@11.1.11)(reflect-metadata@0.2.2)(rxjs@7.8.2)
-      '@nestjs/microservices':
-        specifier: ^11.1.12
-        version: 11.1.12(@nestjs/common@11.1.11)(@nestjs/core@11.1.11)(amqp-connection-manager@5.0.0)(amqplib@0.10.9)(cache-manager@7.2.8)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+        version: 11.1.11(@nestjs/common@11.1.11)(@nestjs/microservices@11.1.14)(@nestjs/platform-express@11.1.11)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/platform-express':
         specifier: ^11.1.11
         version: 11.1.11(@nestjs/common@11.1.11)(@nestjs/core@11.1.11)
@@ -426,15 +441,6 @@ importers:
       '@repo/api':
         specifier: workspace:*
         version: link:../../packages/api
-      '@repo/models':
-        specifier: workspace:*
-        version: link:../../packages/models
-      '@repo/nest-service':
-        specifier: workspace:*
-        version: link:../../packages/nest-service
-      '@repo/rabbitmq-config':
-        specifier: workspace:*
-        version: link:../../packages/rabbitmq-config
       pg:
         specifier: ^8.18.0
         version: 8.18.0
@@ -459,7 +465,7 @@ importers:
         version: 11.0.9(typescript@5.8.2)
       '@nestjs/testing':
         specifier: ^11.1.11
-        version: 11.1.11(@nestjs/common@11.1.11)(@nestjs/core@11.1.11)(@nestjs/microservices@11.1.12)(@nestjs/platform-express@11.1.11)
+        version: 11.1.11(@nestjs/common@11.1.11)(@nestjs/core@11.1.11)(@nestjs/microservices@11.1.14)(@nestjs/platform-express@11.1.11)
       '@repo/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
@@ -532,6 +538,9 @@ importers:
       '@repo/api':
         specifier: workspace:*
         version: link:../../packages/api
+      '@repo/models':
+        specifier: workspace:^
+        version: link:../../packages/models
       '@repo/rabbitmq-config':
         specifier: workspace:*
         version: link:../../packages/rabbitmq-config
@@ -541,6 +550,9 @@ importers:
       cache-manager:
         specifier: ^7.2.8
         version: 7.2.8
+      class-transformer:
+        specifier: ^0.5.1
+        version: 0.5.1
       pg:
         specifier: ^8.18.0
         version: 8.18.0
@@ -3021,6 +3033,40 @@ packages:
       tslib: 2.8.1
       uid: 2.0.2
 
+  /@nestjs/core@11.1.11(@nestjs/common@11.1.11)(@nestjs/microservices@11.1.14)(@nestjs/platform-express@11.1.11)(reflect-metadata@0.2.2)(rxjs@7.8.2):
+    resolution:
+      {
+        integrity: sha512-H9i+zT3RvHi7tDc+lCmWHJ3ustXveABCr+Vcpl96dNOxgmrx4elQSTC4W93Mlav2opfLV+p0UTHY6L+bpUA4zA==,
+      }
+    engines: { node: '>= 20' }
+    requiresBuild: true
+    peerDependencies:
+      '@nestjs/common': ^11.0.0
+      '@nestjs/microservices': ^11.0.0
+      '@nestjs/platform-express': ^11.0.0
+      '@nestjs/websockets': ^11.0.0
+      reflect-metadata: ^0.1.12 || ^0.2.0
+      rxjs: ^7.1.0
+    peerDependenciesMeta:
+      '@nestjs/microservices':
+        optional: true
+      '@nestjs/platform-express':
+        optional: true
+      '@nestjs/websockets':
+        optional: true
+    dependencies:
+      '@nestjs/common': 11.1.11(class-transformer@0.5.1)(class-validator@0.14.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/microservices': 11.1.14(@nestjs/common@11.1.11)(@nestjs/core@11.1.11)(amqp-connection-manager@5.0.0)(amqplib@0.10.9)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/platform-express': 11.1.11(@nestjs/common@11.1.11)(@nestjs/core@11.1.11)
+      '@nuxt/opencollective': 0.4.1
+      fast-safe-stringify: 2.1.1
+      iterare: 1.2.1
+      path-to-regexp: 8.3.0
+      reflect-metadata: 0.2.2
+      rxjs: 7.8.2
+      tslib: 2.8.1
+      uid: 2.0.2
+
   /@nestjs/mapped-types@2.1.0(@nestjs/common@11.1.11)(class-transformer@0.5.1)(class-validator@0.14.3)(reflect-metadata@0.2.2):
     resolution:
       {
@@ -3087,6 +3133,54 @@ packages:
       amqp-connection-manager: 5.0.0(amqplib@0.10.9)
       amqplib: 0.10.9
       cache-manager: 7.2.8
+      iterare: 1.2.1
+      reflect-metadata: 0.2.2
+      rxjs: 7.8.2
+      tslib: 2.8.1
+
+  /@nestjs/microservices@11.1.14(@nestjs/common@11.1.11)(@nestjs/core@11.1.11)(amqp-connection-manager@5.0.0)(amqplib@0.10.9)(reflect-metadata@0.2.2)(rxjs@7.8.2):
+    resolution:
+      {
+        integrity: sha512-7x+QaX7351xJMYpjw4pqwoACXtSxuUQt4Prb7ZyqqsCawnBRrObPpZ/HIdpdKJPgo8vFfLJoAnkFJ+mQ6xz6Rw==,
+      }
+    peerDependencies:
+      '@grpc/grpc-js': '*'
+      '@nestjs/common': ^11.0.0
+      '@nestjs/core': ^11.0.0
+      '@nestjs/websockets': ^11.0.0
+      amqp-connection-manager: '*'
+      amqplib: '*'
+      cache-manager: '*'
+      ioredis: '*'
+      kafkajs: '*'
+      mqtt: '*'
+      nats: '*'
+      reflect-metadata: ^0.1.12 || ^0.2.0
+      rxjs: ^7.1.0
+    peerDependenciesMeta:
+      '@grpc/grpc-js':
+        optional: true
+      '@nestjs/websockets':
+        optional: true
+      amqp-connection-manager:
+        optional: true
+      amqplib:
+        optional: true
+      cache-manager:
+        optional: true
+      ioredis:
+        optional: true
+      kafkajs:
+        optional: true
+      mqtt:
+        optional: true
+      nats:
+        optional: true
+    dependencies:
+      '@nestjs/common': 11.1.11(class-transformer@0.5.1)(class-validator@0.14.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/core': 11.1.11(@nestjs/common@11.1.11)(@nestjs/microservices@11.1.14)(@nestjs/platform-express@11.1.11)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      amqp-connection-manager: 5.0.0(amqplib@0.10.9)
+      amqplib: 0.10.9
       iterare: 1.2.1
       reflect-metadata: 0.2.2
       rxjs: 7.8.2
@@ -3166,6 +3260,29 @@ packages:
       '@nestjs/common': 11.1.11(class-transformer@0.5.1)(class-validator@0.14.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/core': 11.1.11(@nestjs/common@11.1.11)(@nestjs/microservices@11.1.12)(@nestjs/platform-express@11.1.11)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/microservices': 11.1.12(@nestjs/common@11.1.11)(@nestjs/core@11.1.11)(amqp-connection-manager@5.0.0)(amqplib@0.10.9)(cache-manager@7.2.8)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/platform-express': 11.1.11(@nestjs/common@11.1.11)(@nestjs/core@11.1.11)
+      tslib: 2.8.1
+    dev: true
+
+  /@nestjs/testing@11.1.11(@nestjs/common@11.1.11)(@nestjs/core@11.1.11)(@nestjs/microservices@11.1.14)(@nestjs/platform-express@11.1.11):
+    resolution:
+      {
+        integrity: sha512-Po2aZKXlxuySDEh3Gi05LJ7/BtfTAPRZ3KPTrbpNrTmgGr3rFgEGYpQwN50wXYw0pywoICiFLZSZ/qXsplf6NA==,
+      }
+    peerDependencies:
+      '@nestjs/common': ^11.0.0
+      '@nestjs/core': ^11.0.0
+      '@nestjs/microservices': ^11.0.0
+      '@nestjs/platform-express': ^11.0.0
+    peerDependenciesMeta:
+      '@nestjs/microservices':
+        optional: true
+      '@nestjs/platform-express':
+        optional: true
+    dependencies:
+      '@nestjs/common': 11.1.11(class-transformer@0.5.1)(class-validator@0.14.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/core': 11.1.11(@nestjs/common@11.1.11)(@nestjs/microservices@11.1.14)(@nestjs/platform-express@11.1.11)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/microservices': 11.1.14(@nestjs/common@11.1.11)(@nestjs/core@11.1.11)(amqp-connection-manager@5.0.0)(amqplib@0.10.9)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/platform-express': 11.1.11(@nestjs/common@11.1.11)(@nestjs/core@11.1.11)
       tslib: 2.8.1
     dev: true
@@ -3335,6 +3452,7 @@ packages:
         integrity: sha512-GXD3wy50qYbxCJ652bDrDzgMr3NFEkIS374+IgFQKkCvk9yiYcLvX2XDYr7UyQxf4wK0e+yqDYRubZ0DtOxnmQ==,
       }
     engines: { node: ^14.18.0 || >=16.10.0, npm: '>=5.10.0' }
+    hasBin: true
     dependencies:
       consola: 3.4.2
 
@@ -4933,6 +5051,18 @@ packages:
       {
         integrity: sha512-Sg0xJUNDU1sJNGdfGWhVHX0kkZ+HWcvmVymJbj6NSgZZmW/8S9Y2HQ5euytnIgakgxN6papOAWiwDo1ctFDcoQ==,
       }
+
+  /bcrypt@6.0.0:
+    resolution:
+      {
+        integrity: sha512-cU8v/EGSrnH+HnxV2z0J7/blxH8gq7Xh2JFT6Aroax7UohdmiJJlxApMxtKfuI7z68NvvVcmR78k2LbT6efhRg==,
+      }
+    engines: { node: '>= 18' }
+    requiresBuild: true
+    dependencies:
+      node-addon-api: 8.5.0
+      node-gyp-build: 4.8.4
+    dev: false
 
   /bl@4.1.0:
     resolution:
@@ -9194,6 +9324,14 @@ packages:
       }
     dev: true
 
+  /node-addon-api@8.5.0:
+    resolution:
+      {
+        integrity: sha512-/bRZty2mXUIFY/xU5HLvveNHlswNJej+RnxBjOMkidWfwZzgTbPG1E3K5TOxRLOR+5hX7bSofy8yf1hZevMS8A==,
+      }
+    engines: { node: ^18 || ^20 || >= 21 }
+    dev: false
+
   /node-emoji@1.11.0:
     resolution:
       {
@@ -9202,6 +9340,14 @@ packages:
     dependencies:
       lodash: 4.17.21
     dev: true
+
+  /node-gyp-build@4.8.4:
+    resolution:
+      {
+        integrity: sha512-LA4ZjwlnUblHVgq0oBF3Jl/6h/Nvs5fzBLwdEF4nuxnFdsfajde4WfxtJr3CaiH+F6ewcIB/q4jQ4UzPyid+CQ==,
+      }
+    hasBin: true
+    dev: false
 
   /node-int64@0.4.0:
     resolution:

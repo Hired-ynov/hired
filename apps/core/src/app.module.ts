@@ -9,6 +9,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from './users/entities/user.entity';
 import { UserModule } from './users/user.module';
+import { OfferModule } from './offer/offer.module';
 
 @Module({
   controllers: [AppController],
@@ -34,6 +35,7 @@ import { UserModule } from './users/user.module';
     CompanyModule,
     ApplicationModule,
     UserModule,
+    OfferModule,
   ],
   providers: [AppService],
 })

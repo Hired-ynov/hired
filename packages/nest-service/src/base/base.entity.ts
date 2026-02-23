@@ -4,7 +4,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { BaseEntity as BaseEntityInterface } from '@repo/entities';
+import { BaseEntity as BaseEntityInterface } from '../base/base.service';
 
 export abstract class BaseEntity implements BaseEntityInterface {
   @PrimaryGeneratedColumn('uuid')

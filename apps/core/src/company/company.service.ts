@@ -6,13 +6,14 @@ import { plainToInstance } from 'class-transformer';
 import { Repository } from 'typeorm';
 
 import { CompanyEntity } from './entities/company.entity';
+import { UserEntity } from '../users/entities/user.entity';
 
 @Injectable()
 export class CompanyService extends BaseService<CompanyEntity> {
   constructor(
     @InjectRepository(CompanyEntity)
     private companiesRepository: Repository<CompanyEntity>,
-    @InjectRepository(User)
+    @InjectRepository(UserEntity)
     private usersRepository: Repository<User>,
   ) {
     super(companiesRepository);

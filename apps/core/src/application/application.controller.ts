@@ -1,24 +1,10 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Put,
-  UseGuards,
-  UseInterceptors,
-  UploadedFiles,
-} from '@nestjs/common';
-import { FilesInterceptor } from '@nestjs/platform-express';
-import { CreateApplicationDTO } from '@repo/models';
-import { ApplicationService } from './application.service';
+import { Controller } from '@nestjs/common';
+import { MessagePattern, Payload } from '@nestjs/microservices';
+import { UserDTO, CreateApplicationDTO, ApplicationDTO } from '@repo/models';
+import { plainToInstance } from 'class-transformer';
 
-import { CurrentUser } from '../auth/current-user.decorator';
-import { Role, UserDto } from '@hired4/domain-objects';
-import { ApplicationDto } from './dto/application.dto';
-import { AuthGuard, Roles } from '../auth/auth.guard';
-import { UpdateApplicationDto } from './dto/update-application.dto';
+import { ApplicationService } from './application.service';
+import { ApplicationEntity } from './entities/application.entity';
 
 interface MulterFile {
   fieldname: string;
@@ -36,62 +22,69 @@ interface MulterFile {
 export class ApplicationController {
   constructor(private readonly applicationService: ApplicationService) {}
 
-  @Post()
-  @UseGuards(AuthGuard)
-  @UseInterceptors(FilesInterceptor('files'))
+  @MessagePattern('core.application.create')
   async create(
-    @Body() body: CreateApplicationDTO,
-    @CurrentUser() user: UserDto,
-    @UploadedFiles() files?: MulterFile[],
-  ): Promise<ApplicationDto> {
-    return this.applicationService.create(body, user, files);
+    @Payload()
+    payload: {
+      createApplication: CreateApplicationDTO;
+      user: UserDTO;
+      files: MulterFile[];
+    },
+  ): Promise<ApplicationDTO> {
+    const applicationData = await this.applicationService.createApplication(
+      payload.createApplication,
+      payload.user,
+      payload.files,
+    );
+    const saved = await this.applicationService.create(applicationData);
+    return plainToInstance(ApplicationDTO, saved);
   }
 
-  @Get()
-  @UseGuards(AuthGuard)
-  @Roles(Role.admin)
-  findAll(): Promise<ApplicationDto[]> {
-    return this.applicationService.findAll();
+  @MessagePattern('core.application.findAll')
+  async findAll(): Promise<ApplicationDTO[]> {
+    var applications = await this.applicationService.findAll();
+    return applications.map((a) => plainToInstance(ApplicationEntity, a));
   }
 
-  @Get('me')
-  @UseGuards(AuthGuard)
-  findMyApplications(@CurrentUser() user: UserDto): Promise<ApplicationDto[]> {
+  @MessagePattern('core.application.findMyApplications')
+  async findMyApplications(
+    @Payload() user: UserDTO,
+  ): Promise<ApplicationDTO[]> {
     const userId =
-      (user as UserDto & { sub?: number }).sub?.toString() || user.id;
-    return this.applicationService.findByUserId(userId);
+      (user as UserDTO & { sub?: number }).sub?.toString() || user.id;
+    const applications = await this.applicationService.findByUserId(userId);
+    return applications.map((a) => plainToInstance(ApplicationDTO, a));
   }
 
-  @Get(':id')
-  @UseGuards(AuthGuard)
-  findOne(@Param('id') id: string): Promise<ApplicationDto> {
-    return this.applicationService.findOne(+id);
+  @MessagePattern('core.application.findOne')
+  async findOne(@Payload() id: string): Promise<ApplicationDTO> {
+    return await plainToInstance(
+      ApplicationEntity,
+      this.applicationService.findOne({ id: id }),
+    );
   }
 
-  @Get('/offer/:id')
-  @UseGuards(AuthGuard)
+  @MessagePattern('core.application.findByOfferId')
   findByOfferId(
-    @Param('id') id: string,
-    @CurrentUser() user: UserDto,
-  ): Promise<ApplicationDto[]> {
-    return this.applicationService.findByOfferId(id, user);
+    @Payload() payload: { id: string; user: UserDTO },
+  ): Promise<ApplicationDTO[]> {
+    return this.applicationService.findByOfferId(payload.id, payload.user);
   }
 
-  @Put(':id')
-  @UseGuards(AuthGuard)
-  @UseInterceptors(FilesInterceptor('files'))
-  async update(
-    @Param('id') id: string,
-    @Body() body: UpdateApplicationDto,
-    @CurrentUser() user: UserDto,
-    @UploadedFiles() files?: MulterFile[],
-  ): Promise<ApplicationDto> {
-    return this.applicationService.update(+id, body, user, files);
+  @MessagePattern('core.application.update')
+  async updateApplication(
+    @Payload() payload: { id; body; user; files },
+  ): Promise<ApplicationDTO> {
+    return this.applicationService.updateApplication(
+      +payload.id,
+      payload.body,
+      payload.user,
+      payload.files,
+    );
   }
 
-  @Delete(':id')
-  @UseGuards(AuthGuard)
-  remove(@Param('id') id: string, @CurrentUser() user: UserDto): Promise<void> {
-    return this.applicationService.remove(+id, user);
+  @MessagePattern('core.application.delete')
+  remove(@Payload() payload: { id: string; user: UserDTO }): Promise<void> {
+    return this.applicationService.removeApplication(+payload.id, payload.user);
   }
 }

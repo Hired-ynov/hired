@@ -17,6 +17,7 @@
   "dependencies": {
     "@nestjs/common": "^11.1.11",
     "@nestjs/core": "^11.1.11",
+    "@nestjs/microservices": "^11.1.14",
     "@nestjs/platform-express": "^11.1.11",
     "@nestjs/typeorm": "^11.0.0",
     "@repo/api": "workspace:*",

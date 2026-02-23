@@ -2,7 +2,7 @@ import { IsEnum, IsString } from 'class-validator';
 
 import { ApplicationStatus } from '../../enums/application/ApplicationStatus';
 
-export class UpdateApplicationDto {
+export class UpdateApplicationDTO {
   @IsString()
   firstMessage?: string;
 

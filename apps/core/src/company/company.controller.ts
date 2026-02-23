@@ -1,15 +1,5 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Put,
-  UseGuards,
-} from '@nestjs/common';
-import { CurrentUser } from '../auth/current-user.decorator';
-import { CompanyService } from './company.service';
+import { Controller, Param } from '@nestjs/common';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 import {
   UpdateCompanyDTO,
   UserDTO,
@@ -17,52 +7,50 @@ import {
   CompanyDTO,
 } from '@repo/models';
 import { plainToInstance } from 'class-transformer';
+
+import { CompanyService } from './company.service';
 import { CompanyEntity } from './entities/company.entity';
 
 @Controller('company')
 export class CompanyController {
   constructor(private readonly companyService: CompanyService) {}
 
-  @Post()
-  //@UseGuards(AuthGuard)
+  @MessagePattern('company.create')
   create(
-    @Body() createCompanyDto: CreateCompanyDTO,
-    @CurrentUser() user: UserDTO,
+    @Payload() payload: { createCompanyDto: CreateCompanyDTO; user: UserDTO },
   ): Promise<CompanyDTO> {
-    const company = plainToInstance(CompanyEntity, createCompanyDto);
+    const company = plainToInstance(CompanyEntity, payload.createCompanyDto);
     const userId =
-      (user as UserDTO & { sub?: number }).sub?.toString() || user.id;
+      (payload.user as UserDTO & { sub?: number }).sub?.toString() ||
+      payload.user.id;
 
     return this.companyService.createCompany(company, userId);
   }
 
-  @Get()
-  //@Roles(Role.admin)
+  @MessagePattern('company.findAll')
   findAll(): Promise<CompanyDTO[]> {
     return this.companyService.findAll();
   }
 
-  @Get(':id')
-  async findOne(@Param('id') id: string): Promise<CompanyDTO> {
-    return await plainToInstance(
-      CompanyDTO,
-      this.companyService.findOne({ id: id }),
-    );
+  @MessagePattern('company.findOne')
+  async findOne(@Payload() id: string): Promise<CompanyDTO> {
+    return plainToInstance(CompanyDTO, this.companyService.findOne({ id: id }));
   }
 
-  @Put(':id')
-  //@UseGuards(AuthGuard)
+  @MessagePattern('company.update')
   update(
-    @Param('id') id: string,
-    @Body() updateCompanyDto: UpdateCompanyDTO,
+    @Payload()
+    payload: {
+      id: string;
+      updateCompanyDto: UpdateCompanyDTO;
+    },
   ): Promise<CompanyDTO> {
-    const company = plainToInstance(CompanyEntity, updateCompanyDto);
-    return this.companyService.updateCompany(+id, company);
+    const company = plainToInstance(CompanyEntity, payload.updateCompanyDto);
+    return this.companyService.updateCompany(+payload.id, company);
   }
 
-  @Delete(':id')
-  //@UseGuards(AuthGuard)
-  remove(@Param('id') id: string): Promise<void> {
+  @MessagePattern('company.delete')
+  delete(@Param('id') id: string): Promise<void> {
     return this.companyService.remove(id);
   }
 }

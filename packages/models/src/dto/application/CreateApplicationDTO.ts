@@ -1,6 +1,6 @@
 import { IsString } from 'class-validator';
 
-export class CreateApplicationDto {
+export class CreateApplicationDTO {
   @IsString()
   offerId: string;
 

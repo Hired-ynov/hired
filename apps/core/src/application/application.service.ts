@@ -1,13 +1,16 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { Application } from './entities/application.entity';
 import { Repository } from 'typeorm';
 import { User } from '../user/entities/user.entity';
 import { UserDTO, CreateApplicationDTO, ApplicationDTO } from '@repo/models';
-import { ApplicationMapper } from './application.mapper';
+
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { UpdateApplicationDto } from './dto/update-application.dto';
-import { Offer } from '../offer/entities/offer.entity';
-import { FileService } from '../file/file.service';
+import { ApplicationEntity } from './entities/application.entity';
+import { plainToInstance } from 'class-transformer';
+import { BaseService } from '@repo/nest-service';
+import { OfferService } from '../offer/offer.service';
+import { OfferEntity } from '../offer/entities/offer.entity';
+import { UserEntity } from '../users/entities/user.entity';
 
 interface MulterFile {
   fieldname: string;
@@ -21,35 +24,40 @@ interface MulterFile {
   buffer: Buffer;
 }
 
-export class ApplicationService {
+export class ApplicationService extends BaseService<ApplicationEntity> {
   constructor(
-    @InjectRepository(Application)
-    private applicationsRepository: Repository<Application>,
-    @InjectRepository(User)
+    @InjectRepository(ApplicationEntity)
+    private applicationsRepository: Repository<ApplicationEntity>,
+    @InjectRepository(UserEntity)
     private usersRepository: Repository<User>,
-    @InjectRepository(Offer)
-    private offersRepository: Repository<Offer>,
+    @InjectRepository(OfferEntity)
+    private offersRepository: Repository<OfferEntity>,
     private fileService: FileService,
-  ) {}
+    private readonly offerService: OfferService,
+  ) {
+    super(applicationsRepository);
+  }
 
-  async create(
-    createApplicationDto: CreateApplicationDto,
-    user: UserDto,
+  async createApplication(
+    createApplicationDto: CreateApplicationDTO,
+    user: UserDTO,
     files?: MulterFile[],
-  ): Promise<ApplicationDto> {
-    const application =
-      ApplicationMapper.toApplicationEntityFromCreate(createApplicationDto);
+  ): Promise<ApplicationDTO> {
+    const application = plainToInstance(
+      ApplicationEntity,
+      createApplicationDto,
+    );
 
     const userId =
-      (user as UserDto & { sub?: number }).sub?.toString() || user.id;
-    const userEntity = await this.usersRepository.findOneBy({
+      (user as UserDTO & { sub?: number }).sub?.toString() || user.id;
+    const userEntity = await this.userService.findOne({
       id: userId,
     });
     if (!userEntity) {
       throw new NotFoundException('User not found');
     }
 
-    const offer = await this.offersRepository.findOne({
+    const offer = await this.offerService.findOne({
       where: { id: createApplicationDto.offerId },
       relations: ['company'],
     });
@@ -78,47 +86,34 @@ export class ApplicationService {
       throw new BadRequestException('You have already applied to this offer');
     }
 
-    if (files && files.length > 0) {
-      const uploadedFiles = await Promise.all(
-        files.map((file) => this.fileService.uploadFile(file)),
-      );
-      application.filesIds = uploadedFiles.map((file) => file.id);
-    }
+    const applicationData: any = {
+      ...createApplicationDto,
+      userId: userEntity.id,
+    };
 
-    application.userId = userEntity.id;
-    const saved = await this.applicationsRepository.save(application);
+    // if (files && files.length > 0) {
+    //   const uploadedFiles = await Promise.all(
+    //     files.map((file) => this.fileService.uploadFile(file)),
+    //   );
+    //   application.filesIds = uploadedFiles.map((file) => file.id);
+    // }
 
-    return ApplicationMapper.toApplicationDto(saved);
+    return applicationData;
   }
 
-  async findAll(): Promise<ApplicationDto[]> {
-    const applications = await this.applicationsRepository.find();
-    return applications.map((a) => ApplicationMapper.toApplicationDto(a));
-  }
-
-  async findOne(id: number): Promise<ApplicationDto> {
-    const application = await this.applicationsRepository.findOneBy({
-      id: id.toString(),
-    });
-    if (!application) {
-      throw new NotFoundException('Application not found');
-    }
-    return ApplicationMapper.toApplicationDto(application);
-  }
-
-  async findByUserId(userId: string): Promise<ApplicationDto[]> {
+  async findByUserId(userId: string): Promise<ApplicationDTO[]> {
     const applications = await this.applicationsRepository.find({
       where: { userId },
     });
-    return applications.map((a) => ApplicationMapper.toApplicationDto(a));
+    return applications;
   }
 
   async findByOfferId(
     offerId: string,
-    user: UserDto,
-  ): Promise<ApplicationDto[]> {
+    user: UserDTO,
+  ): Promise<ApplicationDTO[]> {
     const userId =
-      (user as UserDto & { sub?: number }).sub?.toString() || user.id;
+      (user as UserDTO & { sub?: number }).sub?.toString() || user.id;
 
     const userEntity = await this.usersRepository.findOneBy({
       id: userId,
@@ -148,15 +143,15 @@ export class ApplicationService {
     const applications = await this.applicationsRepository.find({
       where: { offerId },
     });
-    return applications.map((a) => ApplicationMapper.toApplicationDto(a));
+    return applications.map((a) => plainToInstance(ApplicationDTO, a));
   }
 
-  async update(
+  async updateApplication(
     id: number,
     updateApplicationDto: UpdateApplicationDto,
-    user: UserDto,
+    user: UserDTO,
     files?: MulterFile[],
-  ): Promise<ApplicationDto> {
+  ): Promise<ApplicationDTO> {
     const existingApplication = await this.applicationsRepository.findOneBy({
       id: id.toString(),
     });
@@ -166,7 +161,7 @@ export class ApplicationService {
     }
 
     const userId =
-      (user as UserDto & { sub?: number }).sub?.toString() || user.id;
+      (user as UserDTO & { sub?: number }).sub?.toString() || user.id;
 
     const userEntity = await this.usersRepository.findOneBy({
       id: userId,
@@ -214,12 +209,10 @@ export class ApplicationService {
       id: id.toString(),
     });
 
-    return ApplicationMapper.toApplicationDto(
-      updatedApplication as Application,
-    );
+    return plainToInstance(ApplicationDTO, updatedApplication);
   }
 
-  async remove(id: number, user: UserDto): Promise<void> {
+  async removeApplication(id: number, user: UserDTO): Promise<void> {
     const application = await this.applicationsRepository.findOneBy({
       id: id.toString(),
     });
@@ -229,7 +222,7 @@ export class ApplicationService {
     }
 
     const userId =
-      (user as UserDto & { sub?: number }).sub?.toString() || user.id;
+      (user as UserDTO & { sub?: number }).sub?.toString() || user.id;
 
     if (application.userId.toString() !== userId.toString()) {
       throw new BadRequestException(
