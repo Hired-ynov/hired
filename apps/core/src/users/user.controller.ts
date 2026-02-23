@@ -16,6 +16,7 @@ import {
   ChangePasswordDTO,
   CreateUser,
   CreateUserDTO,
+  Role,
   UpdateUser,
   UpdateUserDTO,
   User,
@@ -36,6 +37,13 @@ export class UserController {
     });
     if (existingUser) {
       throw new ConflictException('Email already exists');
+    }
+
+    const emptyUser = await this.userService.findAll();
+    if (emptyUser.length === 0) {
+      createUser.role = Role.admin;
+    } else {
+      createUser.role = Role.user;
     }
 
     const passwordHash = await this.userService.generatePasswordHash(
@@ -60,6 +68,20 @@ export class UserController {
     @Payload() payload: { email: string },
   ): Promise<User | null> {
     const user = await this.userService.findOne({ email: payload.email });
+    if (!user) {
+      return null;
+    }
+
+    return user;
+  }
+
+  @MessagePattern('core.user.find-one-by-email-with-password')
+  async findOneByEmailWithPassword(
+    @Payload() payload: { email: string },
+  ): Promise<User | null> {
+    const user = await this.userService.findOneByEmailWithPassword(
+      payload.email,
+    );
     if (!user) {
       return null;
     }
@@ -109,7 +131,7 @@ export class UserController {
   async changePassword(
     @Payload() payload: { id: string; changePasswordDto: ChangePassword },
   ): Promise<{ message: string }> {
-    const user = await this.userService.findById(payload.id);
+    const user = await this.userService.findByIdWithPassword(payload.id);
     if (!user) {
       throw new NotFoundException('User not found');
     }
@@ -145,6 +167,16 @@ export class UserController {
     });
 
     return { message: 'Password changed successfully' };
+  }
+
+  @MessagePattern('core.user.verify-password')
+  async verifyPassword(
+    @Payload() payload: { password: string; passwordHash: string },
+  ): Promise<boolean> {
+    return this.userService.verifyPassword(
+      payload.password,
+      payload.passwordHash,
+    );
   }
 
   @MessagePattern('core.user.remove')

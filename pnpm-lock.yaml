@@ -359,6 +359,9 @@ importers:
       '@repo/nest-service':
         specifier: workspace:^
         version: link:../../packages/nest-service
+      '@repo/rabbitmq-config':
+        specifier: workspace:*
+        version: link:../../packages/rabbitmq-config
       bcrypt:
         specifier: ^6.0.0
         version: 6.0.0

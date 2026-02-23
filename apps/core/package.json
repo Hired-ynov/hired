@@ -24,6 +24,7 @@
     "@repo/models": "workspace:^",
     "@repo/models-entities": "workspace:*",
     "@repo/nest-service": "workspace:^",
+    "@repo/rabbitmq-config": "workspace:*",
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
     "pg": "^8.18.0",

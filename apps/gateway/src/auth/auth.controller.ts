@@ -1,7 +1,9 @@
 import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Body, Controller, Inject, Post } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { LoginDTO, RegisterDTO } from '@repo/models';
+import { plainToInstance } from 'class-transformer';
+import { firstValueFrom } from 'rxjs';
+import { LoginDTO, RegisterDTO, Login, Register } from '@repo/models';
 import { microservices } from '@repo/rabbitmq-config';
 
 @Controller('auth')
@@ -14,17 +16,21 @@ export class AuthController {
   ) {}
 
   @Post('login')
-  async login(@Body() logtinDto: LoginDTO) {
-    return this.authService.send('auth.auth.login', logtinDto);
+  async login(@Body() loginDto: LoginDTO) {
+    const login = plainToInstance(Login, loginDto);
+    return firstValueFrom(this.authService.send('auth.auth.login', login));
   }
 
   @Post('register')
   async register(@Body() registerDto: RegisterDTO) {
-    return this.authService.send('auth.auth.register', registerDto);
+    const register = plainToInstance(Register, registerDto);
+    return firstValueFrom(
+      this.authService.send('auth.auth.register', register),
+    );
   }
 
   @Post('verify')
   async verifyToken(@Body() data: { token: string }) {
-    return this.authService.send('auth.auth.verify', data);
+    return firstValueFrom(this.authService.send('auth.auth.verify', data));
   }
 }

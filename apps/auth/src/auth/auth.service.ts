@@ -21,7 +21,9 @@ export class AuthService {
 
   async login(login: Login): Promise<{ access_token: string }> {
     const user = await firstValueFrom(
-      this.coreService.send('core.user.findOne', { email: login.email }),
+      this.coreService.send('core.user.find-one-by-email-with-password', {
+        email: login.email,
+      }),
     );
 
     if (!user) {
@@ -29,7 +31,7 @@ export class AuthService {
     }
 
     const isPasswordValid = await firstValueFrom(
-      this.coreService.send('core.user.verifyPassword', {
+      this.coreService.send('core.user.verify-password', {
         password: login.password,
         passwordHash: user.passwordHash || '',
       }),
@@ -53,53 +55,26 @@ export class AuthService {
   }
 
   async register(register: Register): Promise<{ access_token: string }> {
-    try {
-      const existingUser = await firstValueFrom(
-        this.coreService.send('core.user.findOne', { email: register.email }),
-      );
+    const user = await firstValueFrom(
+      this.coreService.send('core.user.create', {
+        ...register,
+        role: null,
+        skills: [],
+        location: null,
+      }),
+    );
 
-      if (existingUser) {
-        throw new ConflictException('Email already exists');
-      }
+    const payload = {
+      sub: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      role: user.role,
+    };
 
-      const allUsers = await firstValueFrom(
-        this.coreService.send('core.user.findAll', {}),
-      );
-      const emptyUsers = allUsers.length === 0;
-
-      const passwordHash = await firstValueFrom(
-        this.coreService.send('core.user.generatePasswordHash', {
-          password: register.password,
-        }),
-      );
-
-      const user = await firstValueFrom(
-        this.coreService.send('core.user.create', {
-          ...register,
-          passwordHash,
-          role: emptyUsers ? Role.admin : Role.user,
-          skills: [],
-          location: null,
-        }),
-      );
-
-      const payload = {
-        sub: user.id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        role: user.role,
-      };
-
-      return {
-        access_token: await this.generateToken(payload),
-      };
-    } catch (error) {
-      if (error instanceof ConflictException) {
-        throw error;
-      }
-      throw new InternalServerErrorException('Registration failed');
-    }
+    return {
+      access_token: await this.generateToken(payload),
+    };
   }
 
   async generateToken(payload: {
