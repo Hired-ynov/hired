@@ -6,7 +6,7 @@ import {
   Inject,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { LoginDTO, RegisterDTO, Role } from '@repo/models';
+import { Login, Register, Role } from '@repo/models';
 import { ClientProxy } from '@nestjs/microservices';
 import { microservices } from '@repo/rabbitmq-config';
 import { firstValueFrom } from 'rxjs';
@@ -19,7 +19,7 @@ export class AuthService {
     private readonly coreService: ClientProxy,
   ) {}
 
-  async login(login: LoginDTO): Promise<{ access_token: string }> {
+  async login(login: Login): Promise<{ access_token: string }> {
     const user = await firstValueFrom(
       this.coreService.send('core.user.findOne', { email: login.email }),
     );
@@ -52,7 +52,7 @@ export class AuthService {
     };
   }
 
-  async register(register: RegisterDTO): Promise<{ access_token: string }> {
+  async register(register: Register): Promise<{ access_token: string }> {
     try {
       const existingUser = await firstValueFrom(
         this.coreService.send('core.user.findOne', { email: register.email }),

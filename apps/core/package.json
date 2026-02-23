@@ -17,10 +17,12 @@
   "dependencies": {
     "@nestjs/common": "^11.1.11",
     "@nestjs/core": "^11.1.11",
+    "@nestjs/microservices": "^11.1.13",
     "@nestjs/platform-express": "^11.1.11",
     "@nestjs/typeorm": "^11.0.0",
     "@repo/api": "workspace:*",
     "@repo/models": "workspace:^",
+    "@repo/models-entities": "workspace:*",
     "@repo/nest-service": "workspace:^",
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
