@@ -64,7 +64,7 @@ export class MinioService {
       );
 
       const url = await this.getFileUrl(fileName);
-
+      this.logger.log(`File '${fileName}' uploaded successfully`);
       return {
         url,
         etag: result.etag,
