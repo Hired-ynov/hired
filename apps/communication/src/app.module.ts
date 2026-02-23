@@ -17,6 +17,7 @@ import { MessageModule } from './chat/message/message.module';
       isGlobal: true,
     }),
     TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         database: configService.get('POSTGRES_DB'),

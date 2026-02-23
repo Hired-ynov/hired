@@ -1,6 +1,12 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { ConversationDTO, CreateConversationDTO, UserDTO } from '@repo/models';
+import {
+  ConversationDTO,
+  CreateConversationDTO,
+  UserDTO,
+  PaginationOptions,
+  PaginationResult,
+} from '@repo/models';
 import { plainToInstance } from 'class-transformer';
 
 import { Conversation } from '../entities/conversation.entity';
@@ -29,5 +35,61 @@ export class ConversationController {
     );
 
     return plainToInstance(ConversationDTO, result);
+  }
+
+  @MessagePattern('communication.conversation.findAll')
+  async findAllConversation(
+    @Payload()
+    data: {
+      page: PaginationOptions;
+      currentUser: UserDTO;
+    },
+  ): Promise<PaginationResult<ConversationDTO>> {
+    const { currentUser, page } = data;
+
+    const result = await this.conversationService.findAllConversation(
+      page,
+      currentUser,
+    );
+
+    return {
+      ...result,
+      data: plainToInstance(ConversationDTO, result.data),
+    };
+  }
+
+  @MessagePattern('communication.conversation.findOne')
+  async findConversation(
+    @Payload()
+    data: {
+      id: string;
+      currentUser: UserDTO;
+    },
+  ): Promise<ConversationDTO | null> {
+    const { currentUser, id } = data;
+
+    const conversation = await this.conversationService.findConversation(
+      id,
+      currentUser,
+    );
+
+    if (!conversation) {
+      return null;
+    }
+
+    return plainToInstance(ConversationDTO, conversation);
+  }
+
+  @MessagePattern('communication.conversation.remove')
+  async removeConversation(
+    @Payload()
+    data: {
+      id: string;
+      currentUser: UserDTO;
+    },
+  ): Promise<void> {
+    const { currentUser, id } = data;
+
+    await this.conversationService.removeConversation(id, currentUser);
   }
 }
