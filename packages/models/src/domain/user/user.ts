@@ -1,7 +1,7 @@
-import { Role } from './Role';
-import type { Skill } from './Skill';
-import { BaseEntity } from './BaseEntity';
-export interface User extends BaseEntity {
+import { Base } from '../base';
+import { Role } from '../enum/role.enum';
+import { Skill } from '../enum/skill.enum';
+export interface User extends Base {
   firstName: string;
   lastName: string;
   email: string;

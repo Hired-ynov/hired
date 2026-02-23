@@ -1,6 +1,7 @@
 import { BaseEntity } from '@repo/nest-service';
-import { User, Skill, Role } from '@repo/models';
 import { Entity, Column } from 'typeorm';
+import { Exclude } from 'class-transformer';
+import { Role, Skill, User } from '@repo/models';
 
 @Entity('users')
 export class UserEntity extends BaseEntity implements User {
@@ -13,7 +14,8 @@ export class UserEntity extends BaseEntity implements User {
   @Column({ unique: true })
   email!: string;
 
-  @Column()
+  @Column({ select: false })
+  @Exclude()
   passwordHash!: string;
 
   @Column({ default: Role.user })
