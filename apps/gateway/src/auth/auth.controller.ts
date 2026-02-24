@@ -5,6 +5,7 @@ import { plainToInstance } from 'class-transformer';
 import { firstValueFrom } from 'rxjs';
 import { LoginDTO, RegisterDTO, Login, Register } from '@repo/models';
 import { microservices } from '@repo/rabbitmq-config';
+import { Public } from '@repo/commun';
 
 @Controller('auth')
 export class AuthController {
@@ -16,12 +17,14 @@ export class AuthController {
   ) {}
 
   @Post('login')
+  @Public()
   async login(@Body() loginDto: LoginDTO) {
     const login = plainToInstance(Login, loginDto);
     return firstValueFrom(this.authService.send('auth.auth.login', login));
   }
 
   @Post('register')
+  @Public()
   async register(@Body() registerDto: RegisterDTO) {
     const register = plainToInstance(Register, registerDto);
     return firstValueFrom(
@@ -30,6 +33,7 @@ export class AuthController {
   }
 
   @Post('verify')
+  @Public()
   async verifyToken(@Body() data: { token: string }) {
     return firstValueFrom(this.authService.send('auth.auth.verify', data));
   }

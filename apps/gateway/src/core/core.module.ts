@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
 import { CoreController } from './core.controller';
+import { UserController } from './user/user.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientsModule } from '@nestjs/microservices';
 import { microservices } from '@repo/rabbitmq-config';
 
 @Module({
-  controllers: [CoreController],
+  controllers: [CoreController, UserController],
   imports: [
     ClientsModule.registerAsync([
       {

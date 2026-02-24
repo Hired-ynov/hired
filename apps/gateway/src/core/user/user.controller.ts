@@ -1,12 +1,10 @@
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
   Inject,
-  NotFoundException,
   Param,
   Post,
   Put,
@@ -23,19 +21,20 @@ import {
   UpdateUser,
   ChangePassword,
   User,
+  Role,
 } from '@repo/models';
 import { microservices } from '@repo/rabbitmq-config';
+import { Public, Roles, CurrentUser } from '@repo/commun';
 
 @Controller('user')
 export class UserController {
   constructor(
     @Inject(microservices.symbols.CORE_SERVICE)
     private readonly userService: ClientProxy,
-    @Inject(CACHE_MANAGER)
-    private cacheManager: Cache,
   ) {}
 
   @Post()
+  @Public()
   async create(@Body() createUserDto: CreateUserDTO): Promise<UserDTO> {
     const createUser = plainToInstance(CreateUser, createUserDto);
     const user = (await firstValueFrom(
@@ -45,6 +44,7 @@ export class UserController {
   }
 
   @Get()
+  @Roles(Role.admin)
   async findAll(): Promise<UserDTO[]> {
     const users = (await firstValueFrom(
       this.userService.send('core.user.find-all', {}),
@@ -61,11 +61,29 @@ export class UserController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<UserDTO | null> {
+  async findOne(
+    @Param('id') id: string,
+    @CurrentUser() currentUser: any,
+  ): Promise<UserDTO | null> {
     const user = (await firstValueFrom(
       this.userService.send('core.user.find-one-by-id', { id }),
     )) as User;
     return user ? plainToInstance(UserDTO, user) : null;
+  }
+
+  @Put(':id/change-password')
+  @Roles(Role.user)
+  async changePassword(
+    @Param('id') id: string,
+    @Body() changePasswordDto: ChangePasswordDTO,
+  ): Promise<{ message: string }> {
+    const changePassword = plainToInstance(ChangePassword, changePasswordDto);
+    return firstValueFrom(
+      this.userService.send('core.user.change-password', {
+        id,
+        changePasswordDto: changePassword,
+      }),
+    );
   }
 
   @Put(':id')
@@ -78,20 +96,6 @@ export class UserController {
       this.userService.send('core.user.update', { id, updateUser }),
     )) as User;
     return plainToInstance(UserDTO, user);
-  }
-
-  @Put(':id/change-password')
-  async changePassword(
-    @Param('id') id: string,
-    @Body() changePasswordDto: ChangePasswordDTO,
-  ): Promise<{ message: string }> {
-    const changePassword = plainToInstance(ChangePassword, changePasswordDto);
-    return firstValueFrom(
-      this.userService.send('core.user.change-password', {
-        id,
-        changePasswordDto: changePassword,
-      }),
-    );
   }
 
   @Delete(':id')
