@@ -28,7 +28,7 @@ export const microservices = {
         ...base.options,
         queue: 'auth_queue',
       },
-    } as ClientProvider & { transport: Transport };
+    } as ClientProvider;
   },
   COMMUNICATION_SERVICE: (envs: NodeJS.ProcessEnv) => {
     const base = microservices.base(envs);
@@ -38,7 +38,7 @@ export const microservices = {
         ...base.options,
         queue: 'communication_queue',
       },
-    } as ClientProvider & { transport: Transport };
+    } as ClientProvider;
   },
   CORE_SERVICE: (envs: NodeJS.ProcessEnv) => {
     const base = microservices.base(envs);
@@ -48,7 +48,7 @@ export const microservices = {
         ...base.options,
         queue: 'core_queue',
       },
-    } as ClientProvider & { transport: Transport };
+    } as ClientProvider;
   },
   FILES_SERVICE: (envs: NodeJS.ProcessEnv) => {
     const base = microservices.base(envs);
@@ -58,7 +58,7 @@ export const microservices = {
         ...base.options,
         queue: 'files_queue',
       },
-    } as ClientProvider & { transport: Transport };
+    } as ClientProvider;
   },
   INTERNAL_BUS_SERVICE: (envs: NodeJS.ProcessEnv) => {
     const base = microservices.base(envs);
@@ -68,6 +68,6 @@ export const microservices = {
         ...base.options,
         queue: 'internal_bus_queue',
       },
-    } as ClientProvider & { transport: Transport };
+    } as ClientProvider;
   },
 };

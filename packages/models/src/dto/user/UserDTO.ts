@@ -7,9 +7,8 @@ import {
   IsUUID,
   IsPhoneNumber,
 } from 'class-validator';
-import { Skill } from '../../entities/Skill';
-import { Role } from '../../entities/Role';
 import { BaseDTO } from '../utils/BaseDTO';
+import { Role, Skill } from '../../domain';
 
 export class UserDTO extends BaseDTO {
   @IsString()

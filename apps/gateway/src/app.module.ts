@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -9,6 +10,7 @@ import { CoreModule } from './core/core.module';
 import { FilesModule } from './files/files.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { cache } from '@repo/redis-config';
+import { AuthSharedModule, AuthGuard } from '@repo/commun';
 
 @Module({
   controllers: [AppController],
@@ -17,6 +19,7 @@ import { cache } from '@repo/redis-config';
       isGlobal: true,
       envFilePath: '.env',
     }),
+    AuthSharedModule.forRoot(),
     CacheModule.registerAsync({
       isGlobal: true,
       imports: [ConfigModule],
@@ -32,6 +35,12 @@ import { cache } from '@repo/redis-config';
     CoreModule,
     FilesModule,
   ],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+  ],
 })
 export class AppModule {}
