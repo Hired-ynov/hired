@@ -9,7 +9,7 @@ import {
 import { plainToInstance } from 'class-transformer';
 
 import { CompanyService } from './company.service';
-import { CompanyEntity } from './entities/company.entity';
+import { CompanyEntity } from '@repo/entities';
 
 @Controller('company')
 export class CompanyController {

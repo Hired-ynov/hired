@@ -1,6 +1,5 @@
 import { IsEnum, IsString } from 'class-validator';
-
-import { ApplicationStatus } from '../../enums/application/ApplicationStatus';
+import { ApplicationStatus } from '../../entry';
 
 export class UpdateApplicationDTO {
   @IsString()

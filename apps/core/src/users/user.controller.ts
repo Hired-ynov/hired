@@ -1,11 +1,5 @@
 import {
   Controller,
-  Get,
-  Post,
-  Body,
-  Param,
-  Delete,
-  Put,
   ConflictException,
   NotFoundException,
   BadRequestException,

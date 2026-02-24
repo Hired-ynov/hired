@@ -1,6 +1,6 @@
 import { IsEnum, IsString } from 'class-validator';
-import { ApplicationStatus } from '../../enums/application/ApplicationStatus';
 import { BaseDTO } from '../utils';
+import { ApplicationStatus } from '../../entry';
 
 export class ApplicationDTO extends BaseDTO {
   @IsString()
