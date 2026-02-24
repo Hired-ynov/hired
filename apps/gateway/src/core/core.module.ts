@@ -4,9 +4,10 @@ import { UserController } from './user/user.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientsModule } from '@nestjs/microservices';
 import { microservices } from '@repo/rabbitmq-config';
+import { CompanyController } from './company/company.controller';
 
 @Module({
-  controllers: [CoreController, UserController],
+  controllers: [CoreController, UserController, CompanyController],
   imports: [
     ClientsModule.registerAsync([
       {

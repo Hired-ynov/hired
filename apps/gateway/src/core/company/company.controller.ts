@@ -1,5 +1,6 @@
 import {
   Body,
+  Controller,
   Delete,
   Get,
   Inject,
@@ -7,19 +8,22 @@ import {
   Param,
   Post,
   Put,
-  UseGuards,
 } from '@nestjs/common';
-import { microservices } from '@repo/rabbitmq-config';
 import { ClientProxy } from '@nestjs/microservices';
+import { CurrentUser, Roles } from '@repo/commun';
 import {
-  CreateOfferDTO,
   UserDTO,
   CompanyDTO,
   UpdateCompanyDTO,
+  Role,
+  CreateCompanyDTO,
+  Company,
 } from '@repo/models';
+import { microservices } from '@repo/rabbitmq-config';
 import { plainToInstance } from 'class-transformer';
+import { firstValueFrom } from 'rxjs';
 
-@Injectable()
+@Controller('company')
 export class CompanyController {
   constructor(
     @Inject(microservices.symbols.CORE_SERVICE)
@@ -27,44 +31,54 @@ export class CompanyController {
   ) {}
 
   @Post()
-  @UseGuards(AuthGuard)
-  @ApiBearerAuth()
   async create(
-    @Body() createOfferDto: CreateOfferDTO,
+    @Body() createCompanyDto: CreateCompanyDTO,
     @CurrentUser() user: UserDTO,
   ): Promise<CompanyDTO> {
-    return this.coreService.send('company.create', {
-      createOfferDto: createOfferDto,
-      user: user,
-    });
+    const newCompany = (await firstValueFrom(
+      this.coreService.send('company.create', {
+        createCompanyDto: createCompanyDto,
+        user: user,
+      }),
+    )) as Company;
+
+    return plainToInstance(CompanyDTO, newCompany);
   }
 
-  @Get()
-  //@Roles(Role.admin)
-  findAll(): Promise<CompanyDTO[]> {
-    return this.coreService.send('company.findAll', {});
+  @Get('all')
+  @Roles(Role.admin)
+  async findAll(): Promise<CompanyDTO[]> {
+    const companies = (await firstValueFrom(
+      this.coreService.send('company.findAll', {}),
+    )) as Company[];
+    return companies.map((company) => plainToInstance(CompanyDTO, company));
   }
 
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<CompanyDTO> {
-    return this.coreService.send('company.findOne', { id: id });
+    const company = (await firstValueFrom(
+      this.coreService.send('company.findOne', { id: +id }),
+    )) as Company;
+    return plainToInstance(CompanyDTO, company);
   }
 
   @Put(':id')
-  //@UseGuards(AuthGuard)
-  update(
+  async update(
     @Param('id') id: string,
     @Body() updateCompanyDto: UpdateCompanyDTO,
   ): Promise<CompanyDTO> {
-    return this.coreService.send('company.update', {
-      id: +id,
-      updateCompanyDto,
-    });
+    const company = (await firstValueFrom(
+      this.coreService.send('company.update', {
+        id: +id,
+        updateCompanyDto: updateCompanyDto,
+      }),
+    )) as Company;
+
+    return plainToInstance(CompanyDTO, company);
   }
 
   @Delete(':id')
-  //@UseGuards(AuthGuard)
-  remove(@Param('id') id: string): Promise<void> {
-    this.coreService.send('company.delete', id);
+  async remove(@Param('id') id: string): Promise<void> {
+    await firstValueFrom(this.coreService.send('company.delete', { id }));
   }
 }

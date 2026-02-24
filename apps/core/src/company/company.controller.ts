@@ -1,15 +1,15 @@
-import { Controller, Param } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
+import { CompanyEntity } from '@repo/entities';
 import {
   UpdateCompanyDTO,
   UserDTO,
   CreateCompanyDTO,
-  CompanyDTO,
+  Company,
 } from '@repo/models';
 import { plainToInstance } from 'class-transformer';
 
 import { CompanyService } from './company.service';
-import { CompanyEntity } from '@repo/entities';
 
 @Controller('company')
 export class CompanyController {
@@ -18,23 +18,22 @@ export class CompanyController {
   @MessagePattern('company.create')
   create(
     @Payload() payload: { createCompanyDto: CreateCompanyDTO; user: UserDTO },
-  ): Promise<CompanyDTO> {
-    const company = plainToInstance(CompanyEntity, payload.createCompanyDto);
+  ): Promise<Company> {
     const userId =
       (payload.user as UserDTO & { sub?: number }).sub?.toString() ||
       payload.user.id;
 
-    return this.companyService.createCompany(company, userId);
+    return this.companyService.createCompany(payload.createCompanyDto, userId);
   }
 
   @MessagePattern('company.findAll')
-  findAll(): Promise<CompanyDTO[]> {
+  findAll(): Promise<Company[]> {
     return this.companyService.findAll();
   }
 
   @MessagePattern('company.findOne')
-  async findOne(@Payload() id: string): Promise<CompanyDTO> {
-    return plainToInstance(CompanyDTO, this.companyService.findOne({ id: id }));
+  async findOne(@Payload() id: string): Promise<CompanyEntity | null> {
+    return await this.companyService.findOne({ id: id });
   }
 
   @MessagePattern('company.update')
@@ -44,13 +43,13 @@ export class CompanyController {
       id: string;
       updateCompanyDto: UpdateCompanyDTO;
     },
-  ): Promise<CompanyDTO> {
+  ): Promise<CompanyEntity | null> {
     const company = plainToInstance(CompanyEntity, payload.updateCompanyDto);
     return this.companyService.updateCompany(+payload.id, company);
   }
 
   @MessagePattern('company.delete')
-  delete(@Param('id') id: string): Promise<void> {
-    return this.companyService.remove(id);
+  delete(@Payload() payload: { id: string }): Promise<void> {
+    return this.companyService.remove(payload.id);
   }
 }

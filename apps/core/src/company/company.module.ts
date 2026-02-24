@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { CompanyEntity } from '@repo/entities';
 
 import { CompanyController } from './company.controller';
 import { CompanyService } from './company.service';
-import { CompanyEntity } from './entities/company.entity';
 
 @Module({
   controllers: [CompanyController],

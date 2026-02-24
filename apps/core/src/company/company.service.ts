@@ -1,12 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CompanyDTO, User } from '@repo/models';
+import { Company, CompanyDTO, CreateCompanyDTO, User } from '@repo/models';
 import { BaseService } from '@repo/nest-service';
 import { plainToInstance } from 'class-transformer';
 import { Repository } from 'typeorm';
 
-import { CompanyEntity } from './entities/company.entity';
-import { UserEntity } from '../users/entities/user.entity';
+import { CompanyEntity, UserEntity } from '@repo/entities';
 
 @Injectable()
 export class CompanyService extends BaseService<CompanyEntity> {
@@ -20,23 +19,26 @@ export class CompanyService extends BaseService<CompanyEntity> {
   }
 
   async createCompany(
-    company: CompanyEntity,
+    company: CreateCompanyDTO,
     userId: string,
-  ): Promise<CompanyDTO> {
-    const saved = await this.companiesRepository.save(company);
+  ): Promise<Company> {
+    const savedCompany = await this.companiesRepository.save(company);
 
     const userEntity = await this.usersRepository.findOneBy({ id: userId });
     if (!userEntity) {
       throw new NotFoundException('User not found');
     }
 
-    userEntity.companyId = saved.id;
+    userEntity.companyId = savedCompany.id;
     await this.usersRepository.save(userEntity);
 
-    return plainToInstance(CompanyDTO, saved);
+    return savedCompany;
   }
 
-  async updateCompany(id: number, company: CompanyEntity): Promise<CompanyDTO> {
+  async updateCompany(
+    id: number,
+    company: CompanyEntity,
+  ): Promise<CompanyEntity | null> {
     const existingCompany = await this.companiesRepository.findOneBy({
       id: id.toString(),
     });
@@ -54,6 +56,6 @@ export class CompanyService extends BaseService<CompanyEntity> {
       id: id.toString(),
     });
 
-    return plainToInstance(CompanyDTO, updatedCompany);
+    return updatedCompany;
   }
 }
