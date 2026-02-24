@@ -6,8 +6,7 @@ import {
   IsOptional,
   MinLength,
 } from 'class-validator';
-import { Role } from '../../entities/Role';
-import { Skill } from '../../entities/Skill';
+import { Role, Skill } from '../../domain';
 
 export class CreateUserDTO {
   @IsString()
