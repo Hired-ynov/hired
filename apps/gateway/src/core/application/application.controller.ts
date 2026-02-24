@@ -12,15 +12,18 @@ import {
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import { CurrentUser } from '@repo/commun';
 import {
   UserDTO,
   ApplicationDTO,
   CreateApplicationDTO,
   UpdateApplicationDTO,
+  CreateApplication,
+  UpdateApplication,
 } from '@repo/models';
 import { microservices } from '@repo/rabbitmq-config';
-
-import { CurrentUser } from '../auth/current-user.decorator';
+import { plainToInstance } from 'class-transformer';
+import { firstValueFrom } from 'rxjs';
 
 interface MulterFile {
   fieldname: string;
@@ -48,39 +51,61 @@ export class ApplicationController {
     @CurrentUser() user: UserDTO,
     @UploadedFiles() files?: MulterFile[],
   ): Promise<ApplicationDTO> {
-    return this.coreService.send('core.application.create', {
-      body,
-      user,
-      files,
-    });
+    const createApplication = plainToInstance(CreateApplication, body);
+    const application = await firstValueFrom(
+      this.coreService.send('core.application.create', {
+        createApplication: createApplication,
+        userId: user.id,
+        files: files,
+      }),
+    );
+    return plainToInstance(ApplicationDTO, application);
   }
 
   @Get()
   async findAll(): Promise<ApplicationDTO[]> {
-    return this.coreService.send('application.findAll', {});
+    const applications = (await firstValueFrom(
+      this.coreService.send('core.application.findAll', {}),
+    )) as ApplicationDTO[];
+    return applications.map((application) =>
+      plainToInstance(ApplicationDTO, application),
+    );
   }
 
   @Get('me')
   async findMyApplications(
     @CurrentUser() user: UserDTO,
   ): Promise<ApplicationDTO[]> {
-    return this.coreService.send('core.application.findMyApplication', user);
+    const applications = await firstValueFrom(
+      this.coreService.send('core.application.findMyApplications', user),
+    );
+    return applications.map((application) =>
+      plainToInstance(ApplicationDTO, application),
+    );
   }
 
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<ApplicationDTO> {
-    return this.coreService.send('core.application.findOne', id);
+    const application = (await firstValueFrom(
+      this.coreService.send('core.application.findOne', id),
+    )) as ApplicationDTO;
+    return plainToInstance(ApplicationDTO, application);
   }
 
   @Get('/offer/:id')
-  findByOfferId(
+  async findByOfferId(
     @Param('id') id: string,
     @CurrentUser() user: UserDTO,
   ): Promise<ApplicationDTO[]> {
-    return this.coreService.send('core.application.findByOfferId', {
-      id,
-      user,
-    });
+    const applications = (await firstValueFrom(
+      this.coreService.send('core.application.findByOfferId', {
+        id,
+        user,
+      }),
+    )) as ApplicationDTO[];
+    return applications.map((application) =>
+      plainToInstance(ApplicationDTO, application),
+    );
   }
 
   @Put(':id')
@@ -91,16 +116,22 @@ export class ApplicationController {
     @CurrentUser() user: UserDTO,
     @UploadedFiles() files?: MulterFile[],
   ): Promise<ApplicationDTO> {
-    return this.coreService.send('core.application.update', {
-      id: +id,
-      body,
-      user,
-      files,
-    });
+    const updateApplication = plainToInstance(UpdateApplication, body);
+    const application = await firstValueFrom(
+      this.coreService.send('core.application.update', {
+        id: +id,
+        updateApplication: updateApplication,
+        userId: user.id,
+        files: files,
+      }),
+    );
+    return plainToInstance(ApplicationDTO, application);
   }
 
   @Delete(':id')
   delete(@Param('id') id: string, @CurrentUser() user: UserDTO): Promise<void> {
-    return this.coreService.send('core.application.delete', { id: +id, user });
+    return firstValueFrom(
+      this.coreService.send('core.application.delete', { id, userId: user.id }),
+    );
   }
 }

@@ -1,8 +1,8 @@
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { BaseEntity } from '@repo/nest-service';
+import type { SalaryRange } from '@repo/models';
 import { Offer, Skill } from '@repo/models';
-import { SalaryRange } from '@repo/models/dist/entities/utils/SalaryRange';
-import { CompanyEntity } from '../../company/entities/company.entity';
+import { CompanyEntity } from '../company/company.entity';
 
 @Entity('offers')
 export class OfferEntity extends BaseEntity implements Offer {

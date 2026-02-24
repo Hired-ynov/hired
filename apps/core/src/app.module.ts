@@ -2,12 +2,17 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CompanyModule } from './company/company.module';
-import { CompanyEntity } from './company/entities/company.entity';
+
 import { ApplicationModule } from './application/application.module';
-import { ApplicationEntity } from './application/entities/application.entity';
+
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserEntity } from '@repo/entities';
+import {
+  ApplicationEntity,
+  CompanyEntity,
+  OfferEntity,
+  UserEntity,
+} from '@repo/entities';
 import { UserModule } from './users/user.module';
 import { OfferModule } from './offer/offer.module';
 
@@ -19,10 +24,11 @@ import { OfferModule } from './offer/offer.module';
       isGlobal: true,
     }),
     TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         database: configService.get('POSTGRES_DB'),
-        entities: [CompanyEntity, ApplicationEntity, UserEntity],
+        entities: [CompanyEntity, ApplicationEntity, UserEntity, OfferEntity],
         host: configService.get('POSTGRES_HOST'),
         password: configService.get('POSTGRES_PASSWORD'),
         port: configService.get<number>('POSTGRES_PORT'),
@@ -31,7 +37,12 @@ import { OfferModule } from './offer/offer.module';
         username: configService.get('POSTGRES_USER'),
       }),
     }),
-    TypeOrmModule.forFeature([CompanyEntity, ApplicationEntity, UserEntity]),
+    TypeOrmModule.forFeature([
+      CompanyEntity,
+      ApplicationEntity,
+      UserEntity,
+      OfferEntity,
+    ]),
     CompanyModule,
     ApplicationModule,
     UserModule,

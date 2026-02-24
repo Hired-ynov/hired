@@ -1,10 +1,19 @@
-import { Controller } from '@nestjs/common';
+import { BadRequestException, Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { UserDTO, CreateApplicationDTO, ApplicationDTO } from '@repo/models';
+import {
+  UserDTO,
+  CreateApplicationDTO,
+  ApplicationDTO,
+  CreateApplication,
+  Application,
+  UpdateApplication,
+} from '@repo/models';
 import { plainToInstance } from 'class-transformer';
 
 import { ApplicationService } from './application.service';
-import { ApplicationEntity } from './entities/application.entity';
+import { ApplicationEntity } from '@repo/entities';
+import { UserService } from 'src/users/user.service';
+import { OfferService } from 'src/offer/offer.service';
 
 interface MulterFile {
   fieldname: string;
@@ -20,71 +29,124 @@ interface MulterFile {
 
 @Controller('application')
 export class ApplicationController {
-  constructor(private readonly applicationService: ApplicationService) {}
+  constructor(
+    private readonly applicationService: ApplicationService,
+    private readonly userService: UserService,
+    private readonly offerService: OfferService,
+  ) {}
 
   @MessagePattern('core.application.create')
   async create(
     @Payload()
     payload: {
-      createApplication: CreateApplicationDTO;
-      user: UserDTO;
+      createApplication: CreateApplication;
+      userId: string;
       files: MulterFile[];
     },
-  ): Promise<ApplicationDTO> {
-    const applicationData = await this.applicationService.createApplication(
-      payload.createApplication,
-      payload.user,
-      payload.files,
-    );
+  ): Promise<Application> {
+    const user = await this.userService.findByIdOrFail(payload.userId);
+
+    const offer = await this.offerService.findOrFail({
+      id: payload.createApplication.offerId,
+    });
+
+    this.applicationService.validateUserCanViewOfferApplications(user, offer);
+
+    const existingApplication = await this.applicationService.findOne({
+      userId: user.id,
+      offerId: payload.createApplication.offerId,
+    });
+
+    if (existingApplication) {
+      throw new BadRequestException('You have already applied to this offer');
+    }
+
+    const applicationData: any = {
+      ...payload.createApplication,
+      userId: user.id,
+    };
     const saved = await this.applicationService.create(applicationData);
-    return plainToInstance(ApplicationDTO, saved);
+    return saved;
   }
 
   @MessagePattern('core.application.findAll')
-  async findAll(): Promise<ApplicationDTO[]> {
-    var applications = await this.applicationService.findAll();
-    return applications.map((a) => plainToInstance(ApplicationEntity, a));
+  async findAll(): Promise<Application[]> {
+    return await this.applicationService.findAll();
   }
 
   @MessagePattern('core.application.findMyApplications')
-  async findMyApplications(
-    @Payload() user: UserDTO,
-  ): Promise<ApplicationDTO[]> {
-    const userId =
-      (user as UserDTO & { sub?: number }).sub?.toString() || user.id;
-    const applications = await this.applicationService.findByUserId(userId);
-    return applications.map((a) => plainToInstance(ApplicationDTO, a));
+  async findMyApplications(@Payload() userId: string): Promise<Application[]> {
+    return await this.applicationService.findAll({
+      where: { userId: userId },
+    });
   }
 
   @MessagePattern('core.application.findOne')
   async findOne(@Payload() id: string): Promise<ApplicationDTO> {
-    return await plainToInstance(
-      ApplicationEntity,
-      this.applicationService.findOne({ id: id }),
-    );
+    return await this.applicationService.findByIdOrFail(id);
   }
 
   @MessagePattern('core.application.findByOfferId')
-  findByOfferId(
-    @Payload() payload: { id: string; user: UserDTO },
-  ): Promise<ApplicationDTO[]> {
-    return this.applicationService.findByOfferId(payload.id, payload.user);
+  async findByOfferId(
+    @Payload() payload: { offerId: string; userId: string },
+  ): Promise<Application[]> {
+    const user = await this.userService.findByIdOrFail(payload.userId);
+    const offer = await this.offerService.findOrFail({
+      id: payload.offerId,
+    });
+
+    this.applicationService.validateUserCanViewOfferApplications(user, offer);
+
+    return this.applicationService.findAll({
+      where: { offerId: payload.offerId },
+    });
   }
 
   @MessagePattern('core.application.update')
   async updateApplication(
-    @Payload() payload: { id; body; user; files },
-  ): Promise<ApplicationDTO> {
-    return this.applicationService.updateApplication(
-      +payload.id,
-      payload.body,
-      payload.user,
-      payload.files,
+    @Payload()
+    payload: {
+      id: string;
+      updateApplication: UpdateApplication;
+      userId: string;
+      files: MulterFile[];
+    },
+  ): Promise<Application> {
+    const user = await this.userService.findByIdOrFail(payload.userId);
+    const application = await this.applicationService.findByIdOrFail(
+      payload.id,
     );
+    const offer = await this.offerService.findOrFail({
+      id: application.offerId,
+    });
+
+    this.applicationService.validateUserCanUpdateApplication(
+      user,
+      application,
+      offer,
+    );
+
+    await this.applicationService.update(payload.id, {
+      ...payload.updateApplication,
+      updatedAt: new Date(),
+    });
+
+    return await this.applicationService.findByIdOrFail(payload.id);
   }
 
   @MessagePattern('core.application.delete')
-  remove(@Payload() payload: { id: string; user: UserDTO }): Promise<void> {
-    return this.applicationService.removeApplication(+payload.id, payload.user);
+  async remove(
+    @Payload() payload: { id: string; userId: string },
+  ): Promise<void> {
+    const application = await this.applicationService.findByIdOrFail(
+      payload.id,
+    );
+
+    if (application.userId.toString() !== payload.userId) {
+      throw new BadRequestException(
+        'You can only delete your own applications',
+      );
+    }
+    return this.applicationService.remove(payload.id);
   }
 }

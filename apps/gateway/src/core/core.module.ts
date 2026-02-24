@@ -5,9 +5,17 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientsModule } from '@nestjs/microservices';
 import { microservices } from '@repo/rabbitmq-config';
 import { CompanyController } from './company/company.controller';
+import { OfferController } from './offer/offer.controller';
+import { ApplicationController } from './application/application.controller';
 
 @Module({
-  controllers: [CoreController, UserController, CompanyController],
+  controllers: [
+    CoreController,
+    UserController,
+    CompanyController,
+    OfferController,
+    ApplicationController,
+  ],
   imports: [
     ClientsModule.registerAsync([
       {
