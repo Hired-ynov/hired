@@ -1,29 +1,19 @@
 import {
   Controller,
-  Get,
-  Post,
-  Body,
-  Param,
-  Delete,
-  Put,
   ConflictException,
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { UserService } from './user.service';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 import {
   ChangePassword,
-  ChangePasswordDTO,
   CreateUser,
-  CreateUserDTO,
   Role,
   UpdateUser,
-  UpdateUserDTO,
   User,
-  UserDTO,
 } from '@repo/models';
-import { plainToInstance } from 'class-transformer';
-import { MessagePattern, Payload } from '@nestjs/microservices';
+
+import { UserService } from './user.service';
 
 @Controller('user')
 export class UserController {
@@ -40,19 +30,14 @@ export class UserController {
     }
 
     const emptyUser = await this.userService.findAll();
-    if (emptyUser.length === 0) {
-      createUser.role = Role.admin;
-    } else {
-      createUser.role = Role.user;
-    }
+    createUser.role = emptyUser.length === 0 ? Role.admin : Role.user;
 
     const passwordHash = await this.userService.generatePasswordHash(
       createUser.password,
     );
-    const user = await this.userService.create({
-      ...createUser,
-      passwordHash,
-    });
+    const user = await this.userService.create(
+      Object.assign({}, createUser, { passwordHash }),
+    );
 
     return user;
   }
@@ -124,7 +109,11 @@ export class UserController {
     await this.userService.update(payload.id, payload.updateUser);
     const user = await this.userService.findById(payload.id);
 
-    return user!;
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
   }
 
   @MessagePattern('core.user.change-password')

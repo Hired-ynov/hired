@@ -7,59 +7,64 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 
+interface ErrorLike {
+  error?: string;
+  message?: string | string[];
+  name?: string;
+  statusCode?: number;
+}
+
+function isErrorLike(value: unknown): value is ErrorLike {
+  return typeof value === 'object' && value !== null;
+}
+
 @Catch()
 export class RpcToHttpExceptionFilter implements ExceptionFilter {
-  catch(exception: any, host: ArgumentsHost) {
+  catch(exception: unknown, host: ArgumentsHost): void {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
 
-    // Déterminer le status code
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
-    let message = 'Internal server error';
+    let message: string | string[] = 'Internal server error';
     let error = 'Error';
 
-    // Si c'est une HttpException native
     if (exception instanceof HttpException) {
       status = exception.getStatus();
       const exceptionResponse = exception.getResponse();
-      message =
-        typeof exceptionResponse === 'string'
-          ? exceptionResponse
-          : (exceptionResponse as any).message;
-      error = (exceptionResponse as any).error || exception.name;
-    }
-    // Si c'est une erreur RPC de RabbitMQ
-    else if (exception?.error) {
+      if (typeof exceptionResponse === 'string') {
+        message = exceptionResponse;
+      } else if (isErrorLike(exceptionResponse)) {
+        message = exceptionResponse.message ?? 'Internal server error';
+        error = exceptionResponse.error ?? exception.name;
+      }
+    } else if (isErrorLike(exception) && isErrorLike(exception.error)) {
       const rpcError = exception.error;
-      status = rpcError.statusCode || HttpStatus.INTERNAL_SERVER_ERROR;
-      message = rpcError.message || 'Internal server error';
-      error = rpcError.error || 'RpcError';
-    }
-    // Si c'est une erreur avec statusCode (format custom)
-    else if (exception?.statusCode) {
+      status = rpcError.statusCode ?? HttpStatus.INTERNAL_SERVER_ERROR;
+      message = rpcError.message ?? 'Internal server error';
+      error = rpcError.error ?? 'RpcError';
+    } else if (
+      isErrorLike(exception) &&
+      typeof exception.statusCode === 'number'
+    ) {
       status = exception.statusCode;
-      message = exception.message || 'Internal server error';
-      error = exception.error || exception.name || 'Error';
-    }
-    // Autres erreurs
-    else {
-      message = exception?.message || 'Internal server error';
-      error = exception?.name || 'Error';
+      message = exception.message ?? 'Internal server error';
+      error = exception.error ?? exception.name ?? 'Error';
+    } else if (isErrorLike(exception)) {
+      message = exception.message ?? 'Internal server error';
+      error = exception.name ?? 'Error';
     }
 
-    // Log pour debugging
     console.error('Exception caught in gateway:', {
-      status,
-      message,
       error,
+      message,
       originalException: exception,
+      status,
     });
 
-    // Réponse HTTP formatée
     response.status(status).json({
-      statusCode: status,
-      message: Array.isArray(message) ? message : [message],
       error,
+      message: Array.isArray(message) ? message : [message],
+      statusCode: status,
       timestamp: new Date().toISOString(),
     });
   }

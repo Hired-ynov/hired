@@ -1,8 +1,9 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { ConfigService } from '@nestjs/config';
-import { microservices } from '@repo/rabbitmq-config';
 import { ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { NestFactory } from '@nestjs/core';
+import { microservices } from '@repo/rabbitmq-config';
+
+import { AppModule } from './app.module';
 import { AllRpcExceptionsFilter } from './filters/rpc-exception.filter';
 
 async function bootstrap() {
@@ -13,9 +14,9 @@ async function bootstrap() {
   // Global validation pipe
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true,
       forbidNonWhitelisted: true,
       transform: true,
+      whitelist: true,
     }),
   );
 

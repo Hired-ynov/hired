@@ -1,23 +1,24 @@
 import { Module } from '@nestjs/common';
-import { CoreController } from './core.controller';
-import { UserController } from './user/user.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientsModule } from '@nestjs/microservices';
 import { microservices } from '@repo/rabbitmq-config';
+
+import { CoreController } from './core.controller';
+import { UserController } from './user/user.controller';
 
 @Module({
   controllers: [CoreController, UserController],
   imports: [
     ClientsModule.registerAsync([
       {
-        name: microservices.symbols.CORE_SERVICE,
         imports: [ConfigModule],
+        inject: [ConfigService],
+        name: microservices.symbols.CORE_SERVICE,
         useFactory: (configService: ConfigService) => {
           return microservices.CORE_SERVICE({
             RABBITMQ_URL: configService.get<string>('RABBITMQ_URL'),
           });
         },
-        inject: [ConfigService],
       },
     ]),
   ],

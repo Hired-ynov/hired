@@ -1,7 +1,8 @@
+import { Type } from 'class-transformer';
 import { IsArray, IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
+
 import { Skill } from '../../entry';
 import { SalaryRangeDTO } from '../utils/SalaryRangeDTO';
-import { Type } from 'class-transformer';
 
 export class UpdateOfferDTO {
   @IsOptional()
