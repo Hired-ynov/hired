@@ -12,89 +12,108 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import {
+  ChangePassword,
   ChangePasswordDTO,
+  CreateUser,
   CreateUserDTO,
+  Role,
+  UpdateUser,
   UpdateUserDTO,
+  User,
   UserDTO,
 } from '@repo/models';
 import { plainToInstance } from 'class-transformer';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
-  async create(@Body() createUserDto: CreateUserDTO): Promise<UserDTO> {
+  @MessagePattern('core.user.create')
+  async create(@Payload() createUser: CreateUser): Promise<User> {
     // Vérifier si l'email existe déjà
     const existingUser = await this.userService.findOne({
-      email: createUserDto.email,
+      email: createUser.email,
     });
     if (existingUser) {
       throw new ConflictException('Email already exists');
     }
 
+    const emptyUser = await this.userService.findAll();
+    if (emptyUser.length === 0) {
+      createUser.role = Role.admin;
+    } else {
+      createUser.role = Role.user;
+    }
+
     const passwordHash = await this.userService.generatePasswordHash(
-      createUserDto.password,
+      createUser.password,
     );
     const user = await this.userService.create({
-      ...createUserDto,
+      ...createUser,
       passwordHash,
     });
 
-    const dto = plainToInstance(UserDTO, user, {
-      excludeExtraneousValues: false,
-    });
-    delete dto.passwordHash;
-    return dto;
+    return user;
   }
 
-  @Get()
-  async findAll(): Promise<UserDTO[]> {
+  @MessagePattern('core.user.find-all')
+  async findAll(): Promise<User[]> {
     const users = await this.userService.findAll();
-    return plainToInstance(UserDTO, users, { excludeExtraneousValues: false });
+    return users;
   }
 
-  @Get('email/:email')
-  async findOneByEmail(@Param('email') email: string): Promise<UserDTO | null> {
-    const user = await this.userService.findOne({ email });
+  @MessagePattern('core.user.find-one-by-email')
+  async findOneByEmail(
+    @Payload() payload: { email: string },
+  ): Promise<User | null> {
+    const user = await this.userService.findOne({ email: payload.email });
     if (!user) {
       return null;
     }
-    const dto = plainToInstance(UserDTO, user, {
-      excludeExtraneousValues: false,
-    });
-    delete dto.passwordHash;
-    return dto;
+
+    return user;
   }
 
-  @Get(':id')
-  async findOne(@Param('id') id: string): Promise<UserDTO | null> {
-    const user = await this.userService.findById(id);
+  @MessagePattern('core.user.find-one-by-email-with-password')
+  async findOneByEmailWithPassword(
+    @Payload() payload: { email: string },
+  ): Promise<User | null> {
+    const user = await this.userService.findOneByEmailWithPassword(
+      payload.email,
+    );
     if (!user) {
       return null;
     }
-    const dto = plainToInstance(UserDTO, user, {
-      excludeExtraneousValues: false,
-    });
-    // Exclure le passwordHash par défaut
-    delete dto.passwordHash;
-    return dto;
+
+    return user;
   }
 
-  @Put(':id')
+  @MessagePattern('core.user.find-one-by-id')
+  async findOne(@Payload() payload: { id: string }): Promise<User | null> {
+    const user = await this.userService.findById(payload.id);
+    if (!user) {
+      return null;
+    }
+    return user;
+  }
+
+  @MessagePattern('core.user.update')
   async update(
-    @Param('id') id: string,
-    @Body() updateUserDto: UpdateUserDTO,
-  ): Promise<UserDTO> {
-    const existingUser = await this.userService.findById(id);
+    @Payload() payload: { id: string; updateUser: UpdateUser },
+  ): Promise<User> {
+    const existingUser = await this.userService.findById(payload.id);
     if (!existingUser) {
       throw new NotFoundException('User not found');
     }
 
     // Vérifier si l'email est déjà utilisé par un autre utilisateur
-    if (updateUserDto.email && updateUserDto.email !== existingUser.email) {
+    if (
+      payload.updateUser.email &&
+      payload.updateUser.email !== existingUser.email
+    ) {
       const emailExists = await this.userService.findOne({
-        email: updateUserDto.email,
+        email: payload.updateUser.email,
       });
 
       if (emailExists) {
@@ -102,29 +121,24 @@ export class UserController {
       }
     }
 
-    await this.userService.update(id, updateUserDto);
-    const user = await this.userService.findById(id);
+    await this.userService.update(payload.id, payload.updateUser);
+    const user = await this.userService.findById(payload.id);
 
-    const dto = plainToInstance(UserDTO, user!, {
-      excludeExtraneousValues: false,
-    });
-    delete dto.passwordHash;
-    return dto;
+    return user!;
   }
 
-  @Put(':id/change-password')
+  @MessagePattern('core.user.change-password')
   async changePassword(
-    @Param('id') id: string,
-    @Body() changePasswordDto: ChangePasswordDTO,
+    @Payload() payload: { id: string; changePasswordDto: ChangePassword },
   ): Promise<{ message: string }> {
-    const user = await this.userService.findById(id);
+    const user = await this.userService.findByIdWithPassword(payload.id);
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
     // Vérifier l'ancien mot de passe
     const isPasswordValid = await this.userService.verifyPassword(
-      changePasswordDto.oldPassword,
+      payload.changePasswordDto.oldPassword,
       user.passwordHash,
     );
 
@@ -134,7 +148,7 @@ export class UserController {
 
     // Vérifier que le nouveau mot de passe est différent de l'ancien
     const isSamePassword = await this.userService.verifyPassword(
-      changePasswordDto.newPassword,
+      payload.changePasswordDto.newPassword,
       user.passwordHash,
     );
 
@@ -145,23 +159,33 @@ export class UserController {
     }
 
     const newPasswordHash = await this.userService.generatePasswordHash(
-      changePasswordDto.newPassword,
+      payload.changePasswordDto.newPassword,
     );
 
-    await this.userService.update(id, {
+    await this.userService.update(payload.id, {
       passwordHash: newPasswordHash,
     });
 
     return { message: 'Password changed successfully' };
   }
 
-  @Delete(':id')
-  async remove(@Param('id') id: string): Promise<void> {
-    const user = await this.userService.findById(id);
+  @MessagePattern('core.user.verify-password')
+  async verifyPassword(
+    @Payload() payload: { password: string; passwordHash: string },
+  ): Promise<boolean> {
+    return this.userService.verifyPassword(
+      payload.password,
+      payload.passwordHash,
+    );
+  }
+
+  @MessagePattern('core.user.remove')
+  async remove(@Payload() payload: { id: string }): Promise<void> {
+    const user = await this.userService.findById(payload.id);
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
-    await this.userService.remove(id);
+    await this.userService.remove(payload.id);
   }
 }

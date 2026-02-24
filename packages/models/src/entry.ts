@@ -1,3 +1,3 @@
-export * from './entities';
+export * from './domain';
 export * from './dto';
 export * from './enums';

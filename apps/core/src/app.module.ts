@@ -7,7 +7,7 @@ import { ApplicationModule } from './application/application.module';
 import { ApplicationEntity } from './application/entities/application.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserEntity } from './users/entities/user.entity';
+import { UserEntity } from '@repo/entities';
 import { UserModule } from './users/user.module';
 import { OfferModule } from './offer/offer.module';
 

@@ -23,6 +23,7 @@
     "@nestjs/platform-express": "^11.1.11",
     "@nestjs/typeorm": "^11.0.0",
     "@repo/api": "workspace:*",
+    "@repo/commun": "workspace:*",
     "@repo/models": "workspace:^",
     "@repo/rabbitmq-config": "workspace:*",
     "@repo/redis-config": "workspace:^",

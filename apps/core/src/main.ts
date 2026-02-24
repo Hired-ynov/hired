@@ -1,13 +1,27 @@
 import { NestFactory } from '@nestjs/core';
-import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module';
+import { ConfigService } from '@nestjs/config';
 import { microservices } from '@repo/rabbitmq-config';
+import { ValidationPipe } from '@nestjs/common';
+import { AllRpcExceptionsFilter } from './filters/rpc-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.enableCors();
   const configService = app.get<ConfigService>(ConfigService);
   const rabbitmqUrl = configService.get<string>('RABBITMQ_URL');
+
+  // Global validation pipe
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
+
+  // Global exception filter pour RPC
+  app.useGlobalFilters(new AllRpcExceptionsFilter());
+
   app.connectMicroservice(
     microservices.CORE_SERVICE({
       RABBITMQ_URL: rabbitmqUrl,
@@ -15,7 +29,7 @@ async function bootstrap() {
   );
 
   await app.startAllMicroservices();
-  await app.listen(3000);
+  console.log('🚀 Core microservice is running');
 }
 
 void bootstrap();
