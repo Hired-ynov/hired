@@ -1,6 +1,6 @@
 import { ApplicationStatus } from '../enum/application-status.enum';
 
-export class UpdateApplicationDTO {
+export class UpdateApplication {
   firstMessage?: string;
 
   status?: ApplicationStatus;

@@ -22,7 +22,7 @@
     "@nestjs/typeorm": "^11.0.0",
     "@repo/api": "workspace:*",
     "@repo/models": "workspace:^",
-    "@repo/models-entities": "workspace:*",
+    "@repo/entities": "workspace:*",
     "@repo/nest-service": "workspace:^",
     "@repo/rabbitmq-config": "workspace:*",
     "bcrypt": "^6.0.0",
