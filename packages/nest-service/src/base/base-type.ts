@@ -1,16 +1,16 @@
 export interface PaginationOptions {
-  page?: number;
   limit?: number;
+  page?: number;
 }
 
 export interface PaginationResult<T> {
   data: T[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
   hasNext: boolean;
   hasPrevious: boolean;
+  limit: number;
+  page: number;
+  total: number;
+  totalPages: number;
 }
 
 export interface SortOptions {

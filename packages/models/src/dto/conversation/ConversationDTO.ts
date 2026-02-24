@@ -1,7 +1,8 @@
-import { IsArray, IsUUID, ValidateNested } from 'class-validator';
-import { BaseDTO } from '../utils/BaseDTO';
-import { OfferDTO } from '../offer/OfferDTO';
 import { Type } from 'class-transformer';
+import { IsArray, IsUUID, ValidateNested } from 'class-validator';
+
+import { OfferDTO } from '../offer/OfferDTO';
+import { BaseDTO } from '../utils/BaseDTO';
 
 export class ConversationDTO extends BaseDTO {
   @IsArray()

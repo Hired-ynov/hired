@@ -1,6 +1,7 @@
-import { IsOptional, IsString } from 'class-validator';
-import { BaseDTO } from '../utils/BaseDTO';
 import { Type } from 'class-transformer';
+import { IsOptional, IsString } from 'class-validator';
+
+import { BaseDTO } from '../utils/BaseDTO';
 import { MetadataDTO } from '../utils/MetadataDTO';
 
 export class FileUploadResponseDTO extends BaseDTO {

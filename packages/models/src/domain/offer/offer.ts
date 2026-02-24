@@ -3,11 +3,11 @@ import { Skill } from '../enum/skill.enum';
 import { SalaryRange } from '../utils/salary-range';
 
 export interface Offer extends Base {
-  title: string;
+  companyId: string;
   description: string;
+  filesIds: string[];
   location: string;
   salaryRange: SalaryRange;
-  companyId: string;
   skills: Skill[];
-  filesIds: string[];
+  title: string;
 }

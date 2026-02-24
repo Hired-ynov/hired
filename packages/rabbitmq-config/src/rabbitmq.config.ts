@@ -1,25 +1,6 @@
 import { ClientProvider, Transport } from '@nestjs/microservices';
 
 export const microservices = {
-  base: (envs: NodeJS.ProcessEnv) => {
-    return {
-      transport: Transport.RMQ,
-      options: {
-        urls: [envs.RABBITMQ_URL || 'amqp://localhost:5672'],
-        queueOptions: {
-          durable: true,
-        },
-        prefetchCount: 1,
-      },
-    };
-  },
-  symbols: Object.freeze({
-    AUTH_SERVICE: Symbol('AUTH_SERVICE'),
-    COMMUNICATION_SERVICE: Symbol('COMMUNICATION_SERVICE'),
-    CORE_SERVICE: Symbol('CORE_SERVICE'),
-    FILES_SERVICE: Symbol('FILES_SERVICE'),
-    INTERNAL_BUS_SERVICE: Symbol('INTERNAL_BUS_SERVICE'),
-  } as const),
   AUTH_SERVICE: (envs: NodeJS.ProcessEnv) => {
     const base = microservices.base(envs);
     return {
@@ -29,6 +10,18 @@ export const microservices = {
         queue: 'auth_queue',
       },
     } as ClientProvider;
+  },
+  base: (envs: NodeJS.ProcessEnv) => {
+    return {
+      options: {
+        prefetchCount: 1,
+        queueOptions: {
+          durable: true,
+        },
+        urls: [envs.RABBITMQ_URL ?? 'amqp://localhost:5672'],
+      },
+      transport: Transport.RMQ,
+    };
   },
   COMMUNICATION_SERVICE: (envs: NodeJS.ProcessEnv) => {
     const base = microservices.base(envs);
@@ -70,4 +63,11 @@ export const microservices = {
       },
     } as ClientProvider;
   },
+  symbols: Object.freeze({
+    AUTH_SERVICE: Symbol('AUTH_SERVICE'),
+    COMMUNICATION_SERVICE: Symbol('COMMUNICATION_SERVICE'),
+    CORE_SERVICE: Symbol('CORE_SERVICE'),
+    FILES_SERVICE: Symbol('FILES_SERVICE'),
+    INTERNAL_BUS_SERVICE: Symbol('INTERNAL_BUS_SERVICE'),
+  } as const),
 };

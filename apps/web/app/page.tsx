@@ -5,6 +5,8 @@ import styles from './page.module.css';
 
 import type { Link } from '@repo/api';
 
+export const dynamic = 'force-dynamic';
+
 type Props = Omit<ImageProps, 'src'> & {
   srcLight: string;
   srcDark: string;
