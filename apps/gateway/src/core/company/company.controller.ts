@@ -4,12 +4,12 @@ import {
   Delete,
   Get,
   Inject,
-  Injectable,
   Param,
   Post,
   Put,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CurrentUser, Roles } from '@repo/commun';
 import {
   UserDTO,
@@ -23,6 +23,7 @@ import { microservices } from '@repo/rabbitmq-config';
 import { plainToInstance } from 'class-transformer';
 import { firstValueFrom } from 'rxjs';
 
+@ApiTags('company')
 @Controller('company')
 export class CompanyController {
   constructor(
@@ -30,6 +31,8 @@ export class CompanyController {
     private readonly coreService: ClientProxy,
   ) {}
 
+  @ApiOperation({ summary: 'Créer une entreprise' })
+  @ApiResponse({ status: 201, description: 'Entreprise créée' })
   @Post()
   async create(
     @Body() createCompanyDto: CreateCompanyDTO,
@@ -45,6 +48,8 @@ export class CompanyController {
     return plainToInstance(CompanyDTO, newCompany);
   }
 
+  @ApiOperation({ summary: 'Récupérer toutes les entreprises' })
+  @ApiResponse({ status: 201, description: 'Entreprises récupérées' })
   @Get('all')
   @Roles(Role.admin)
   async findAll(): Promise<CompanyDTO[]> {
@@ -54,6 +59,8 @@ export class CompanyController {
     return companies.map((company) => plainToInstance(CompanyDTO, company));
   }
 
+  @ApiOperation({ summary: 'Récupérer une entreprise' })
+  @ApiResponse({ status: 201, description: 'Entreprise récupérée' })
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<CompanyDTO> {
     const company = (await firstValueFrom(
@@ -62,6 +69,8 @@ export class CompanyController {
     return plainToInstance(CompanyDTO, company);
   }
 
+  @ApiOperation({ summary: 'Mettre à jour une entreprise' })
+  @ApiResponse({ status: 201, description: 'Entreprise mise à jour' })
   @Put(':id')
   async update(
     @Param('id') id: string,
@@ -77,6 +86,8 @@ export class CompanyController {
     return plainToInstance(CompanyDTO, company);
   }
 
+  @ApiOperation({ summary: 'Supprimer une entreprise' })
+  @ApiResponse({ status: 201, description: 'Entreprise supprimée' })
   @Delete(':id')
   async remove(@Param('id') id: string): Promise<void> {
     await firstValueFrom(this.coreService.send('company.delete', { id }));

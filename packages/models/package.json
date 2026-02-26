@@ -26,6 +26,9 @@
       "require": "./dist/*.js"
     }
   },
+  "peerDependencies": {
+    "@nestjs/swagger": "*"
+  },
   "dependencies": {
     "@nestjs/mapped-types": "*",
     "class-validator": "^0.14.1",

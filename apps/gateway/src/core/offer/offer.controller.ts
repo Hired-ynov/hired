@@ -8,6 +8,9 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { CurrentUser } from '@repo/commun';
 import {
   CreateOffer,
   CreateOfferDTO,
@@ -18,12 +21,11 @@ import {
   UserDTO,
 } from '@repo/models';
 import { microservices } from '@repo/rabbitmq-config';
-import { ClientProxy } from '@nestjs/microservices';
-import { CurrentUser } from '@repo/commun';
 import { plainToInstance } from 'class-transformer';
 import { firstValueFrom } from 'rxjs/internal/firstValueFrom';
 import { getUserId } from 'src/utils/user-id.utils';
 
+@ApiTags('offer')
 @Controller('offer')
 export class OfferController {
   constructor(
@@ -31,6 +33,8 @@ export class OfferController {
     private readonly coreService: ClientProxy,
   ) {}
 
+  @ApiOperation({ summary: 'Créer une offre' })
+  @ApiResponse({ description: 'Offre créée', status: 201 })
   @Post()
   async create(
     @Body() createOfferDto: CreateOfferDTO,
@@ -46,6 +50,8 @@ export class OfferController {
     return plainToInstance(OfferDTO, offer);
   }
 
+  @ApiOperation({ summary: 'Récupérer toutes les offres' })
+  @ApiResponse({ status: 201, description: 'Offres réucpérées' })
   @Get()
   async findAll(): Promise<OfferDTO[]> {
     const offers = (await firstValueFrom(
@@ -54,6 +60,8 @@ export class OfferController {
     return offers.map((offer: Offer) => plainToInstance(OfferDTO, offer));
   }
 
+  @ApiOperation({ summary: "Récupérer les offres par l'id d'une entreprise" })
+  @ApiResponse({ status: 201, description: 'Offres récupérées' })
   @Get('company/:id')
   async findByCompanyId(@Param('id') id: string): Promise<OfferDTO[]> {
     const offers = (await firstValueFrom(
@@ -62,6 +70,8 @@ export class OfferController {
     return offers.map((offer: Offer) => plainToInstance(OfferDTO, offer));
   }
 
+  @ApiOperation({ summary: 'Récupérer une offre' })
+  @ApiResponse({ status: 201, description: 'Offre récupérée' })
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<OfferDTO | null> {
     const offer = (await firstValueFrom(
@@ -70,6 +80,8 @@ export class OfferController {
     return offer ? plainToInstance(OfferDTO, offer) : null;
   }
 
+  @ApiOperation({ summary: 'Mettre à jour une offre' })
+  @ApiResponse({ status: 201, description: 'Offre mise à jour' })
   @Put(':id')
   async update(
     @Param('id') id: string,
@@ -82,6 +94,8 @@ export class OfferController {
     return plainToInstance(OfferDTO, offer);
   }
 
+  @ApiOperation({ summary: 'Supprimer une offre' })
+  @ApiResponse({ status: 201, description: 'Offre supprimée' })
   @Delete(':id')
   async remove(@Param('id') id: string): Promise<void> {
     return firstValueFrom(this.coreService.send('core.offer.delete', id));
