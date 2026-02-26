@@ -6,6 +6,7 @@ import {
   IsOptional,
   MinLength,
 } from 'class-validator';
+
 import { Role, Skill } from '../../domain';
 
 export class CreateUserDTO {

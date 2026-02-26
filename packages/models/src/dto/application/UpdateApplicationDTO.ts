@@ -1,4 +1,5 @@
 import { IsArray, IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
+
 import { ApplicationStatus } from '../../entry';
 
 export class UpdateApplicationDTO {

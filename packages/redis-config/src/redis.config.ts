@@ -11,12 +11,12 @@ export const cache = {
       ],
     };
   },
+  LOCAL: () => {
+    return cache.base(new Keyv());
+  },
   REDIS: (envs: NodeJS.ProcessEnv) => {
     return cache.base(
-      new KeyvRedis(envs.REDIS_URL || 'redis://localhost:6379/0'),
+      new KeyvRedis(envs.REDIS_URL ?? 'redis://localhost:6379/0'),
     );
-  },
-  LOCAL: (envs: NodeJS.ProcessEnv) => {
-    return cache.base(new Keyv());
   },
 };

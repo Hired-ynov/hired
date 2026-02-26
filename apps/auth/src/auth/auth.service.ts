@@ -1,13 +1,7 @@
-import {
-  Injectable,
-  UnauthorizedException,
-  ConflictException,
-  InternalServerErrorException,
-  Inject,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException, Inject } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { Login, Register, Role } from '@repo/models';
 import { ClientProxy } from '@nestjs/microservices';
+import { Login, Register, UserDTO } from '@repo/models';
 import { microservices } from '@repo/rabbitmq-config';
 import { firstValueFrom } from 'rxjs';
 
@@ -21,9 +15,12 @@ export class AuthService {
 
   async login(login: Login): Promise<{ access_token: string }> {
     const user = await firstValueFrom(
-      this.coreService.send('core.user.find-one-by-email-with-password', {
-        email: login.email,
-      }),
+      this.coreService.send<UserDTO | null>(
+        'core.user.find-one-by-email-with-password',
+        {
+          email: login.email,
+        },
+      ),
     );
 
     if (!user) {
@@ -31,9 +28,9 @@ export class AuthService {
     }
 
     const isPasswordValid = await firstValueFrom(
-      this.coreService.send('core.user.verify-password', {
+      this.coreService.send<boolean>('core.user.verify-password', {
         password: login.password,
-        passwordHash: user.passwordHash || '',
+        passwordHash: user.passwordHash ?? '',
       }),
     );
 
@@ -42,11 +39,11 @@ export class AuthService {
     }
 
     const payload = {
-      sub: user.id,
+      email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
-      email: user.email,
       role: user.role,
+      sub: user.id,
     };
 
     return {
@@ -56,20 +53,22 @@ export class AuthService {
 
   async register(register: Register): Promise<{ access_token: string }> {
     const user = await firstValueFrom(
-      this.coreService.send('core.user.create', {
-        ...register,
-        role: null,
-        skills: [],
-        location: null,
-      }),
+      this.coreService.send<UserDTO>(
+        'core.user.create',
+        Object.assign({}, register, {
+          location: null,
+          role: null,
+          skills: [],
+        }),
+      ),
     );
 
     const payload = {
-      sub: user.id,
+      email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
-      email: user.email,
       role: user.role,
+      sub: user.id,
     };
 
     return {

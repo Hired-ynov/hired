@@ -9,6 +9,15 @@ import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { Role } from '@repo/models';
 
+interface JwtPayload extends Record<string, unknown> {
+  role?: Role;
+}
+
+interface HttpRequest {
+  headers?: Record<string, string | string[] | undefined>;
+  user?: JwtPayload;
+}
+
 export const IS_PUBLIC_KEY = 'isPublic';
 export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
 
@@ -18,8 +27,8 @@ export const Roles = (...roles: Role[]) => SetMetadata(ROLES_KEY, roles);
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
-    private jwtService: JwtService,
-    private reflector: Reflector,
+    private readonly jwtService: JwtService,
+    private readonly reflector: Reflector,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -32,17 +41,17 @@ export class AuthGuard implements CanActivate {
       return true;
     }
 
-    const request = context.switchToHttp().getRequest<Request>();
+    const request = context.switchToHttp().getRequest<HttpRequest>();
     const token = this.extractTokenFromHeader(request);
     if (!token) {
       throw new UnauthorizedException('Token manquant');
     }
 
-    let payload: any;
+    let payload: JwtPayload;
     try {
-      payload = await this.jwtService.verifyAsync(token);
-      (request as unknown as Record<string, unknown>)['user'] = payload;
-    } catch (error) {
+      payload = await this.jwtService.verifyAsync<JwtPayload>(token);
+      request.user = payload;
+    } catch {
       throw new UnauthorizedException('Token invalide');
     }
 
@@ -51,22 +60,29 @@ export class AuthGuard implements CanActivate {
       context.getClass(),
     ]);
 
-    if (requiredRoles && requiredRoles.length > 0) {
-      if (!payload.role || !requiredRoles.includes(payload.role)) {
-        throw new UnauthorizedException(
-          `Rôle requis: ${requiredRoles.join(', ')}, rôle actuel: ${payload.role}`,
-        );
-      }
+    if (
+      requiredRoles.length > 0 &&
+      (!payload.role || !requiredRoles.includes(payload.role))
+    ) {
+      throw new UnauthorizedException(
+        `Rôle requis: ${requiredRoles.join(', ')}, rôle actuel: ${String(payload.role)}`,
+      );
     }
 
     return true;
   }
 
-  private extractTokenFromHeader(request: Request): string | undefined {
-    const headers =
-      (request.headers as unknown as Record<string, string>) || {};
-    const authorization = headers.authorization || '';
-    const [type, token] = authorization.split(' ') ?? [];
+  private extractTokenFromHeader(request: HttpRequest): string | undefined {
+    const authorizationHeader = request.headers?.authorization;
+    const authorization = Array.isArray(authorizationHeader)
+      ? authorizationHeader[0]
+      : authorizationHeader;
+
+    if (!authorization) {
+      return undefined;
+    }
+
+    const [type, token] = authorization.split(' ');
     return type === 'Bearer' ? token : undefined;
   }
 }
