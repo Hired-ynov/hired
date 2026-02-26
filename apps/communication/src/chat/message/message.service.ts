@@ -1,13 +1,13 @@
 import { Injectable, Inject, HttpStatus } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
+import { UserDTO, Role } from '@repo/models';
 import {
+  BaseService,
   PaginationOptions,
   PaginationResult,
-  UserDTO,
-  Role,
-} from '@repo/models';
-import { BaseService, RabbitMQException } from '@repo/nest-service';
+  RabbitMQException,
+} from '@repo/nest-service';
 import { microservices } from '@repo/rabbitmq-config';
 import { Subject, Observable } from 'rxjs';
 import { Repository } from 'typeorm';
@@ -24,8 +24,10 @@ export class MessageService extends BaseService<Message> {
     private readonly messageRepository: Repository<Message>,
     @InjectRepository(Conversation)
     private readonly conversationRepository: Repository<Conversation>,
-    @Inject(microservices.symbols.INTERNAL_BUS_SERVICE)
-    private readonly internalBusClient: ClientProxy,
+    @Inject(microservices.symbols.CORE_SERVICE)
+    private readonly coreClient: ClientProxy,
+    @Inject(microservices.symbols.COMMUNICATION_SERVICE)
+    private readonly communicationClient: ClientProxy,
   ) {
     super(messageRepository);
   }
@@ -57,15 +59,24 @@ export class MessageService extends BaseService<Message> {
       }
 
       message.senderId = currentUser.id;
+      message.conversationId = conversation.id;
 
       const created = await this.create(message);
 
       const subj = this.streams.get(created.conversationId);
+
+      console.log('Message created:', created);
+      console.log(
+        subj
+          ? 'Emitting to stream subscribers'
+          : 'No stream subscribers to emit to',
+      );
+
       if (subj) subj.next(created);
 
       // also emit on internal bus for other subscribers
       try {
-        this.internalBusClient.emit('communication.message.created', created);
+        this.communicationClient.emit('communication.message.created', created);
       } catch {
         // ignore internal bus failures
       }
@@ -73,6 +84,8 @@ export class MessageService extends BaseService<Message> {
       return created;
     } catch (error) {
       if (error instanceof RabbitMQException) throw error;
+
+      console.error('Error creating message:', error);
 
       throw new RabbitMQException(
         HttpStatus.INTERNAL_SERVER_ERROR,

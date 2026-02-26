@@ -1,17 +1,12 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import {
-  ConversationDTO,
-  CreateConversationDTO,
-  UserDTO,
-  PaginationOptions,
-  PaginationResult,
-} from '@repo/models';
+import { ConversationDTO, CreateConversationDTO, UserDTO } from '@repo/models';
 import { plainToInstance } from 'class-transformer';
 
 import { Conversation } from '../entities/conversation.entity';
 
 import { ConversationService } from './conversation.service';
+import { PaginationOptions, PaginationResult } from '@repo/nest-service';
 
 @Controller()
 export class ConversationController {

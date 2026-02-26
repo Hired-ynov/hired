@@ -6,14 +6,13 @@ import {
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Offer, Role, UserDTO } from '@repo/models';
 import {
-  Offer,
+  BaseService,
   PaginationOptions,
   PaginationResult,
-  Role,
-  UserDTO,
-} from '@repo/models';
-import { BaseService, RabbitMQException } from '@repo/nest-service';
+  RabbitMQException,
+} from '@repo/nest-service';
 import { microservices } from '@repo/rabbitmq-config';
 import { firstValueFrom, timeout } from 'rxjs';
 import { ArrayContains, Repository } from 'typeorm';
@@ -25,8 +24,8 @@ export class ConversationService extends BaseService<Conversation> {
   constructor(
     @InjectRepository(Conversation)
     private conversationRepository: Repository<Conversation>,
-    @Inject(microservices.symbols.INTERNAL_BUS_SERVICE)
-    private readonly internalBusClient: ClientProxy,
+    @Inject(microservices.symbols.CORE_SERVICE)
+    private readonly coreClient: ClientProxy,
   ) {
     super(conversationRepository);
   }
@@ -37,8 +36,8 @@ export class ConversationService extends BaseService<Conversation> {
   ): Promise<Conversation> {
     try {
       const offer = await firstValueFrom<Offer | undefined>(
-        this.internalBusClient
-          .send('core.offers.findOne', { id: conversation.offerId })
+        this.coreClient
+          .send('core.offer.find-one', conversation.offerId)
           .pipe(timeout(1000)),
       );
 
@@ -47,14 +46,14 @@ export class ConversationService extends BaseService<Conversation> {
       }
 
       const selfUser = await firstValueFrom<UserDTO | undefined>(
-        this.internalBusClient
-          .send('core.users.findOne', { id: currentUser.id })
+        this.coreClient
+          .send('core.user.find-one-by-id', { id: currentUser.id })
           .pipe(timeout(1000)),
       );
 
       const remoteUser = await firstValueFrom<UserDTO | undefined>(
-        this.internalBusClient
-          .send('core.users.findOne', { companyId: offer.companyId })
+        this.coreClient
+          .send('core.user.find-one-by-id', { companyId: offer.companyId })
           .pipe(timeout(1000)),
       );
 
@@ -75,6 +74,8 @@ export class ConversationService extends BaseService<Conversation> {
       // revert
       this.remove(conversation.id).catch(() => void 0);
 
+      console.error('Error creating conversation:', error);
+
       // server throw
       throw new RabbitMQException(
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -87,6 +88,12 @@ export class ConversationService extends BaseService<Conversation> {
     page: PaginationOptions,
     currentUser: UserDTO,
   ): Promise<PaginationResult<Conversation>> {
+    console.log(
+      'Finding conversations for user:',
+      currentUser,
+      'with pagination:',
+      page,
+    );
     return await this.findWithPagination(page, {
       where: [
         {

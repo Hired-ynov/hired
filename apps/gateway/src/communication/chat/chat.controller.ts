@@ -15,27 +15,26 @@ import {
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { microservices } from '@repo/rabbitmq-config';
-import { firstValueFrom, map, timeout } from 'rxjs';
+import { firstValueFrom, map, Observable, timeout } from 'rxjs';
 import { plainToInstance } from 'class-transformer';
 import {
   MessageDTO,
-  PaginationOptions,
-  PaginationResult,
   ConversationDTO,
   CreateConversationDTO,
   UserDTO,
   Message,
 } from '@repo/models';
-import { CurrentUser } from '@repo/nest-service';
+import { PaginationOptions, PaginationResult } from '@repo/nest-service';
+import { CurrentUser } from '@repo/commun';
+import { ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 
 @Controller('chat')
+@ApiBearerAuth()
 export class ChatController {
   constructor(
     @Inject(microservices.symbols.COMMUNICATION_SERVICE)
-    private readonly communicationService: ClientProxy,
-    @Inject(microservices.symbols.INTERNAL_BUS_SERVICE)
-    private readonly internalService: ClientProxy<{
-      'communication.message.created': (payload: Message) => void;
+    private readonly communicationService: ClientProxy<{
+      'communication.message.created': (message: Message) => void;
     }>,
   ) {}
 
@@ -44,10 +43,11 @@ export class ChatController {
     if (!chatId) {
       throw new BadRequestException('chat id is required');
     } // keep the SSE open and proxy the internal message stream
-
-    return this.internalService
-      .send('communication.message.created', { conversationId: chatId })
-      .pipe(map((payload) => ({ data: payload })));
+    // request a message stream for this conversation from the communication service
+    const payload = { conversationId: chatId };
+    return this.communicationService
+      .send<MessageDTO>('communication.message.created', payload)
+      .pipe(map((message) => ({ data: plainToInstance(MessageDTO, message) })));
   }
 
   @Get('/:id/messages')
@@ -77,6 +77,42 @@ export class ChatController {
       ...response,
       data: plainToInstance(MessageDTO, response.data),
     };
+  }
+
+  @Post('/:id/messages')
+  @ApiBody({ type: MessageDTO })
+  async createMessage(
+    @Param('id') chatId: string,
+    @Body() message: Partial<MessageDTO>,
+    @CurrentUser() currentUser?: UserDTO,
+  ): Promise<MessageDTO> {
+    if (!chatId) {
+      throw new BadRequestException('chat id is required');
+    }
+
+    if (!message || !message.content) {
+      throw new BadRequestException('message content is required in body');
+    }
+
+    if (!currentUser) {
+      throw new BadRequestException('currentUser is required');
+    }
+
+    const messageDto = plainToInstance(MessageDTO, {
+      ...message,
+      conversationId: chatId,
+    });
+
+    const response = await firstValueFrom(
+      this.communicationService
+        .send<MessageDTO>('communication.message.create', {
+          message: messageDto,
+          currentUser,
+        })
+        .pipe(timeout(5000)),
+    );
+
+    return plainToInstance(MessageDTO, response);
   }
 
   @Post('/conversations')

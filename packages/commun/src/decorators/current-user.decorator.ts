@@ -6,6 +6,9 @@ export const CurrentUser = createParamDecorator(
     const request: Request & { user: UserDTO } = ctx
       .switchToHttp()
       .getRequest();
-    return request.user;
+
+    const user = request.user;
+    user.id = (user as UserDTO & { sub: string }).sub; // map sub to id for consistency
+    return user;
   },
 );

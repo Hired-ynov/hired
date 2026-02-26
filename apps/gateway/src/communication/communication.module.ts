@@ -21,18 +21,6 @@ import { CommunicationController } from './communication.controller';
         },
       },
     ]),
-    ClientsModule.registerAsync([
-      {
-        imports: [ConfigModule],
-        inject: [ConfigService],
-        name: microservices.symbols.INTERNAL_BUS_SERVICE,
-        useFactory: (configService: ConfigService) => {
-          return microservices.INTERNAL_BUS_SERVICE({
-            RABBITMQ_URL: configService.get<string>('RABBITMQ_URL'),
-          });
-        },
-      },
-    ]),
   ],
 })
 export class CommunicationModule {}

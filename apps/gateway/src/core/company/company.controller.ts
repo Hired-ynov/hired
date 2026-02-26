@@ -10,6 +10,7 @@ import {
   Put,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { CurrentUser, Roles } from '@repo/commun';
 import {
   UserDTO,
@@ -24,6 +25,7 @@ import { plainToInstance } from 'class-transformer';
 import { firstValueFrom } from 'rxjs';
 
 @Controller('company')
+@ApiBearerAuth()
 export class CompanyController {
   constructor(
     @Inject(microservices.symbols.CORE_SERVICE)

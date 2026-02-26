@@ -15,12 +15,6 @@ async function bootstrap() {
     }),
   );
 
-  app.connectMicroservice(
-    microservices.INTERNAL_BUS_SERVICE({
-      RABBITMQ_URL: rabbitmqUrl,
-    }),
-  );
-
   await app.startAllMicroservices();
 }
 

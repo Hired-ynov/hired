@@ -16,10 +16,10 @@ import { ConversationService } from './conversation.service';
   imports: [
     ClientsModule.registerAsync([
       {
-        name: microservices.symbols.INTERNAL_BUS_SERVICE,
+        name: microservices.symbols.CORE_SERVICE,
         imports: [ConfigModule],
         useFactory: (configService: ConfigService) => {
-          return microservices.INTERNAL_BUS_SERVICE({
+          return microservices.CORE_SERVICE({
             RABBITMQ_URL: configService.get<string>('RABBITMQ_URL'),
           });
         },

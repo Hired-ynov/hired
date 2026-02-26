@@ -18,7 +18,6 @@ export const microservices = {
     COMMUNICATION_SERVICE: Symbol('COMMUNICATION_SERVICE'),
     CORE_SERVICE: Symbol('CORE_SERVICE'),
     FILES_SERVICE: Symbol('FILES_SERVICE'),
-    INTERNAL_BUS_SERVICE: Symbol('INTERNAL_BUS_SERVICE'),
   } as const),
   AUTH_SERVICE: (envs: NodeJS.ProcessEnv) => {
     const base = microservices.base(envs);
@@ -57,16 +56,6 @@ export const microservices = {
       options: {
         ...base.options,
         queue: 'files_queue',
-      },
-    } as ClientProvider;
-  },
-  INTERNAL_BUS_SERVICE: (envs: NodeJS.ProcessEnv) => {
-    const base = microservices.base(envs);
-    return {
-      ...base,
-      options: {
-        ...base.options,
-        queue: 'internal_bus_queue',
       },
     } as ClientProvider;
   },

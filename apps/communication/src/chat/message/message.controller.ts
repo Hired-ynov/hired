@@ -1,18 +1,13 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import {
-  MessageDTO,
-  CreateMessageDTO,
-  PaginationOptions,
-  PaginationResult,
-  UserDTO,
-} from '@repo/models';
+import { MessageDTO, CreateMessageDTO, UserDTO } from '@repo/models';
 import { plainToInstance } from 'class-transformer';
 import { map } from 'rxjs/operators';
 
 import { Message } from '../entities/message.entity';
 
 import { MessageService } from './message.service';
+import { PaginationOptions, PaginationResult } from '@repo/nest-service';
 
 @Controller()
 export class MessageController {

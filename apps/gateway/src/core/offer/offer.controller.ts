@@ -23,8 +23,10 @@ import { CurrentUser } from '@repo/commun';
 import { plainToInstance } from 'class-transformer';
 import { firstValueFrom } from 'rxjs/internal/firstValueFrom';
 import { getUserId } from 'src/utils/user-id.utils';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('offer')
+@ApiBearerAuth()
 export class OfferController {
   constructor(
     @Inject(microservices.symbols.CORE_SERVICE)
