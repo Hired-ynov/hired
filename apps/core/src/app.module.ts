@@ -1,14 +1,19 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { CompanyModule } from './company/company.module';
-import { UserModule } from './users/user.module';
-import { OfferModule } from './offer/offer.module';
-import { ApplicationModule } from './application/application.module';
-
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserEntity, CompanyEntity, ApplicationEntity, OfferEntity } from '@repo/entities';
+import {
+  UserEntity,
+  CompanyEntity,
+  ApplicationEntity,
+  OfferEntity,
+} from '@repo/entities';
+
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { ApplicationModule } from './application/application.module';
+import { CompanyModule } from './company/company.module';
+import { OfferModule } from './offer/offer.module';
+import { UserModule } from './users/user.module';
 
 @Module({
   controllers: [AppController],
