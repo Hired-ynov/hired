@@ -6,6 +6,7 @@ on:
       - dev
       - staging
       - main
+      - feat/HIR-25-CICD
   pull_request:
     branches:
       - dev
