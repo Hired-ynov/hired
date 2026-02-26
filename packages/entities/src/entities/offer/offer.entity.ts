@@ -23,7 +23,7 @@ export class OfferEntity extends BaseEntity implements Offer {
 
   @ManyToOne(() => CompanyEntity, { eager: false })
   @JoinColumn({ name: 'companyId' })
-  company: CompanyEntity;
+  company!: CompanyEntity;
 
   @Column('simple-array')
   skills!: Skill[];
