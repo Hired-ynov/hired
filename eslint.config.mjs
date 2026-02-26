@@ -3,14 +3,10 @@ import tsParser from '@typescript-eslint/parser';
 
 export default [
   {
-    ignores: [
-      'apps/**',
-      'packages/**',
-      'dist/**',
-      'node_modules/**',
-      '*.config.mjs',
-      '.*rc.mjs',
-    ],
+    files: ['apps/**/*.{ts,tsx}', 'packages/**/*.{ts,tsx}'],
+  },
+  {
+    ignores: ['dist/**', 'node_modules/**', '*.config.mjs', '.*rc.mjs'],
   },
   ...libraryConfig,
   {
