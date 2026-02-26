@@ -9,7 +9,7 @@ import {
   Put,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { CurrentUser, Roles } from '@repo/commun';
+import { CurrentUser, Public, Roles } from '@repo/commun';
 import {
   UserDTO,
   CompanyDTO,
@@ -53,6 +53,7 @@ export class CompanyController {
   }
 
   @Get(':id')
+  @Public()
   async findOne(@Param('id') id: string): Promise<CompanyDTO> {
     const company = await firstValueFrom<CompanyDTO>(
       this.coreService.send('company.findOne', { id: id }),

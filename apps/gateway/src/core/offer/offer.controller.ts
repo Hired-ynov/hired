@@ -20,6 +20,8 @@ import {
   UserDTO,
 } from '@repo/models';
 import { microservices } from '@repo/rabbitmq-config';
+import { ClientProxy } from '@nestjs/microservices';
+import { CurrentUser, Public } from '@repo/commun';
 import { plainToInstance } from 'class-transformer';
 import { firstValueFrom } from 'rxjs/internal/firstValueFrom';
 import { getUserId } from 'src/utils/user-id.utils';
@@ -47,6 +49,7 @@ export class OfferController {
   }
 
   @Get()
+  @Public()
   async findAll(): Promise<OfferDTO[]> {
     const offers = await firstValueFrom<Offer[]>(
       this.coreService.send('core.offer.find-all', {}),
@@ -55,6 +58,7 @@ export class OfferController {
   }
 
   @Get('company/:id')
+  @Public()
   async findByCompanyId(@Param('id') id: string): Promise<OfferDTO[]> {
     const offers = await firstValueFrom<Offer[]>(
       this.coreService.send('core.offer.find-by-company-id', id),
@@ -63,6 +67,7 @@ export class OfferController {
   }
 
   @Get(':id')
+  @Public()
   async findOne(@Param('id') id: string): Promise<OfferDTO | null> {
     const offer = await firstValueFrom<Offer | null>(
       this.coreService.send('core.offer.find-one', id),

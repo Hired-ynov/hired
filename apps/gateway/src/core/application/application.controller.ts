@@ -59,7 +59,7 @@ export class ApplicationController {
         files: files,
         userId: getUserId(user),
       }),
-    );
+    )) as ApplicationDTO;
     return plainToInstance(ApplicationDTO, application);
   }
 
@@ -82,7 +82,7 @@ export class ApplicationController {
         'core.application.findMyApplications',
         getUserId(user),
       ),
-    );
+    )) as ApplicationDTO[];
     return applications.map((application) =>
       plainToInstance(ApplicationDTO, application),
     );
@@ -128,7 +128,7 @@ export class ApplicationController {
         updateApplication: updateApplication,
         userId: getUserId(user),
       }),
-    );
+    )) as ApplicationDTO;
     return plainToInstance(ApplicationDTO, application);
   }
 
