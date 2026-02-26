@@ -18,6 +18,7 @@ import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FilesService } from './files.service';
 import { FileDTO } from '@repo/models';
+import { plainToInstance } from 'class-transformer';
 
 /**
  * Contrôleur HTTP REST pour la gestion des fichiers
@@ -38,7 +39,8 @@ export class FilesHttpController {
     }
 
     try {
-      return await this.filesService.uploadFile(file);
+      const uploadedFile = await this.filesService.uploadFile(file);
+      return plainToInstance(FileDTO, uploadedFile);
     } catch (error) {
       throw new BadRequestException(
         `Failed to upload file: ${error instanceof Error ? error.message : 'Unknown error'}`,
@@ -48,12 +50,14 @@ export class FilesHttpController {
 
   @Get()
   async findAll(): Promise<FileDTO[]> {
-    return this.filesService.findAllFiles();
+    const files = await this.filesService.findAllFiles();
+    return files.map((file) => plainToInstance(FileDTO, file));
   }
 
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<FileDTO> {
-    return this.filesService.findFileById(id);
+    const file = this.filesService.findFileById(id);
+    return plainToInstance(FileDTO, file);
   }
 
   @Get(':id/url')

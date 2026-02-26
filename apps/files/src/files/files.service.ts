@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FileDTO } from '@repo/models';
+import { File } from '@repo/models';
 import { BaseService } from '@repo/nest-service';
 import { Repository } from 'typeorm';
 import { MinioService } from './minio.service';
@@ -20,7 +20,7 @@ export class FilesService extends BaseService<FileEntity> {
   /**
    * Upload un fichier vers MinIO et sauvegarde les métadonnées en base
    */
-  async uploadFile(file: Express.Multer.File): Promise<FileDTO> {
+  async uploadFile(file: Express.Multer.File): Promise<File> {
     const timestamp = Date.now();
     const fileName = `${timestamp}-${file.originalname}`;
 
@@ -35,26 +35,25 @@ export class FilesService extends BaseService<FileEntity> {
       },
     });
 
-    return plainToInstance(FileDTO, fileEntity);
+    return fileEntity;
   }
 
   /**
    * Récupère tous les fichiers
    */
-  async findAllFiles(): Promise<FileDTO[]> {
-    const files = await this.findAll();
-    return plainToInstance(FileDTO, files);
+  async findAllFiles(): Promise<File[]> {
+    return await this.findAll();
   }
 
   /**
    * Récupère un fichier par son ID
    */
-  async findFileById(id: string): Promise<FileDTO> {
+  async findFileById(id: string): Promise<File> {
     const file = await this.findOne({ id });
     if (!file) {
       throw new NotFoundException(`File with ID ${id} not found`);
     }
-    return plainToInstance(FileDTO, file);
+    return file;
   }
 
   /**
@@ -78,7 +77,7 @@ export class FilesService extends BaseService<FileEntity> {
   /**
    * Récupère le stream d'un fichier pour le téléchargement
    */
-  async getFileStream(id: string): Promise<{ stream: any; file: FileEntity }> {
+  async getFileStream(id: string): Promise<{ stream: any; file: File }> {
     const file = await this.findOne({ id });
     if (!file) {
       throw new NotFoundException(`File with ID ${id} not found`);
@@ -112,7 +111,7 @@ export class FilesService extends BaseService<FileEntity> {
   /**
    * Récupère plusieurs fichiers par leurs IDs
    */
-  async getFilesByIds(ids: string[]): Promise<FileDTO[]> {
+  async getFilesByIds(ids: string[]): Promise<File[]> {
     const files = await Promise.all(
       ids.map(async (id) => {
         const file = await this.findOne({ id });
@@ -121,6 +120,6 @@ export class FilesService extends BaseService<FileEntity> {
     );
 
     const validFiles = files.filter((file) => file !== null);
-    return plainToInstance(FileDTO, validFiles);
+    return validFiles;
   }
 }

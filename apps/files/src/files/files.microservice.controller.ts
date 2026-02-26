@@ -1,7 +1,7 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload, RpcException } from '@nestjs/microservices';
 import { FilesService } from './files.service';
-import { FileDTO } from '@repo/models';
+import { File } from '@repo/models';
 
 interface UploadFilePayload {
   file: {
@@ -28,8 +28,8 @@ interface DeleteFilePayload {
 export class FilesMicroserviceController {
   constructor(private readonly filesService: FilesService) {}
 
-  @MessagePattern({ cmd: 'upload_file' })
-  async uploadFile(@Payload() payload: UploadFilePayload): Promise<FileDTO> {
+  @MessagePattern('file.file.uploadFile')
+  async uploadFile(@Payload() payload: UploadFilePayload): Promise<File> {
     const { file } = payload;
 
     if (!file) {
@@ -58,13 +58,13 @@ export class FilesMicroserviceController {
     }
   }
 
-  @MessagePattern({ cmd: 'find_all_files' })
-  async findAll(): Promise<FileDTO[]> {
+  @MessagePattern('file.file.findAll')
+  async findAll(): Promise<File[]> {
     return this.filesService.findAllFiles();
   }
 
-  @MessagePattern({ cmd: 'find_one_file' })
-  async findOne(@Payload() payload: FindOnePayload): Promise<FileDTO> {
+  @MessagePattern('file.file.findOne')
+  async findOne(@Payload() payload: FindOnePayload): Promise<File> {
     try {
       return await this.filesService.findFileById(payload.id);
     } catch (error) {
@@ -74,7 +74,7 @@ export class FilesMicroserviceController {
     }
   }
 
-  @MessagePattern({ cmd: 'get_file_url' })
+  @MessagePattern('file.file.getFileUrl')
   async getFileUrl(
     @Payload() payload: FindOnePayload,
   ): Promise<{ url: string }> {
@@ -87,7 +87,7 @@ export class FilesMicroserviceController {
     }
   }
 
-  @MessagePattern({ cmd: 'delete_file' })
+  @MessagePattern('file.file.deleteFile')
   async remove(
     @Payload() payload: DeleteFilePayload,
   ): Promise<{ success: boolean }> {
@@ -101,10 +101,8 @@ export class FilesMicroserviceController {
     }
   }
 
-  @MessagePattern({ cmd: 'get_files_by_ids' })
-  async getFilesByIds(
-    @Payload() payload: { ids: string[] },
-  ): Promise<FileDTO[]> {
+  @MessagePattern('file.file.getFilesByIds')
+  async getFilesByIds(@Payload() payload: { ids: string[] }): Promise<File[]> {
     try {
       return await this.filesService.getFilesByIds(payload.ids);
     } catch (error) {

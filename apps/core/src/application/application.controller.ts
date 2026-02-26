@@ -1,20 +1,17 @@
-import { BadRequestException, Controller } from '@nestjs/common';
-import { MessagePattern, Payload } from '@nestjs/microservices';
+import { BadRequestException, Controller, Inject } from '@nestjs/common';
+import { ClientProxy, MessagePattern, Payload } from '@nestjs/microservices';
 import {
-  UserDTO,
-  CreateApplicationDTO,
-  ApplicationDTO,
   CreateApplication,
   Application,
   UpdateApplication,
   ApplicationStatus,
 } from '@repo/models';
-import { plainToInstance } from 'class-transformer';
+import { firstValueFrom } from 'rxjs';
 
 import { ApplicationService } from './application.service';
-import { ApplicationEntity } from '@repo/entities';
 import { UserService } from 'src/users/user.service';
 import { OfferService } from 'src/offer/offer.service';
+import { microservices } from '@repo/rabbitmq-config';
 
 interface MulterFile {
   fieldname: string;
@@ -34,6 +31,8 @@ export class ApplicationController {
     private readonly applicationService: ApplicationService,
     private readonly userService: UserService,
     private readonly offerService: OfferService,
+    @Inject(microservices.symbols.FILES_SERVICE)
+    private readonly fileService: ClientProxy,
   ) {}
 
   @MessagePattern('core.application.create')
@@ -67,6 +66,16 @@ export class ApplicationController {
       status: ApplicationStatus.PENDING,
       userId: user.id,
     };
+
+    if (payload.files && payload.files.length > 0) {
+      const uploadedFiles = await Promise.all(
+        payload.files.map((file) =>
+          firstValueFrom(this.fileService.send('file.file.uploadFile', file)),
+        ),
+      );
+      applicationData.filesIds = uploadedFiles.map((file) => file.id);
+    }
+
     const saved = await this.applicationService.create(applicationData);
     return saved;
   }
@@ -84,7 +93,7 @@ export class ApplicationController {
   }
 
   @MessagePattern('core.application.findOne')
-  async findOne(@Payload() id: string): Promise<ApplicationDTO> {
+  async findOne(@Payload() id: string): Promise<Application> {
     return await this.applicationService.findByIdOrFail(id);
   }
 
