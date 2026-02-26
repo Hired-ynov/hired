@@ -1,5 +1,6 @@
 import { File } from '@repo/models';
-import { Metadata } from '@repo/models/dist/entities/utils/Metadata';
+import { Metadata } from '@repo/models/domain/utils/metadata';
+
 import { BaseEntity } from '@repo/nest-service';
 import { Entity, Column } from 'typeorm';
 

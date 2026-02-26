@@ -1,22 +1,20 @@
 import { Module } from '@nestjs/common';
-
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { FilesController } from './files/files.controller';
-import { FilesService } from './files/files.service';
 import { FilesModule } from './files/files.module';
-import { FileEntity } from './files/entities/file.entity';
+import { FileEntity } from '@repo/entities';
 
 @Module({
-  controllers: [AppController, FilesController],
+  controllers: [AppController],
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
     }),
     TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
@@ -29,9 +27,8 @@ import { FileEntity } from './files/entities/file.entity';
         synchronize: configService.get('NODE_ENV') !== 'production',
       }),
     }),
-    TypeOrmModule.forFeature([FileEntity]),
     FilesModule,
   ],
-  providers: [AppService, FilesService],
+  providers: [AppService],
 })
 export class AppModule {}

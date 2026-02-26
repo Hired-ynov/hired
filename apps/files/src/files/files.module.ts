@@ -1,13 +1,14 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { FilesController } from './files.controller';
+import { FilesHttpController } from './files.http.controller';
+import { FilesMicroserviceController } from './files.microservice.controller';
 import { FilesService } from './files.service';
 import { MinioService } from './minio.service';
-import { FileEntity } from './entities/file.entity';
+import { FileEntity } from '@repo/entities';
 
 @Module({
   imports: [TypeOrmModule.forFeature([FileEntity])],
-  controllers: [FilesController],
+  controllers: [FilesHttpController, FilesMicroserviceController],
   providers: [FilesService, MinioService],
   exports: [FilesService, MinioService],
 })
