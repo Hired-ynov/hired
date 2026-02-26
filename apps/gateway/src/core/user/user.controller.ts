@@ -1,4 +1,3 @@
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import {
   Body,
   Controller,
@@ -61,6 +60,7 @@ export class UserController {
   }
 
   @Get(':id')
+  @Public()
   async findOne(
     @Param('id') id: string,
     @CurrentUser() currentUser: any,

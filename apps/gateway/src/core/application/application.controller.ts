@@ -23,7 +23,6 @@ import {
 } from '@repo/models';
 import { microservices } from '@repo/rabbitmq-config';
 import { plainToInstance } from 'class-transformer';
-import { get } from 'http';
 import { firstValueFrom } from 'rxjs';
 import { getUserId } from 'src/utils/user-id.utils';
 
@@ -54,13 +53,13 @@ export class ApplicationController {
     @UploadedFiles() files?: MulterFile[],
   ): Promise<ApplicationDTO> {
     const createApplication = plainToInstance(CreateApplication, body);
-    const application = await firstValueFrom(
+    const application = (await firstValueFrom(
       this.coreService.send('core.application.create', {
         createApplication: createApplication,
         userId: getUserId(user),
         files: files,
       }),
-    );
+    )) as ApplicationDTO;
     return plainToInstance(ApplicationDTO, application);
   }
 
@@ -78,12 +77,12 @@ export class ApplicationController {
   async findMyApplications(
     @CurrentUser() user: UserDTO,
   ): Promise<ApplicationDTO[]> {
-    const applications = await firstValueFrom(
+    const applications = (await firstValueFrom(
       this.coreService.send(
         'core.application.findMyApplications',
         getUserId(user),
       ),
-    );
+    )) as ApplicationDTO[];
     return applications.map((application) =>
       plainToInstance(ApplicationDTO, application),
     );
@@ -122,14 +121,14 @@ export class ApplicationController {
     @UploadedFiles() files?: MulterFile[],
   ): Promise<ApplicationDTO> {
     const updateApplication = plainToInstance(UpdateApplication, body);
-    const application = await firstValueFrom(
+    const application = (await firstValueFrom(
       this.coreService.send('core.application.update', {
         id: id,
         updateApplication: updateApplication,
         userId: getUserId(user),
         files: files,
       }),
-    );
+    )) as ApplicationDTO;
     return plainToInstance(ApplicationDTO, application);
   }
 
