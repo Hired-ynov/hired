@@ -27,12 +27,14 @@
     }
   },
   "dependencies": {
-    "@nestjs/common": "^11.1.11",
-    "@nestjs/config": "^4.0.2",
-    "@nestjs/core": "^11.1.11",
-    "@nestjs/jwt": "^11.0.2",
     "@nestjs/mapped-types": "*",
     "@repo/models": "workspace:*"
+  },
+  "peerDependencies": {
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/config": "^4.0.0",
+    "@nestjs/core": "^11.0.0",
+    "@nestjs/jwt": "^11.0.0"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",

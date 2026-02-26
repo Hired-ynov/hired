@@ -4,3 +4,4 @@ export * from './offer';
 export * from './conversation';
 export * from './message';
 export * from './file';
+export * from './application';

@@ -124,7 +124,10 @@ export abstract class BaseService<T extends BaseEntity> {
     return entity;
   }
 
-  async findByIdOrFail(id: string): Promise<T> {
+  async findByIdOrFail(id: string | undefined): Promise<T> {
+    if (!id) {
+      throw new Error('ID is required');
+    }
     const entity = await this.findById(id);
     if (!entity) {
       throw new Error(`Entity with id ${id} not found`);

@@ -1,4 +1,11 @@
-import { IsArray, IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
+import {
+  IsArray,
+  IsEnum,
+  IsOptional,
+  IsString,
+  IsUUID,
+  ValidateNested,
+} from 'class-validator';
 import { Skill } from '../../entry';
 import { SalaryRangeDTO } from '../utils/SalaryRangeDTO';
 import { Type } from 'class-transformer';
@@ -17,6 +24,7 @@ export class UpdateOfferDTO {
   location?: string;
 
   @IsOptional()
+  @ValidateNested()
   @Type(() => SalaryRangeDTO)
   salaryRange?: SalaryRangeDTO;
 
