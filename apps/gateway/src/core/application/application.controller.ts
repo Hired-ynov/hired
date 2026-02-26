@@ -59,7 +59,7 @@ export class ApplicationController {
         files: files,
         userId: getUserId(user),
       }),
-    )) as ApplicationDTO;
+    );
     return plainToInstance(ApplicationDTO, application);
   }
 
@@ -82,7 +82,7 @@ export class ApplicationController {
         'core.application.findMyApplications',
         getUserId(user),
       ),
-    )) as ApplicationDTO[];
+    );
     return applications.map((application) =>
       plainToInstance(ApplicationDTO, application),
     );
@@ -103,7 +103,7 @@ export class ApplicationController {
   ): Promise<ApplicationDTO[]> {
     const applications = await firstValueFrom<ApplicationDTO[]>(
       this.coreService.send('core.application.findByOfferId', {
-        id,
+        offerId: id,
         userId: getUserId(user),
       }),
     );
@@ -128,7 +128,7 @@ export class ApplicationController {
         updateApplication: updateApplication,
         userId: getUserId(user),
       }),
-    )) as ApplicationDTO;
+    );
     return plainToInstance(ApplicationDTO, application);
   }
 

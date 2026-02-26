@@ -53,14 +53,9 @@ export class AuthService {
 
   async register(register: Register): Promise<{ access_token: string }> {
     const user = await firstValueFrom(
-      this.coreService.send<UserDTO>(
-        'core.user.create',
-        Object.assign({}, register, {
-          location: null,
-          role: null,
-          skills: [],
-        }),
-      ),
+      this.coreService.send<UserDTO>('core.user.create', {
+        ...register,
+      }),
     );
 
     const payload = {

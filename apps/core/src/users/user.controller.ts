@@ -21,7 +21,11 @@ export class UserController {
 
   @MessagePattern('core.user.create')
   async create(@Payload() createUser: CreateUser): Promise<User> {
-    // Vérifier si l'email existe déjà
+    const { password, ...rest } = createUser;
+    if (!password?.trim()) {
+      throw new BadRequestException('Password is required');
+    }
+
     const existingUser = await this.userService.findOne({
       email: createUser.email,
     });
