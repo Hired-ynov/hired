@@ -7,3 +7,4 @@ export * from './application';
 export * from './user';
 export * from './enum';
 export * from './file';
+export * from './utils';

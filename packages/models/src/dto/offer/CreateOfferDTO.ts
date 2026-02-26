@@ -1,4 +1,4 @@
-import { IsArray, IsEnum, IsString } from 'class-validator';
+import { IsArray, IsEnum, IsString, ValidateNested } from 'class-validator';
 import { Skill } from '../../entry';
 import { Type } from 'class-transformer';
 import { SalaryRangeDTO } from '../utils/SalaryRangeDTO';
@@ -13,6 +13,7 @@ export class CreateOfferDTO {
   @IsString()
   location: string;
 
+  @ValidateNested()
   @Type(() => SalaryRangeDTO)
   salaryRange: SalaryRangeDTO;
 

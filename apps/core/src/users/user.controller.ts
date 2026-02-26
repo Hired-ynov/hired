@@ -1,11 +1,5 @@
 import {
   Controller,
-  Get,
-  Post,
-  Body,
-  Param,
-  Delete,
-  Put,
   ConflictException,
   NotFoundException,
   BadRequestException,
@@ -13,16 +7,11 @@ import {
 import { UserService } from './user.service';
 import {
   ChangePassword,
-  ChangePasswordDTO,
   CreateUser,
-  CreateUserDTO,
   Role,
   UpdateUser,
-  UpdateUserDTO,
   User,
-  UserDTO,
 } from '@repo/models';
-import { plainToInstance } from 'class-transformer';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 
 @Controller('user')
