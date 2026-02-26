@@ -23,7 +23,9 @@ import {
 } from '@repo/models';
 import { microservices } from '@repo/rabbitmq-config';
 import { plainToInstance } from 'class-transformer';
+import { get } from 'http';
 import { firstValueFrom } from 'rxjs';
+import { getUserId } from 'src/utils/user-id.utils';
 
 interface MulterFile {
   fieldname: string;
@@ -55,7 +57,7 @@ export class ApplicationController {
     const application = await firstValueFrom(
       this.coreService.send('core.application.create', {
         createApplication: createApplication,
-        userId: user.id,
+        userId: getUserId(user),
         files: files,
       }),
     );
@@ -77,7 +79,10 @@ export class ApplicationController {
     @CurrentUser() user: UserDTO,
   ): Promise<ApplicationDTO[]> {
     const applications = await firstValueFrom(
-      this.coreService.send('core.application.findMyApplications', user),
+      this.coreService.send(
+        'core.application.findMyApplications',
+        getUserId(user),
+      ),
     );
     return applications.map((application) =>
       plainToInstance(ApplicationDTO, application),
@@ -100,7 +105,7 @@ export class ApplicationController {
     const applications = (await firstValueFrom(
       this.coreService.send('core.application.findByOfferId', {
         id,
-        user,
+        userId: getUserId(user),
       }),
     )) as ApplicationDTO[];
     return applications.map((application) =>
@@ -119,9 +124,9 @@ export class ApplicationController {
     const updateApplication = plainToInstance(UpdateApplication, body);
     const application = await firstValueFrom(
       this.coreService.send('core.application.update', {
-        id: +id,
+        id: id,
         updateApplication: updateApplication,
-        userId: user.id,
+        userId: getUserId(user),
         files: files,
       }),
     );
@@ -131,7 +136,10 @@ export class ApplicationController {
   @Delete(':id')
   delete(@Param('id') id: string, @CurrentUser() user: UserDTO): Promise<void> {
     return firstValueFrom(
-      this.coreService.send('core.application.delete', { id, userId: user.id }),
+      this.coreService.send('core.application.delete', {
+        id,
+        userId: getUserId(user),
+      }),
     );
   }
 }

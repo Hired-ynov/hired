@@ -1,4 +1,4 @@
-import { IsEnum, IsString } from 'class-validator';
+import { IsArray, IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
 import { BaseDTO } from '../utils';
 import { ApplicationStatus } from '../../entry';
 
@@ -9,12 +9,15 @@ export class ApplicationDTO extends BaseDTO {
   @IsString()
   offerId: string;
 
+  @IsOptional()
   @IsString()
   firstMessage?: string;
 
-  @IsEnum({ enum: ['pending', 'reviewed', 'accepted', 'rejected'] })
+  @IsEnum(ApplicationStatus)
   status: ApplicationStatus;
 
-  @IsString()
+  @IsOptional()
+  @IsArray()
+  @IsUUID(4, { each: true })
   filesIds?: string[];
 }

@@ -7,6 +7,7 @@ import {
   CreateApplication,
   Application,
   UpdateApplication,
+  ApplicationStatus,
 } from '@repo/models';
 import { plainToInstance } from 'class-transformer';
 
@@ -63,6 +64,7 @@ export class ApplicationController {
 
     const applicationData: any = {
       ...payload.createApplication,
+      status: ApplicationStatus.PENDING,
       userId: user.id,
     };
     const saved = await this.applicationService.create(applicationData);
@@ -137,7 +139,7 @@ export class ApplicationController {
   @MessagePattern('core.application.delete')
   async remove(
     @Payload() payload: { id: string; userId: string },
-  ): Promise<void> {
+  ): Promise<{ success: boolean }> {
     const application = await this.applicationService.findByIdOrFail(
       payload.id,
     );
@@ -147,6 +149,7 @@ export class ApplicationController {
         'You can only delete your own applications',
       );
     }
-    return this.applicationService.remove(payload.id);
+    this.applicationService.remove(payload.id);
+    return { success: true };
   }
 }

@@ -36,18 +36,18 @@ export class CompanyService extends BaseService<CompanyEntity> {
   }
 
   async updateCompany(
-    id: number,
+    id: string,
     company: CompanyEntity,
   ): Promise<CompanyEntity | null> {
     const existingCompany = await this.companiesRepository.findOneBy({
-      id: id.toString(),
+      id: id,
     });
 
     if (!existingCompany) {
       throw new NotFoundException('Company not found');
     }
 
-    await this.companiesRepository.update(id.toString(), {
+    await this.companiesRepository.update(id, {
       ...company,
       updatedAt: new Date(),
     });

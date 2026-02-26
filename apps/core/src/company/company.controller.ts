@@ -32,8 +32,11 @@ export class CompanyController {
   }
 
   @MessagePattern('company.findOne')
-  async findOne(@Payload() id: string): Promise<CompanyEntity | null> {
-    return await this.companyService.findOne({ id: id });
+  async findOne(
+    @Payload() payload: { id: string },
+  ): Promise<CompanyEntity | null> {
+    console.log('company id', payload);
+    return await this.companyService.findOne({ id: payload.id });
   }
 
   @MessagePattern('company.update')
@@ -45,11 +48,14 @@ export class CompanyController {
     },
   ): Promise<CompanyEntity | null> {
     const company = plainToInstance(CompanyEntity, payload.updateCompanyDto);
-    return this.companyService.updateCompany(+payload.id, company);
+    return this.companyService.updateCompany(payload.id, company);
   }
 
   @MessagePattern('company.delete')
-  delete(@Payload() payload: { id: string }): Promise<void> {
-    return this.companyService.remove(payload.id);
+  async delete(
+    @Payload() payload: { id: string },
+  ): Promise<{ success: boolean }> {
+    await this.companyService.remove(payload.id);
+    return { success: true };
   }
 }

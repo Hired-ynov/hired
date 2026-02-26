@@ -1,12 +1,15 @@
-import { IsString } from 'class-validator';
+import { IsArray, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class CreateApplicationDTO {
   @IsString()
   offerId: string;
 
+  @IsOptional()
   @IsString()
   firstMessage?: string;
 
-  @IsString()
+  @IsOptional()
+  @IsArray()
+  @IsUUID(4, { each: true })
   filesIds?: string[];
 }

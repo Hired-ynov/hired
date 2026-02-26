@@ -22,6 +22,7 @@ import { ClientProxy } from '@nestjs/microservices';
 import { CurrentUser } from '@repo/commun';
 import { plainToInstance } from 'class-transformer';
 import { firstValueFrom } from 'rxjs/internal/firstValueFrom';
+import { getUserId } from 'src/utils/user-id.utils';
 
 @Controller('offer')
 export class OfferController {
@@ -38,8 +39,8 @@ export class OfferController {
     const createOffer = plainToInstance(CreateOffer, createOfferDto);
     const offer = (await firstValueFrom(
       this.coreService.send('core.offer.create', {
-        userId: user.id,
-        createOffer,
+        userId: getUserId(user),
+        createOffer: createOffer,
       }),
     )) as Offer;
     return plainToInstance(OfferDTO, offer);

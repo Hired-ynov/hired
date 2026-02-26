@@ -62,8 +62,9 @@ export class OfferController {
   }
 
   @MessagePattern('core.offer.delete')
-  async delete(@Payload() id: string): Promise<void> {
+  async delete(@Payload() id: string): Promise<{ success: boolean }> {
     const offer = await this.offerService.findByIdOrFail(id);
-    return this.offerService.remove(offer.id);
+    this.offerService.remove(offer.id);
+    return { success: true };
   }
 }

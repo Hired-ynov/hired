@@ -1,16 +1,17 @@
-import { IsEnum, IsString } from 'class-validator';
+import { IsArray, IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
 import { ApplicationStatus } from '../../entry';
 
 export class UpdateApplicationDTO {
+  @IsOptional()
   @IsString()
   firstMessage?: string;
 
-  @IsEnum({
-    enum: ['pending', 'reviewed', 'accepted', 'rejected'],
-    required: false,
-  })
+  @IsOptional()
+  @IsEnum(ApplicationStatus)
   status?: ApplicationStatus;
 
-  @IsString()
+  @IsOptional()
+  @IsArray()
+  @IsUUID(4, { each: true })
   filesIds?: string[];
 }

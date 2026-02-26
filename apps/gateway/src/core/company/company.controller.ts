@@ -57,7 +57,7 @@ export class CompanyController {
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<CompanyDTO> {
     const company = (await firstValueFrom(
-      this.coreService.send('company.findOne', { id: +id }),
+      this.coreService.send('company.findOne', { id: id }),
     )) as Company;
     return plainToInstance(CompanyDTO, company);
   }
@@ -69,7 +69,7 @@ export class CompanyController {
   ): Promise<CompanyDTO> {
     const company = (await firstValueFrom(
       this.coreService.send('company.update', {
-        id: +id,
+        id: id,
         updateCompanyDto: updateCompanyDto,
       }),
     )) as Company;
