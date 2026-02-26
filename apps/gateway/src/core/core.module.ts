@@ -2,11 +2,11 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientsModule } from '@nestjs/microservices';
 import { microservices } from '@repo/rabbitmq-config';
-import { CompanyController } from './company/company.controller';
-import { OfferController } from './offer/offer.controller';
-import { ApplicationController } from './application/application.controller';
 
+import { ApplicationController } from './application/application.controller';
+import { CompanyController } from './company/company.controller';
 import { CoreController } from './core.controller';
+import { OfferController } from './offer/offer.controller';
 import { UserController } from './user/user.controller';
 
 @Module({

@@ -1,19 +1,17 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Company, CompanyDTO, CreateCompanyDTO, User } from '@repo/models';
-import { BaseService } from '@repo/nest-service';
-import { plainToInstance } from 'class-transformer';
-import { Repository } from 'typeorm';
-
 import { CompanyEntity, UserEntity } from '@repo/entities';
+import { Company, CreateCompanyDTO, User } from '@repo/models';
+import { BaseService } from '@repo/nest-service';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class CompanyService extends BaseService<CompanyEntity> {
   constructor(
     @InjectRepository(CompanyEntity)
-    private companiesRepository: Repository<CompanyEntity>,
+    private readonly companiesRepository: Repository<CompanyEntity>,
     @InjectRepository(UserEntity)
-    private usersRepository: Repository<User>,
+    private readonly usersRepository: Repository<User>,
   ) {
     super(companiesRepository);
   }
@@ -48,12 +46,13 @@ export class CompanyService extends BaseService<CompanyEntity> {
     }
 
     await this.companiesRepository.update(id, {
-      ...company,
+      description: company.description,
+      name: company.name,
       updatedAt: new Date(),
     });
 
     const updatedCompany = await this.companiesRepository.findOneBy({
-      id: id.toString(),
+      id: id,
     });
 
     return updatedCompany;

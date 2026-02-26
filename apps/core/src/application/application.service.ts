@@ -1,31 +1,14 @@
+import { BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { UserDTO, ApplicationDTO, User, Offer } from '@repo/models';
-
-import { BadRequestException, NotFoundException } from '@nestjs/common';
-
-import { plainToInstance } from 'class-transformer';
+import { ApplicationEntity, UserEntity } from '@repo/entities';
+import { User, Offer } from '@repo/models';
 import { BaseService } from '@repo/nest-service';
-import { OfferService } from '../offer/offer.service';
-
-import { ApplicationEntity, OfferEntity, UserEntity } from '@repo/entities';
-
-interface MulterFile {
-  fieldname: string;
-  originalname: string;
-  encoding: string;
-  mimetype: string;
-  size: number;
-  destination: string;
-  filename: string;
-  path: string;
-  buffer: Buffer;
-}
+import { Repository } from 'typeorm';
 
 export class ApplicationService extends BaseService<ApplicationEntity> {
   constructor(
     @InjectRepository(ApplicationEntity)
-    private applicationsRepository: Repository<ApplicationEntity>,
+    private readonly applicationsRepository: Repository<ApplicationEntity>,
   ) {
     super(applicationsRepository);
   }
@@ -35,10 +18,7 @@ export class ApplicationService extends BaseService<ApplicationEntity> {
    * Lance une exception si l'utilisateur n'est pas propriétaire de la company de l'offre
    */
   validateUserCanViewOfferApplications(user: User, offer: Offer): void {
-    if (
-      !user.companyId ||
-      offer.companyId.toString() !== user.companyId.toString()
-    ) {
+    if (offer.companyId !== user.companyId) {
       throw new BadRequestException(
         'You can only view applications for your company offers',
       );
@@ -56,12 +36,9 @@ export class ApplicationService extends BaseService<ApplicationEntity> {
     application: ApplicationEntity,
     offer: Offer,
   ): void {
-    const isApplicationOwner =
-      application.userId.toString() === user.id.toString();
+    const isApplicationOwner = application.userId === user.id;
 
-    const isCompanyOwner =
-      user.companyId &&
-      offer.companyId.toString() === user.companyId.toString();
+    const isCompanyOwner = offer.companyId === user.companyId;
 
     if (!isApplicationOwner && !isCompanyOwner) {
       throw new BadRequestException(

@@ -31,4 +31,5 @@ async function bootstrap() {
   console.log(`🐰 RabbitMQ connection established`);
 }
 
+// eslint-disable-next-line unicorn/prefer-top-level-await
 void bootstrap();

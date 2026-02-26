@@ -4,7 +4,6 @@ import {
   Delete,
   Get,
   Inject,
-  Injectable,
   Param,
   Post,
   Put,
@@ -17,7 +16,6 @@ import {
   UpdateCompanyDTO,
   Role,
   CreateCompanyDTO,
-  Company,
 } from '@repo/models';
 import { microservices } from '@repo/rabbitmq-config';
 import { plainToInstance } from 'class-transformer';
@@ -35,12 +33,12 @@ export class CompanyController {
     @Body() createCompanyDto: CreateCompanyDTO,
     @CurrentUser() user: UserDTO,
   ): Promise<CompanyDTO> {
-    const newCompany = (await firstValueFrom(
+    const newCompany = await firstValueFrom<CompanyDTO>(
       this.coreService.send('company.create', {
         createCompanyDto: createCompanyDto,
         user: user,
       }),
-    )) as Company;
+    );
 
     return plainToInstance(CompanyDTO, newCompany);
   }
@@ -48,17 +46,17 @@ export class CompanyController {
   @Get('all')
   @Roles(Role.admin)
   async findAll(): Promise<CompanyDTO[]> {
-    const companies = (await firstValueFrom(
+    const companies = await firstValueFrom<CompanyDTO[]>(
       this.coreService.send('company.findAll', {}),
-    )) as Company[];
+    );
     return companies.map((company) => plainToInstance(CompanyDTO, company));
   }
 
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<CompanyDTO> {
-    const company = (await firstValueFrom(
+    const company = await firstValueFrom<CompanyDTO>(
       this.coreService.send('company.findOne', { id: id }),
-    )) as Company;
+    );
     return plainToInstance(CompanyDTO, company);
   }
 
@@ -67,12 +65,12 @@ export class CompanyController {
     @Param('id') id: string,
     @Body() updateCompanyDto: UpdateCompanyDTO,
   ): Promise<CompanyDTO> {
-    const company = (await firstValueFrom(
+    const company = await firstValueFrom<CompanyDTO>(
       this.coreService.send('company.update', {
         id: id,
         updateCompanyDto: updateCompanyDto,
       }),
-    )) as Company;
+    );
 
     return plainToInstance(CompanyDTO, company);
   }

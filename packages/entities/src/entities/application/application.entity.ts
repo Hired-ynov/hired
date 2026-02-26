@@ -1,5 +1,5 @@
-import { BaseEntity } from '@repo/nest-service';
 import { Application, ApplicationStatus } from '@repo/models';
+import { BaseEntity } from '@repo/nest-service';
 import { Column, Entity } from 'typeorm';
 
 @Entity('applications')
@@ -10,10 +10,10 @@ export class ApplicationEntity extends BaseEntity implements Application {
   @Column()
   offerId!: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ nullable: true, type: 'text' })
   firstMessage?: string;
 
-  @Column({ type: 'enum', enum: ApplicationStatus })
+  @Column({ enum: ApplicationStatus, type: 'enum' })
   status!: ApplicationStatus;
 
   @Column('simple-array', { nullable: true })

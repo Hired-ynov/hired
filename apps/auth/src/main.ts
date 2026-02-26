@@ -33,4 +33,5 @@ async function bootstrap() {
   console.log('🚀 Auth microservice is running');
 }
 
+// eslint-disable-next-line unicorn/prefer-top-level-await
 void bootstrap();

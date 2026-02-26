@@ -1,6 +1,7 @@
 import { IsArray, IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
-import { BaseDTO } from '../utils';
+
 import { ApplicationStatus } from '../../entry';
+import { BaseDTO } from '../utils';
 
 export class ApplicationDTO extends BaseDTO {
   @IsString()
