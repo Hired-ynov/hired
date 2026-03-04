@@ -398,7 +398,8 @@ jobs:
   pages:
     name: Build and Deploy GitHub Pages
     runs-on: ubuntu-latest
-    if: github.event_name != 'schedule'
+    needs: [test, lighthouse, backstopjs_test]
+    if: always() && github.event_name != 'schedule'
     permissions:
       contents: read
       pages: write
