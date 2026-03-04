@@ -297,9 +297,11 @@ jobs:
 
       - name: Checkout previous commit
         run: |
+          cp backstop.json /tmp/backstop.json
           PREVIOUS_COMMIT=$(git rev-parse HEAD~1)
           echo "Creating reference from previous commit: $PREVIOUS_COMMIT"
           git checkout $PREVIOUS_COMMIT
+          cp /tmp/backstop.json backstop.json
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
