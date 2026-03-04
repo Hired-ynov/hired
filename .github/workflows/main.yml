@@ -489,7 +489,10 @@ jobs:
 
           if [ -d "backstop_data/html_report" ]; then
             cp -r backstop_data/html_report/* public_final/visual/ || echo "Failed to copy BackstopJS HTML report"
-            echo "✓ BackstopJS HTML report copied"
+            echo "✓ BackstopJS HTML report copied from backstop_data/html_report"
+          elif [ -d "html_report" ]; then
+            cp -r html_report/* public_final/visual/ || echo "Failed to copy BackstopJS HTML report"
+            echo "✓ BackstopJS HTML report copied from root html_report"
             
             # Corriger les chemins absolus des images dans les fichiers HTML et JS
             echo "🔧 Fixing absolute image paths in reports..."
@@ -516,17 +519,29 @@ jobs:
           fi
 
           # Copier les bitmaps
+          BITMAPS_TEST=""
+          BITMAPS_REF=""
           if [ -d "backstop_data/bitmaps_test" ]; then
-            cp -r backstop_data/bitmaps_test public_final/visual/
-            cp -r backstop_data/bitmaps_test public_final/
-            echo "✓ Test bitmaps copied to visual/ and root"
-            ls -la public_final/visual/bitmaps_test/ || true
+            BITMAPS_TEST="backstop_data/bitmaps_test"
+          elif [ -d "bitmaps_test" ]; then
+            BITMAPS_TEST="bitmaps_test"
+          fi
+          if [ -d "backstop_data/bitmaps_reference" ]; then
+            BITMAPS_REF="backstop_data/bitmaps_reference"
+          elif [ -d "bitmaps_reference" ]; then
+            BITMAPS_REF="bitmaps_reference"
           fi
 
-          if [ -d "backstop_data/bitmaps_reference" ]; then
-            cp -r backstop_data/bitmaps_reference public_final/visual/
-            cp -r backstop_data/bitmaps_reference public_final/
-            echo "✓ Reference bitmaps copied to visual/ and root"
+          if [ -n "$BITMAPS_TEST" ]; then
+            cp -r "$BITMAPS_TEST" public_final/visual/bitmaps_test
+            cp -r "$BITMAPS_TEST" public_final/bitmaps_test
+            echo "✓ Test bitmaps copied from $BITMAPS_TEST"
+          fi
+
+          if [ -n "$BITMAPS_REF" ]; then
+            cp -r "$BITMAPS_REF" public_final/visual/bitmaps_reference
+            cp -r "$BITMAPS_REF" public_final/bitmaps_reference
+            echo "✓ Reference bitmaps copied from $BITMAPS_REF"
           fi
 
       - name: Create main index page
