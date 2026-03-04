@@ -444,6 +444,8 @@ jobs:
         run: |
           echo "=== Listing current directory ==="
           ls -la
+          echo "=== Showing backstop_data contents ==="
+          find backstop_data -type f 2>/dev/null || echo "No backstop_data directory"
           echo "=== Showing lighthouse artifacts ==="
           ls -la public/ || echo "No public directory from lighthouse"
           ls -la *.report.html || echo "No report.html files"
@@ -509,7 +511,8 @@ jobs:
             done
             echo "✓ Image paths corrected"
           else
-            echo "⚠ No BackstopJS HTML report found"
+            echo "⚠ No BackstopJS HTML report found, creating placeholder"
+            echo "<html><body><h1>Visual Regression Report</h1><p>No BackstopJS report was generated.</p></body></html>" > public_final/visual/index.html
           fi
 
           # Copier les bitmaps
