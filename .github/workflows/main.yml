@@ -112,31 +112,13 @@ jobs:
       - name: Run tests with coverage
         run: pnpm run test
 
-      - name: Upload coverage reports
+      - name: Upload coverage artifacts
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: coverage-reports
-          path: reports/
-
-      - name: Code Coverage Report
-        uses: irongut/CodeCoverageSummary@v1.3.0
-        with:
-          filename: reports/**/cobertura*.xml
-          badge: true
-          fail_below_min: false
-          format: markdown
-          hide_branch_rate: false
-          hide_complexity: true
-          indicators: true
-          output: both
-          thresholds: '60 80'
-
-      - name: Add Coverage PR Comment
-        uses: marocchino/sticky-pull-request-comment@v2
-        if: github.event_name == 'pull_request'
-        with:
-          recreate: true
-          path: code-coverage-results.md
+          path: apps/*/coverage/lcov.info
+          retention-days: 1
 
   # ========== SECURITY STAGE ==========
   secret_detection:
@@ -445,6 +427,13 @@ jobs:
           path: backstop_data/bitmaps_reference
         continue-on-error: true
 
+      - name: Download coverage reports
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-reports
+          path: coverage-artifacts
+        continue-on-error: true
+
       - name: List current directory
         run: |
           echo "=== Listing current directory ==="
@@ -455,8 +444,21 @@ jobs:
 
       - name: Create final public directory structure
         run: |
-          echo "=== Creating final public directory structure ==="s
-          mkdir -p public_final/performance public_final/visual
+          echo "=== Creating final public directory structure ==="
+          mkdir -p public_final/performance public_final/visual public_final/coverage
+
+      - name: Generate coverage HTML report
+        run: |
+          echo "=== Generating coverage HTML report ==="
+          if find coverage-artifacts -name 'lcov.info' 2>/dev/null | grep -q .; then
+            sudo apt-get install -y lcov --quiet
+            find coverage-artifacts -name 'lcov.info' | xargs -I{} sh -c 'cat {}' > merged-lcov.info
+            genhtml merged-lcov.info --output-directory public_final/coverage --title 'Hired - Code Coverage' --legend --quiet
+            echo "✓ Coverage HTML report generated"
+          else
+            echo "⚠ No lcov.info files found, creating placeholder"
+            echo "<html><body><h1>Coverage Report</h1><p>No coverage data available.</p></body></html>" > public_final/coverage/index.html
+          fi
 
       - name: Copy Lighthouse report
         run: |
@@ -542,6 +544,7 @@ jobs:
             <ul>
               <li><a href="performance/index.html">🚀 Lighthouse Performance Report</a></li>
               <li><a href="visual/index.html">👁️ Visual Regression Report</a></li>
+              <li><a href="coverage/index.html">✅ Code Coverage Report</a></li>
             </ul>
           </body>
           </html>
