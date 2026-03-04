@@ -238,7 +238,7 @@ jobs:
 
       - name: Start Next.js server
         run: |
-          pm2 start pnpm --name "nextjs" -- run start
+          pm2 start "pnpm run start" --name "nextjs"
           sleep 15
           pm2 logs --nostream nextjs --lines 50
 
@@ -309,7 +309,7 @@ jobs:
 
       - name: Start Next.js server
         run: |
-          pm2 start pnpm --name "nextjs-ref" -- run start
+          pm2 start "pnpm run start" --name "nextjs-ref"
           sleep 15
           pm2 logs --nostream nextjs-ref --lines 50
 
@@ -376,7 +376,7 @@ jobs:
 
       - name: Start Next.js server
         run: |
-          pm2 start pnpm --name "nextjs" -- run start
+          pm2 start "pnpm run start" --name "nextjs"
           sleep 15
           pm2 logs --nostream nextjs --lines 50
 
