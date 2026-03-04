@@ -50,10 +50,10 @@ jobs:
         with:
           name: build-artifacts
           path: |
-            .next/
-            next.config.js
-            public
-            package.json
+            apps/web/.next/
+            apps/web/next.config.js
+            apps/web/public
+            apps/web/package.json
             pnpm-lock.yaml
           retention-days: 1
 
@@ -238,7 +238,7 @@ jobs:
 
       - name: Start Next.js server
         run: |
-          pm2 start "pnpm run start" --name "nextjs"
+          pm2 start "pnpm --filter web run start" --name "nextjs"
           sleep 15
           pm2 logs --nostream nextjs --lines 50
 
@@ -309,7 +309,7 @@ jobs:
 
       - name: Start Next.js server
         run: |
-          pm2 start "pnpm run start" --name "nextjs-ref"
+          pm2 start "pnpm --filter web run start" --name "nextjs-ref"
           sleep 15
           pm2 logs --nostream nextjs-ref --lines 50
 
@@ -376,7 +376,7 @@ jobs:
 
       - name: Start Next.js server
         run: |
-          pm2 start "pnpm run start" --name "nextjs"
+          pm2 start "pnpm --filter web run start" --name "nextjs"
           sleep 15
           pm2 logs --nostream nextjs --lines 50
 
