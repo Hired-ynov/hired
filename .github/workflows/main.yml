@@ -127,6 +127,7 @@ jobs:
     if: |
       github.event_name == 'schedule' ||
       github.ref == 'refs/heads/main' ||
+      github.ref == 'refs/heads/feat/HIR-25-CICD' ||
       (github.event_name == 'pull_request' && github.base_ref == 'main')
 
     steps:
@@ -149,6 +150,7 @@ jobs:
     if: |
       github.event_name == 'schedule' ||
       github.ref == 'refs/heads/main' ||
+      github.ref == 'refs/heads/feat/HIR-25-CICD' ||
       (github.event_name == 'pull_request' && github.base_ref == 'main')
 
     steps:
@@ -173,6 +175,7 @@ jobs:
     if: |
       github.event_name == 'schedule' ||
       github.ref == 'refs/heads/main' ||
+      github.ref == 'refs/heads/feat/HIR-25-CICD' ||
       (github.event_name == 'pull_request' && github.base_ref == 'main')
 
     steps:
@@ -201,7 +204,7 @@ jobs:
     needs: [build, lint]
     if: |
       github.event_name != 'schedule' &&
-      (github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main')
+      (github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/feat/HIR-25-CICD')
 
     steps:
       - name: Checkout code
@@ -270,7 +273,7 @@ jobs:
     needs: [build, lint]
     if: |
       github.event_name != 'schedule' &&
-      (github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main')
+      (github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/feat/HIR-25-CICD')
 
     steps:
       - name: Checkout code
@@ -332,7 +335,7 @@ jobs:
     needs: [build, backstopjs_reference]
     if: |
       github.event_name != 'schedule' &&
-      (github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main')
+      (github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/feat/HIR-25-CICD')
 
     steps:
       - name: Checkout code
