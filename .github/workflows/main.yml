@@ -454,7 +454,7 @@ jobs:
           if find coverage-artifacts -name 'lcov.info' 2>/dev/null | grep -q .; then
             sudo apt-get install -y lcov --quiet
             find coverage-artifacts -name 'lcov.info' | xargs -I{} sh -c 'cat {}' > merged-lcov.info
-            genhtml merged-lcov.info --output-directory public_final/coverage --title 'Hired - Code Coverage' --legend --quiet
+            genhtml merged-lcov.info --output-directory public_final/coverage --title 'Hired - Code Coverage' --legend --quiet --ignore-errors source
             echo "✓ Coverage HTML report generated"
           else
             echo "⚠ No lcov.info files found, creating placeholder"
