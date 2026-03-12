@@ -1,0 +1,18 @@
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 10px;
+  border: 1px solid var(--primary);
+  border-radius: 1000px;
+  background-color: var(--white);
+  font-size: 0.9rem;
+  color: var(--primary);
+
+  & > .dot {
+    width: 0.5rem;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background-color: var(--primary);
+  }
+}

@@ -69,7 +69,7 @@ export class UserController {
   }
 
   @Put(':id/change-password')
-  @Roles(Role.user)
+  @Roles(Role.user, Role.admin)
   async changePassword(
     @Param('id') id: string,
     @Body() changePasswordDto: ChangePasswordDTO,

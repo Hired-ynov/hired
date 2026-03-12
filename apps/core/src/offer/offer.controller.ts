@@ -19,7 +19,9 @@ export class OfferController {
     @Payload() payload: { userId: string; createOffer: CreateOffer },
   ): Promise<Offer> {
     const user = await this.userService.findByIdOrFail(payload.userId);
-    const company = await this.companyService.findByIdOrFail(user.companyId);
+    const company = await this.companyService.findByIdOrFail(
+      user.companyId ?? '',
+    );
     const { description, location, salaryRange, skills, title } =
       payload.createOffer;
     const offer = await this.offerService.create({

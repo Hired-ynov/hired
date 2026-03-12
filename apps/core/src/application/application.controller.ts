@@ -48,8 +48,6 @@ export class ApplicationController {
       id: payload.createApplication.offerId,
     });
 
-    this.applicationService.validateUserCanViewOfferApplications(user, offer);
-
     const existingApplication = await this.applicationService.findOne({
       offerId: payload.createApplication.offerId,
       userId: user.id,
