@@ -6,6 +6,7 @@ export const nestConfig = {
   ...baseConfig,
   collectCoverageFrom: ['**/*.(t|j)s'],
   coverageDirectory: '../coverage',
+  coverageReporters: ['lcov', 'text'],
   rootDir: 'src',
   testEnvironment: 'node',
   testRegex: String.raw`.*\.spec\.ts$`,

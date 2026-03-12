@@ -6,16 +6,7 @@ export default [
     files: ['apps/**/*.{ts,tsx}', 'packages/**/*.{ts,tsx}'],
   },
   {
-    ignores: [
-      '**/dist/**',
-      '**/node_modules/**',
-      '**/.next/**',
-      '**/.turbo/**',
-      'packages/eslint-config/**',
-      'packages/jest-config/src/next.ts',
-      '**/*.config.mjs',
-      '**/.*.mjs',
-    ],
+    ignores: ['dist/**', 'node_modules/**', '*.config.mjs', '.*rc.mjs'],
   },
   ...libraryConfig,
   {

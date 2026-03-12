@@ -1,0 +1,598 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - dev
+      - staging
+      - main
+      - feat/HIR-25-CICD
+  pull_request:
+    branches:
+      - dev
+      - staging
+      - main
+  schedule:
+    # Exécuter tous les jours à 2h du matin pour les scans de sécurité
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  # ========== BUILD STAGE ==========
+  build:
+    name: Build Next.js Application
+    runs-on: ubuntu-latest
+    if: github.event_name != 'schedule'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'latest'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build application
+        run: pnpm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: |
+            apps/web/.next/
+            apps/web/next.config.js
+            apps/web/public
+            apps/web/package.json
+            pnpm-lock.yaml
+          retention-days: 1
+
+  # ========== LINT STAGE ==========
+  lint:
+    name: Run Linter
+    runs-on: ubuntu-latest
+    if: github.event_name != 'schedule'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'latest'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run ESLint
+        run: pnpm run lint
+
+  # ========== TEST STAGE ==========
+  test:
+    name: Run Jest Tests
+    runs-on: ubuntu-latest
+    needs: [lint]
+    if: github.event_name != 'schedule'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'latest'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run tests with coverage
+        run: pnpm run test
+
+      - name: Upload coverage artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-reports
+          path: apps/*/coverage/lcov.info
+          retention-days: 1
+
+  # ========== SECURITY STAGE ==========
+  secret_detection:
+    name: Secret Detection
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'schedule' ||
+      github.ref == 'refs/heads/main' ||
+      github.ref == 'refs/heads/feat/HIR-25-CICD' ||
+      (github.event_name == 'pull_request' && github.base_ref == 'main')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: TruffleHog OSS
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+          extra_args: --debug --only-verified
+
+  semgrep_sast:
+    name: Semgrep SAST
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'schedule' ||
+      github.ref == 'refs/heads/main' ||
+      github.ref == 'refs/heads/feat/HIR-25-CICD' ||
+      (github.event_name == 'pull_request' && github.base_ref == 'main')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Semgrep
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: >-
+            p/security-audit
+            p/secrets
+            p/owasp-top-ten
+            p/javascript
+            p/typescript
+            p/react
+            p/nextjs
+
+  dependency_scanning:
+    name: Dependency Scanning
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'schedule' ||
+      github.ref == 'refs/heads/main' ||
+      github.ref == 'refs/heads/feat/HIR-25-CICD' ||
+      (github.event_name == 'pull_request' && github.base_ref == 'main')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'latest'
+          cache: 'pnpm'
+
+      - name: Run pnpm audit
+        run: pnpm audit --audit-level=moderate
+        continue-on-error: true
+
+  # ========== ANALYZE STAGE ==========
+  lighthouse:
+    name: Lighthouse Performance Analysis
+    runs-on: ubuntu-latest
+    needs: [build, lint]
+    if: |
+      github.event_name != 'schedule' &&
+      (github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/feat/HIR-25-CICD')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: 'pnpm'
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+        continue-on-error: true
+
+      - name: Install dependencies
+        run: |
+          pnpm add -g lighthouse pm2
+          pnpm install --frozen-lockfile
+
+      - name: Build application
+        run: pnpm run build
+        continue-on-error: true
+
+      - name: Start Next.js server
+        run: |
+          pm2 start "pnpm --filter web run start" --name "nextjs"
+          sleep 15
+          pm2 logs --nostream nextjs --lines 50
+
+      - name: Run Lighthouse
+        run: |
+          mkdir -p public
+          if lighthouse http://localhost:3000/ --chrome-flags="--no-sandbox --headless --disable-extensions" --output html --output-path ./lighthouse.report.html; then
+            cp ./lighthouse.report.html ./public/index.html
+          else
+            echo "Lighthouse encountered an error"
+            echo "<html><body><h1>Lighthouse Report</h1><p>Lighthouse was unable to access the application.</p></body></html>" > ./public/index.html
+          fi
+        continue-on-error: true
+
+      - name: Upload Lighthouse report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse-report
+          path: |
+            lighthouse.report.html
+            public/
+
+      - name: Stop PM2
+        if: always()
+        run: pm2 delete all || true
+
+  # ========== VISUAL REGRESSION STAGE ==========
+  backstopjs_reference:
+    name: BackstopJS Reference
+    runs-on: ubuntu-latest
+    needs: [build, lint]
+    if: |
+      github.event_name != 'schedule' &&
+      (github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/feat/HIR-25-CICD')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: 'pnpm'
+
+      - name: Install BackstopJS and PM2
+        run: pnpm add -g backstopjs pm2
+
+      - name: Checkout previous commit
+        run: |
+          cp backstop.json /tmp/backstop.json
+          PREVIOUS_COMMIT=$(git rev-parse HEAD~1)
+          echo "Creating reference from previous commit: $PREVIOUS_COMMIT"
+          git checkout $PREVIOUS_COMMIT
+          cp /tmp/backstop.json backstop.json
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build previous version
+        run: pnpm run build
+
+      - name: Start Next.js server
+        run: |
+          pm2 start "pnpm --filter web run start" --name "nextjs-ref"
+          sleep 15
+          pm2 logs --nostream nextjs-ref --lines 50
+
+      - name: Create reference images
+        run: backstop reference
+        continue-on-error: true
+
+      - name: Stop PM2
+        if: always()
+        run: pm2 delete all || true
+
+      - name: Upload reference bitmaps
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backstop-reference
+          path: backstop_data/bitmaps_reference
+          retention-days: 1
+
+  backstopjs_test:
+    name: BackstopJS Test
+    runs-on: ubuntu-latest
+    needs: [build, backstopjs_reference]
+    if: |
+      github.event_name != 'schedule' &&
+      (github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/feat/HIR-25-CICD')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: 'pnpm'
+
+      - name: Install BackstopJS and PM2
+        run: pnpm add -g backstopjs pm2
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+        continue-on-error: true
+
+      - name: Download reference bitmaps
+        uses: actions/download-artifact@v4
+        with:
+          name: backstop-reference
+          path: backstop_data/bitmaps_reference
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build current version
+        run: pnpm run build
+        continue-on-error: true
+
+      - name: Start Next.js server
+        run: |
+          pm2 start "pnpm --filter web run start" --name "nextjs"
+          sleep 15
+          pm2 logs --nostream nextjs --lines 50
+
+      - name: Run BackstopJS test
+        run: backstop test || echo "Visual differences detected"
+        continue-on-error: true
+
+      - name: Stop PM2
+        if: always()
+        run: pm2 delete all || true
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backstop-test-results
+          path: |
+            backstop_data/html_report
+            backstop_data/bitmaps_test
+            backstop_data/bitmaps_reference
+          retention-days: 7
+  pages:
+    name: Build and Deploy GitHub Pages
+    runs-on: ubuntu-latest
+    needs: [test, lighthouse, backstopjs_test]
+    if: always() && github.event_name != 'schedule' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download Lighthouse report
+        uses: actions/download-artifact@v4
+        with:
+          name: lighthouse-report
+        continue-on-error: true
+
+      - name: Download BackstopJS test results
+        uses: actions/download-artifact@v4
+        with:
+          name: backstop-test-results
+        continue-on-error: true
+
+      - name: Download BackstopJS reference
+        uses: actions/download-artifact@v4
+        with:
+          name: backstop-reference
+          path: backstop_data/bitmaps_reference
+        continue-on-error: true
+
+      - name: Download coverage reports
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-reports
+          path: coverage-artifacts
+        continue-on-error: true
+
+      - name: List current directory
+        run: |
+          echo "=== Listing current directory ==="
+          ls -la
+          echo "=== Showing backstop_data contents ==="
+          find backstop_data -type f 2>/dev/null || echo "No backstop_data directory"
+          echo "=== Showing lighthouse artifacts ==="
+          ls -la public/ || echo "No public directory from lighthouse"
+          ls -la *.report.html || echo "No report.html files"
+
+      - name: Create final public directory structure
+        run: |
+          echo "=== Creating final public directory structure ==="
+          mkdir -p public_final/performance public_final/visual public_final/coverage
+
+      - name: Generate coverage HTML report
+        run: |
+          echo "=== Generating coverage HTML report ==="
+          if find coverage-artifacts -name 'lcov.info' 2>/dev/null | grep -q .; then
+            sudo apt-get install -y lcov --quiet
+            find coverage-artifacts -name 'lcov.info' | xargs -I{} sh -c 'cat {}' > merged-lcov.info
+            genhtml merged-lcov.info --output-directory public_final/coverage --title 'Hired - Code Coverage' --legend --quiet --synthesize-missing --ignore-errors source
+            echo "✓ Coverage HTML report generated"
+          else
+            echo "⚠ No lcov.info files found, creating placeholder"
+            echo "<html><body><h1>Coverage Report</h1><p>No coverage data available.</p></body></html>" > public_final/coverage/index.html
+          fi
+
+      - name: Copy Lighthouse report
+        run: |
+          echo "=== Copying Lighthouse report ==="
+          if [ -f "lighthouse.report.html" ]; then
+            echo "Found lighthouse.report.html"
+            cp lighthouse.report.html public_final/performance/index.html
+          elif [ -d "public" ] && [ -f "public/index.html" ]; then
+            echo "Found public/index.html from lighthouse job"
+            cp public/index.html public_final/performance/index.html
+          else
+            echo "No Lighthouse report found, creating placeholder"
+            echo "<html><body><h1>Lighthouse Report</h1><p>No Lighthouse report was generated.</p></body></html>" > public_final/performance/index.html
+          fi
+
+      - name: Copy BackstopJS report
+        run: |
+          echo "Copying BackstopJS visual regression report..."
+          mkdir -p public_final/visual
+
+          if [ -d "backstop_data/html_report" ]; then
+            cp -r backstop_data/html_report/* public_final/visual/ || echo "Failed to copy BackstopJS HTML report"
+            echo "✓ BackstopJS HTML report copied from backstop_data/html_report"
+          elif [ -d "html_report" ]; then
+            cp -r html_report/* public_final/visual/ || echo "Failed to copy BackstopJS HTML report"
+            echo "✓ BackstopJS HTML report copied from root html_report"
+            
+            # Corriger les chemins absolus des images dans les fichiers HTML et JS
+            echo "🔧 Fixing absolute image paths in reports..."
+            for file in $(find public_final/visual -type f \( -name "*.html" -o -name "*.js" \)); do
+              sed -i.bak \
+                -e 's|"/bitmaps_test/|"bitmaps_test/|g' \
+                -e 's|"/bitmaps_reference/|"bitmaps_reference/|g' \
+                -e "s|'/bitmaps_test/|'bitmaps_test/|g" \
+                -e "s|'/bitmaps_reference/|'bitmaps_reference/|g" \
+                -e 's|src="/bitmaps|src="bitmaps|g' \
+                -e "s|src='/bitmaps|src='bitmaps|g" \
+                -e 's|href="/bitmaps|href="bitmaps|g' \
+                -e "s|href='/bitmaps|href='bitmaps|g" \
+                -e 's|url(/bitmaps|url(bitmaps|g' \
+                -e 's|url("/bitmaps|url("bitmaps|g' \
+                -e "s|url('/bitmaps|url('bitmaps|g" \
+                "$file"
+              rm -f "$file.bak"
+            done
+            echo "✓ Image paths corrected"
+          else
+            echo "⚠ No BackstopJS HTML report found, creating placeholder"
+            echo "<html><body><h1>Visual Regression Report</h1><p>No BackstopJS report was generated.</p></body></html>" > public_final/visual/index.html
+          fi
+
+          # Copier les bitmaps
+          BITMAPS_TEST=""
+          BITMAPS_REF=""
+          if [ -d "backstop_data/bitmaps_test" ]; then
+            BITMAPS_TEST="backstop_data/bitmaps_test"
+          elif [ -d "bitmaps_test" ]; then
+            BITMAPS_TEST="bitmaps_test"
+          fi
+          if [ -d "backstop_data/bitmaps_reference" ]; then
+            BITMAPS_REF="backstop_data/bitmaps_reference"
+          elif [ -d "bitmaps_reference" ]; then
+            BITMAPS_REF="bitmaps_reference"
+          fi
+
+          if [ -n "$BITMAPS_TEST" ]; then
+            cp -r "$BITMAPS_TEST" public_final/visual/bitmaps_test
+            cp -r "$BITMAPS_TEST" public_final/bitmaps_test
+            echo "✓ Test bitmaps copied from $BITMAPS_TEST"
+          fi
+
+          if [ -n "$BITMAPS_REF" ]; then
+            cp -r "$BITMAPS_REF" public_final/visual/bitmaps_reference
+            cp -r "$BITMAPS_REF" public_final/bitmaps_reference
+            echo "✓ Reference bitmaps copied from $BITMAPS_REF"
+          fi
+
+      - name: Create main index page
+        run: |
+          echo "=== Creating main index page ==="
+          cat > public_final/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html lang="fr">
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Test Reports</title>
+            <style>
+              body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+              h1 { color: #333; }
+              ul { list-style: none; padding: 0; }
+              li { margin: 20px 0; }
+              a { display: inline-block; padding: 15px 30px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; }
+              a:hover { background: #0056b3; }
+            </style>
+          </head>
+          <body>
+            <h1>📊 Rapports de Tests Disponibles</h1>
+            <ul>
+              <li><a href="performance/index.html">🚀 Lighthouse Performance Report</a></li>
+              <li><a href="visual/index.html">👁️ Visual Regression Report</a></li>
+              <li><a href="coverage/index.html">✅ Code Coverage Report</a></li>
+            </ul>
+          </body>
+          </html>
+          EOF
+
+      - name: Show final structure
+        run: |
+          echo "=== Final structure ==="
+          find public_final -type f
+
+      - name: Move to public for GitHub Pages
+        run: |
+          echo "=== Moving to public for GitHub Pages ==="
+          rm -rf public
+          mv public_final public
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'public'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -8,5 +8,4 @@ async function bootstrap() {
   await app.listen(3000);
 }
 
-// eslint-disable-next-line unicorn/prefer-top-level-await
 void bootstrap();

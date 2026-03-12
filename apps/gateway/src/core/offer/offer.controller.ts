@@ -9,7 +9,7 @@ import {
   Put,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { CurrentUser } from '@repo/commun';
+import { CurrentUser, Public } from '@repo/commun';
 import {
   CreateOffer,
   CreateOfferDTO,
@@ -20,8 +20,6 @@ import {
   UserDTO,
 } from '@repo/models';
 import { microservices } from '@repo/rabbitmq-config';
-import { ClientProxy } from '@nestjs/microservices';
-import { CurrentUser, Public } from '@repo/commun';
 import { plainToInstance } from 'class-transformer';
 import { firstValueFrom } from 'rxjs/internal/firstValueFrom';
 import { getUserId } from 'src/utils/user-id.utils';

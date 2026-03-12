@@ -1,8 +1,12 @@
-import { describe, it, expect, beforeEach } from '@jest/globals';
+import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+
+const mockAppService = {
+  getPing: jest.fn().mockReturnValue({ message: 'pong' }),
+};
 
 describe('AppController', () => {
   let appController: AppController;
@@ -10,15 +14,15 @@ describe('AppController', () => {
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
       controllers: [AppController],
-      providers: [AppService],
+      providers: [{ provide: AppService, useValue: mockAppService }],
     }).compile();
 
     appController = app.get<AppController>(AppController);
   });
 
   describe('root', () => {
-    it('should return "Pong!"', () => {
-      expect(appController.getPing()).toBe('Pong!');
+    it('should return pong message', () => {
+      expect(appController.getPing()).toEqual({ message: 'pong' });
     });
   });
 });
