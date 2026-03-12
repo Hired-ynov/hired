@@ -1,8 +1,7 @@
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Test, TestingModule } from '@nestjs/testing';
 import { microservices } from '@repo/rabbitmq-config';
-import { beforeEach, describe, expect, it } from '@jest/globals';
-import { Test, TestingModule } from '@nestjs/testing';
 
 import { AuthController } from './auth.controller';
 
