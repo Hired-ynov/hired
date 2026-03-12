@@ -1,0 +1,1 @@
+export { nestJsConfig as default } from '@repo/eslint-config/nest-js';

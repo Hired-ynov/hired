@@ -162,7 +162,7 @@ Génère les fichiers JavaScript et déclarations TypeScript dans le dossier `di
 ### Import
 
 ```typescript
-import { User, CreateUserDto, LoginDTO, Skill, Role } from '@hired4/models';
+import { User, CreateUserDto, LoginDTO, Skill, Role } from '@hired4/entities';
 ```
 
 ## Architecture

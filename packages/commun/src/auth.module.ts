@@ -1,11 +1,15 @@
 import { DynamicModule, Module } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtModule, JwtModuleOptions } from '@nestjs/jwt';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+
 import { AuthGuard } from './guard/auth.guard';
 
+type JwtExpiresIn = NonNullable<
+  NonNullable<JwtModuleOptions['signOptions']>['expiresIn']
+>;
 export interface AuthModuleOptions {
+  jwtExpiresIn?: JwtExpiresIn;
   jwtSecret?: string;
-  jwtExpiresIn?: string | number;
   useConfigService?: boolean;
 }
 
@@ -13,13 +17,13 @@ export interface AuthModuleOptions {
 export class AuthSharedModule {
   static forRoot(options?: AuthModuleOptions): DynamicModule {
     const {
-      jwtSecret,
       jwtExpiresIn = '1d',
+      jwtSecret,
       useConfigService = true,
-    } = options || {};
+    } = options ?? {};
 
     return {
-      module: AuthSharedModule,
+      exports: [AuthGuard, JwtModule],
       global: true,
       imports: [
         useConfigService
@@ -27,18 +31,18 @@ export class AuthSharedModule {
               global: true,
               inject: [ConfigService],
               useFactory: (configService: ConfigService): JwtModuleOptions => ({
-                secret: configService.get<string>('JWT_SECRET') || jwtSecret,
-                signOptions: { expiresIn: jwtExpiresIn as any },
+                secret: configService.get<string>('JWT_SECRET') ?? jwtSecret,
+                signOptions: { expiresIn: jwtExpiresIn },
               }),
             })
           : JwtModule.register({
               global: true,
               secret: jwtSecret,
-              signOptions: { expiresIn: jwtExpiresIn as any },
+              signOptions: { expiresIn: jwtExpiresIn },
             }),
       ],
+      module: AuthSharedModule,
       providers: [AuthGuard],
-      exports: [AuthGuard, JwtModule],
     };
   }
 }

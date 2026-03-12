@@ -1,0 +1,158 @@
+import { BadRequestException, Controller } from '@nestjs/common';
+import { MessagePattern, Payload } from '@nestjs/microservices';
+import { ApplicationEntity } from '@repo/entities';
+import {
+  ApplicationDTO,
+  CreateApplication,
+  Application,
+  UpdateApplication,
+  ApplicationStatus,
+} from '@repo/models';
+import { OfferService } from 'src/offer/offer.service';
+import { UserService } from 'src/users/user.service';
+
+import { ApplicationService } from './application.service';
+
+interface MulterFile {
+  buffer: Buffer;
+  destination: string;
+  encoding: string;
+  fieldname: string;
+  filename: string;
+  mimetype: string;
+  originalname: string;
+  path: string;
+  size: number;
+}
+
+@Controller('application')
+export class ApplicationController {
+  constructor(
+    private readonly applicationService: ApplicationService,
+    private readonly userService: UserService,
+    private readonly offerService: OfferService,
+  ) {}
+
+  @MessagePattern('core.application.create')
+  async create(
+    @Payload()
+    payload: {
+      createApplication: CreateApplication;
+      userId: string;
+      files: MulterFile[];
+    },
+  ): Promise<Application> {
+    const user = await this.userService.findByIdOrFail(payload.userId);
+
+    const offer = await this.offerService.findOrFail({
+      id: payload.createApplication.offerId,
+    });
+
+    this.applicationService.validateUserCanViewOfferApplications(user, offer);
+
+    const existingApplication = await this.applicationService.findOne({
+      offerId: payload.createApplication.offerId,
+      userId: user.id,
+    });
+
+    if (existingApplication) {
+      throw new BadRequestException('You have already applied to this offer');
+    }
+
+    const { filesIds, firstMessage, offerId } = payload.createApplication;
+    const applicationData: Partial<ApplicationEntity> = {
+      filesIds,
+      firstMessage,
+      offerId,
+      status: ApplicationStatus.PENDING,
+      userId: user.id,
+    };
+    const saved = await this.applicationService.create(applicationData);
+    return saved;
+  }
+
+  @MessagePattern('core.application.findAll')
+  async findAll(): Promise<Application[]> {
+    return await this.applicationService.findAll();
+  }
+
+  @MessagePattern('core.application.findMyApplications')
+  async findMyApplications(@Payload() userId: string): Promise<Application[]> {
+    return await this.applicationService.findAll({
+      where: { userId: userId },
+    });
+  }
+
+  @MessagePattern('core.application.findOne')
+  async findOne(@Payload() id: string): Promise<ApplicationDTO> {
+    return await this.applicationService.findByIdOrFail(id);
+  }
+
+  @MessagePattern('core.application.findByOfferId')
+  async findByOfferId(
+    @Payload() payload: { offerId: string; userId: string },
+  ): Promise<Application[]> {
+    const user = await this.userService.findByIdOrFail(payload.userId);
+    const offer = await this.offerService.findOrFail({
+      id: payload.offerId,
+    });
+
+    this.applicationService.validateUserCanViewOfferApplications(user, offer);
+
+    return this.applicationService.findAll({
+      where: { offerId: payload.offerId },
+    });
+  }
+
+  @MessagePattern('core.application.update')
+  async updateApplication(
+    @Payload()
+    payload: {
+      id: string;
+      updateApplication: UpdateApplication;
+      userId: string;
+      files: MulterFile[];
+    },
+  ): Promise<Application> {
+    const user = await this.userService.findByIdOrFail(payload.userId);
+    const application = await this.applicationService.findByIdOrFail(
+      payload.id,
+    );
+    const offer = await this.offerService.findOrFail({
+      id: application.offerId,
+    });
+
+    this.applicationService.validateUserCanUpdateApplication(
+      user,
+      application,
+      offer,
+    );
+
+    const { filesIds, firstMessage, status } = payload.updateApplication;
+    await this.applicationService.update(payload.id, {
+      filesIds,
+      firstMessage,
+      status,
+      updatedAt: new Date(),
+    });
+
+    return await this.applicationService.findByIdOrFail(payload.id);
+  }
+
+  @MessagePattern('core.application.delete')
+  async remove(
+    @Payload() payload: { id: string; userId: string },
+  ): Promise<{ success: boolean }> {
+    const application = await this.applicationService.findByIdOrFail(
+      payload.id,
+    );
+
+    if (application.userId !== payload.userId) {
+      throw new BadRequestException(
+        'You can only delete your own applications',
+      );
+    }
+    void this.applicationService.remove(payload.id);
+    return { success: true };
+  }
+}

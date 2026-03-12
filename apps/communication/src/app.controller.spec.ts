@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeEach } from '@jest/globals';
 import { Test, TestingModule } from '@nestjs/testing';
-
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -24,7 +23,8 @@ describe('AppController', () => {
 
   describe('ping', () => {
     it('should return pong message', () => {
-      expect(appController.ping()).toEqual({ message: 'pong' });
+      const response = appController.ping() as { message: string };
+      expect(response).toEqual({ message: 'pong' });
     });
   });
 });

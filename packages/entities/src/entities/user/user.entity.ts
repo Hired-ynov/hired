@@ -1,7 +1,7 @@
-import { BaseEntity } from '@repo/nest-service';
-import { Entity, Column } from 'typeorm';
-import { Exclude } from 'class-transformer';
 import { Role, Skill, User } from '@repo/models';
+import { BaseEntity } from '@repo/nest-service';
+import { Exclude } from 'class-transformer';
+import { Column, Entity } from 'typeorm';
 
 @Entity('users')
 export class UserEntity extends BaseEntity implements User {

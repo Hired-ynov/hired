@@ -7,6 +7,7 @@ import {
   FindOptionsOrder,
   QueryDeepPartialEntity,
 } from 'typeorm';
+
 import { PaginationOptions, PaginationResult, SortOptions } from './base-type';
 import { BaseEntity } from './base.entity';
 
@@ -40,7 +41,7 @@ export abstract class BaseService<T extends BaseEntity> {
     paginationOptions: PaginationOptions = {},
     findOptions?: FindManyOptions<T>,
   ): Promise<PaginationResult<T>> {
-    const { page = 1, limit = 10 } = paginationOptions;
+    const { limit = 10, page = 1 } = paginationOptions;
     const skip = (page - 1) * limit;
 
     const [data, total] = await this.repository.findAndCount({
@@ -53,12 +54,12 @@ export abstract class BaseService<T extends BaseEntity> {
 
     return {
       data,
-      total,
-      page,
-      limit,
-      totalPages,
       hasNext: page < totalPages,
       hasPrevious: page > 1,
+      limit,
+      page,
+      total,
+      totalPages,
     };
   }
 
@@ -124,7 +125,10 @@ export abstract class BaseService<T extends BaseEntity> {
     return entity;
   }
 
-  async findByIdOrFail(id: string): Promise<T> {
+  async findByIdOrFail(id: string | undefined): Promise<T> {
+    if (!id) {
+      throw new Error('ID is required');
+    }
     const entity = await this.findById(id);
     if (!entity) {
       throw new Error(`Entity with id ${id} not found`);

@@ -1,9 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import { UserEntity } from '@repo/entities';
 import { InjectRepository } from '@nestjs/typeorm';
+import { UserEntity } from '@repo/entities';
+import { BaseService } from '@repo/nest-service';
 import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
-import { BaseService } from '@repo/nest-service';
+
+const hashPassword = bcrypt.hash as (
+  password: string,
+  saltRounds: number,
+) => Promise<string>;
+const comparePassword = bcrypt.compare as (
+  password: string,
+  hashValue: string,
+) => Promise<boolean>;
 
 @Injectable()
 export class UserService extends BaseService<UserEntity> {
@@ -15,11 +24,11 @@ export class UserService extends BaseService<UserEntity> {
   }
 
   async generatePasswordHash(password: string): Promise<string> {
-    return await bcrypt.hash(password, 12);
+    return hashPassword(password, 12);
   }
 
   async verifyPassword(password: string, hashValue: string): Promise<boolean> {
-    return await bcrypt.compare(password, hashValue);
+    return comparePassword(password, hashValue);
   }
 
   async findOneByEmailWithPassword(email: string): Promise<UserEntity | null> {
