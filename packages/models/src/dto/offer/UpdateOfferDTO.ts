@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsArray,
@@ -10,8 +11,6 @@ import {
 
 import { Skill } from '../../entry';
 import { SalaryRangeDTO } from '../utils/SalaryRangeDTO';
-import { Type } from 'class-transformer';
-import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateOfferDTO {
   @ApiProperty({
