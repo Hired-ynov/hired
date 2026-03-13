@@ -33,4 +33,5 @@ async function bootstrap() {
   console.log(`Files service RabbitMQ connected`);
 }
 
+// eslint-disable-next-line unicorn/prefer-top-level-await
 void bootstrap();

@@ -8,9 +8,9 @@ export class RabbitMQException extends RpcException {
     options?: { headers?: Record<string, string | string[]> },
   ) {
     super({
-      statusCode,
       message: body,
       options,
+      statusCode,
     });
     this.name = 'RabbitMQException';
   }

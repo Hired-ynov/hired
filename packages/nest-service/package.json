@@ -26,16 +26,15 @@
       "require": "./dist/*.js"
     }
   },
-  "dependencies": {
-    "@nestjs/mapped-types": "*"
-  },
   "peerDependencies": {
+    "@nestjs/mapped-types": "^2.0.0",
     "@nestjs/common": "^11.0.0",
     "@nestjs/typeorm": "^11.0.0",
     "typeorm": "^0.3.0",
     "@nestjs/microservices": "^11.0.0"
   },
   "devDependencies": {
+    "@nestjs/mapped-types": "^2.0.0",
     "@nestjs/common": "^11.1.11",
     "@nestjs/typeorm": "^11.0.0",
     "@repo/eslint-config": "workspace:*",

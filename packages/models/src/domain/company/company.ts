@@ -1,7 +1,7 @@
 import { Base } from '../base';
 
 export interface Company extends Base {
-  name: string;
   description: string;
+  name: string;
   website: string;
 }

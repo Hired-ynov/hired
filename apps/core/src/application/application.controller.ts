@@ -1,6 +1,8 @@
 import { BadRequestException, Controller, Inject } from '@nestjs/common';
 import { ClientProxy, MessagePattern, Payload } from '@nestjs/microservices';
+import { ApplicationEntity } from '@repo/entities';
 import {
+  ApplicationDTO,
   CreateApplication,
   Application,
   UpdateApplication,
@@ -9,20 +11,20 @@ import {
 import { firstValueFrom } from 'rxjs';
 
 import { ApplicationService } from './application.service';
-import { UserService } from 'src/users/user.service';
 import { OfferService } from 'src/offer/offer.service';
+import { UserService } from 'src/users/user.service';
 import { microservices } from '@repo/rabbitmq-config';
 
 interface MulterFile {
-  fieldname: string;
-  originalname: string;
-  encoding: string;
-  mimetype: string;
-  size: number;
-  destination: string;
-  filename: string;
-  path: string;
   buffer: Buffer;
+  destination: string;
+  encoding: string;
+  fieldname: string;
+  filename: string;
+  mimetype: string;
+  originalname: string;
+  path: string;
+  size: number;
 }
 
 @Controller('application')
@@ -50,19 +52,20 @@ export class ApplicationController {
       id: payload.createApplication.offerId,
     });
 
-    this.applicationService.validateUserCanViewOfferApplications(user, offer);
-
     const existingApplication = await this.applicationService.findOne({
-      userId: user.id,
       offerId: payload.createApplication.offerId,
+      userId: user.id,
     });
 
     if (existingApplication) {
       throw new BadRequestException('You have already applied to this offer');
     }
 
-    const applicationData: any = {
-      ...payload.createApplication,
+    const { filesIds, firstMessage, offerId } = payload.createApplication;
+    const applicationData: Partial<ApplicationEntity> = {
+      filesIds,
+      firstMessage,
+      offerId,
       status: ApplicationStatus.PENDING,
       userId: user.id,
     };
@@ -137,8 +140,11 @@ export class ApplicationController {
       offer,
     );
 
+    const { filesIds, firstMessage, status } = payload.updateApplication;
     await this.applicationService.update(payload.id, {
-      ...payload.updateApplication,
+      filesIds,
+      firstMessage,
+      status,
       updatedAt: new Date(),
     });
 
@@ -153,12 +159,12 @@ export class ApplicationController {
       payload.id,
     );
 
-    if (application.userId.toString() !== payload.userId) {
+    if (application.userId !== payload.userId) {
       throw new BadRequestException(
         'You can only delete your own applications',
       );
     }
-    this.applicationService.remove(payload.id);
+    void this.applicationService.remove(payload.id);
     return { success: true };
   }
 }

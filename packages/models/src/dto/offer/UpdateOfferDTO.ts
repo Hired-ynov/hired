@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import {
   IsArray,
   IsEnum,
@@ -6,9 +7,9 @@ import {
   IsUUID,
   ValidateNested,
 } from 'class-validator';
+
 import { Skill } from '../../entry';
 import { SalaryRangeDTO } from '../utils/SalaryRangeDTO';
-import { Type } from 'class-transformer';
 
 export class UpdateOfferDTO {
   @IsOptional()

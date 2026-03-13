@@ -3,13 +3,18 @@ import tsParser from '@typescript-eslint/parser';
 
 export default [
   {
+    files: ['apps/**/*.{ts,tsx}', 'packages/**/*.{ts,tsx}'],
+  },
+  {
     ignores: [
-      'apps/**',
-      'packages/**',
-      'dist/**',
-      'node_modules/**',
-      '*.config.mjs',
-      '.*rc.mjs',
+      '**/dist/**',
+      '**/node_modules/**',
+      '**/.next/**',
+      '**/.turbo/**',
+      'packages/eslint-config/**',
+      'packages/jest-config/src/next.ts',
+      '**/*.config.mjs',
+      '**/.*.mjs',
     ],
   },
   ...libraryConfig,
@@ -20,10 +25,13 @@ export default [
   },
   {
     rules: {
-      // add override for any (a metric ton of them, initial conversion)
-      '@typescript-eslint/no-explicit-any': 'off',
       // we generally use this in isFunction, not via calling
       '@typescript-eslint/unbound-method': 'off',
+      // NestJS requires empty decorated classes (@Module, @Controller, etc.)
+      '@typescript-eslint/no-extraneous-class': [
+        'warn',
+        { allowWithDecorator: true },
+      ],
     },
   },
 ];

@@ -20,7 +20,7 @@ export class CompanyController {
     @Payload() payload: { createCompanyDto: CreateCompanyDTO; user: UserDTO },
   ): Promise<Company> {
     const userId =
-      (payload.user as UserDTO & { sub?: number }).sub?.toString() ||
+      (payload.user as UserDTO & { sub?: number }).sub?.toString() ??
       payload.user.id;
 
     return this.companyService.createCompany(payload.createCompanyDto, userId);
