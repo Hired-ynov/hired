@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsArray,
   IsString,
@@ -9,8 +9,8 @@ import {
 } from 'class-validator';
 
 import { Skill } from '../../entry';
-import { CompanyDTO } from '../company';
-import { BaseDTO } from '../utils';
+import { CompanyDTO } from '../company/CompanyDTO';
+import { BaseDTO } from '../utils/BaseDTO';
 import { SalaryRangeDTO } from '../utils/SalaryRangeDTO';
 
 export class OfferDTO extends BaseDTO {

@@ -8,7 +8,7 @@ import { OfferEntity } from '@repo/entities';
 export class OfferService extends BaseService<OfferEntity> {
   constructor(
     @InjectRepository(OfferEntity)
-    private offerRepository: Repository<OfferEntity>,
+    private readonly offerRepository: Repository<OfferEntity>,
   ) {
     super(offerRepository);
   }

@@ -1,3 +1,4 @@
-export { BaseService } from './base/base.service';
-export { BaseEntity } from './base/base.entity';
-export { RabbitMQException } from './utils/RabbitMQException.util';
+export * from './base/base.service';
+export * from './base/base.entity';
+export * from './utils/RabbitMQException.util';
+export * from './base/base-type';

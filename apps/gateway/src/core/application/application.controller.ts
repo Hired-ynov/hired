@@ -24,20 +24,19 @@ import {
 } from '@repo/models';
 import { microservices } from '@repo/rabbitmq-config';
 import { plainToInstance } from 'class-transformer';
-import { get } from 'http';
 import { firstValueFrom } from 'rxjs';
 import { getUserId } from 'src/utils/user-id.utils';
 
 interface MulterFile {
-  fieldname: string;
-  originalname: string;
-  encoding: string;
-  mimetype: string;
-  size: number;
-  destination: string;
-  filename: string;
-  path: string;
   buffer: Buffer;
+  destination: string;
+  encoding: string;
+  fieldname: string;
+  filename: string;
+  mimetype: string;
+  originalname: string;
+  path: string;
+  size: number;
 }
 
 @ApiTags('application')
@@ -58,11 +57,11 @@ export class ApplicationController {
     @UploadedFiles() files?: MulterFile[],
   ): Promise<ApplicationDTO> {
     const createApplication = plainToInstance(CreateApplication, body);
-    const application = await firstValueFrom(
+    const application = await firstValueFrom<ApplicationDTO>(
       this.coreService.send('core.application.create', {
         createApplication: createApplication,
-        userId: getUserId(user),
         files: files,
+        userId: getUserId(user),
       }),
     );
     return plainToInstance(ApplicationDTO, application);
@@ -72,9 +71,9 @@ export class ApplicationController {
   @ApiResponse({ status: 201, description: 'Applications récupérées' })
   @Get()
   async findAll(): Promise<ApplicationDTO[]> {
-    const applications = (await firstValueFrom(
+    const applications = await firstValueFrom<ApplicationDTO[]>(
       this.coreService.send('core.application.findAll', {}),
-    )) as ApplicationDTO[];
+    );
     return applications.map((application) =>
       plainToInstance(ApplicationDTO, application),
     );
@@ -86,7 +85,7 @@ export class ApplicationController {
   async findMyApplications(
     @CurrentUser() user: UserDTO,
   ): Promise<ApplicationDTO[]> {
-    const applications = await firstValueFrom(
+    const applications = await firstValueFrom<ApplicationDTO[]>(
       this.coreService.send(
         'core.application.findMyApplications',
         getUserId(user),
@@ -101,9 +100,9 @@ export class ApplicationController {
   @ApiResponse({ status: 201, description: 'Application récupérée' })
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<ApplicationDTO> {
-    const application = (await firstValueFrom(
+    const application = await firstValueFrom<ApplicationDTO>(
       this.coreService.send('core.application.findOne', id),
-    )) as ApplicationDTO;
+    );
     return plainToInstance(ApplicationDTO, application);
   }
 
@@ -114,12 +113,12 @@ export class ApplicationController {
     @Param('id') id: string,
     @CurrentUser() user: UserDTO,
   ): Promise<ApplicationDTO[]> {
-    const applications = (await firstValueFrom(
+    const applications = await firstValueFrom<ApplicationDTO[]>(
       this.coreService.send('core.application.findByOfferId', {
-        id,
+        offerId: id,
         userId: getUserId(user),
       }),
-    )) as ApplicationDTO[];
+    );
     return applications.map((application) =>
       plainToInstance(ApplicationDTO, application),
     );
@@ -136,12 +135,12 @@ export class ApplicationController {
     @UploadedFiles() files?: MulterFile[],
   ): Promise<ApplicationDTO> {
     const updateApplication = plainToInstance(UpdateApplication, body);
-    const application = await firstValueFrom(
+    const application = await firstValueFrom<ApplicationDTO>(
       this.coreService.send('core.application.update', {
+        files: files,
         id: id,
         updateApplication: updateApplication,
         userId: getUserId(user),
-        files: files,
       }),
     );
     return plainToInstance(ApplicationDTO, application);

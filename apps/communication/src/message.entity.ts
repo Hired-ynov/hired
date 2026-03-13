@@ -1,5 +1,5 @@
-import { Entity, Column } from 'typeorm';
 import { BaseEntity } from '@repo/nest-service';
+import { Entity, Column } from 'typeorm';
 
 @Entity('messages')
 export class Message extends BaseEntity {

@@ -1,4 +1,5 @@
 import { IsString } from 'class-validator';
+
 import { BaseDTO } from '../utils/BaseDTO';
 import { ApiProperty } from '@nestjs/swagger';
 

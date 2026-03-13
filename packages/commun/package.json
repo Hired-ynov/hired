@@ -27,16 +27,17 @@
     }
   },
   "dependencies": {
-    "@nestjs/mapped-types": "*",
     "@repo/models": "workspace:*"
   },
   "peerDependencies": {
+    "@nestjs/mapped-types": "^2.0.0",
     "@nestjs/common": "^11.0.0",
     "@nestjs/config": "^4.0.0",
     "@nestjs/core": "^11.0.0",
     "@nestjs/jwt": "^11.0.0"
   },
   "devDependencies": {
+    "@nestjs/mapped-types": "^2.0.0",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@repo/models": "workspace:*",

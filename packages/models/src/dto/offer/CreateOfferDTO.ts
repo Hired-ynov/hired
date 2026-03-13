@@ -1,6 +1,7 @@
-import { IsArray, IsEnum, IsString, ValidateNested } from 'class-validator';
-import { Skill } from '../../entry';
 import { Type } from 'class-transformer';
+import { IsArray, IsEnum, IsString, ValidateNested } from 'class-validator';
+
+import { Skill } from '../../entry';
 import { SalaryRangeDTO } from '../utils/SalaryRangeDTO';
 import { ApiProperty } from '@nestjs/swagger';
 

@@ -4,7 +4,7 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { UserService } from './user.service';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 import {
   ChangePassword,
   CreateUser,
@@ -12,7 +12,8 @@ import {
   UpdateUser,
   User,
 } from '@repo/models';
-import { MessagePattern, Payload } from '@nestjs/microservices';
+
+import { UserService } from './user.service';
 
 @Controller('user')
 export class UserController {
@@ -20,7 +21,11 @@ export class UserController {
 
   @MessagePattern('core.user.create')
   async create(@Payload() createUser: CreateUser): Promise<User> {
-    // Vérifier si l'email existe déjà
+    const { password, ...rest } = createUser;
+    if (!password?.trim()) {
+      throw new BadRequestException('Password is required');
+    }
+
     const existingUser = await this.userService.findOne({
       email: createUser.email,
     });
@@ -29,19 +34,14 @@ export class UserController {
     }
 
     const emptyUser = await this.userService.findAll();
-    if (emptyUser.length === 0) {
-      createUser.role = Role.admin;
-    } else {
-      createUser.role = Role.user;
-    }
+    createUser.role = emptyUser.length === 0 ? Role.admin : Role.user;
 
     const passwordHash = await this.userService.generatePasswordHash(
       createUser.password,
     );
-    const user = await this.userService.create({
-      ...createUser,
-      passwordHash,
-    });
+    const user = await this.userService.create(
+      Object.assign({}, createUser, { passwordHash }),
+    );
 
     return user;
   }
@@ -113,7 +113,11 @@ export class UserController {
     await this.userService.update(payload.id, payload.updateUser);
     const user = await this.userService.findById(payload.id);
 
-    return user!;
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
   }
 
   @MessagePattern('core.user.change-password')

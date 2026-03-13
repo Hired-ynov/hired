@@ -30,11 +30,14 @@
     "@nestjs/swagger": "*"
   },
   "dependencies": {
-    "@nestjs/mapped-types": "*",
     "class-validator": "^0.14.1",
     "class-transformer": "^0.5.1"
   },
+  "peerDependencies": {
+    "@nestjs/mapped-types": "^2.0.0"
+  },
   "devDependencies": {
+    "@nestjs/mapped-types": "^2.0.0",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^22.10.7",

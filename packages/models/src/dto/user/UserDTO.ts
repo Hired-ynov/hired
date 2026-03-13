@@ -7,9 +7,10 @@ import {
   IsUUID,
   IsPhoneNumber,
 } from 'class-validator';
-import { BaseDTO } from '../utils/BaseDTO';
+
 import { Role, Skill } from '../../domain';
 import { ApiProperty } from '@nestjs/swagger';
+import { BaseDTO } from '../utils/BaseDTO';
 
 export class UserDTO extends BaseDTO {
   @ApiProperty({

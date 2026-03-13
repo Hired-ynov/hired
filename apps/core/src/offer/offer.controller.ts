@@ -2,8 +2,11 @@ import { Controller } from '@nestjs/common';
 import { OfferService } from './offer.service';
 import { CreateOffer, Offer, UpdateOffer } from '@repo/models';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { UserService } from 'src/users/user.service';
+import { CreateOffer, Offer, UpdateOffer } from '@repo/models';
 import { CompanyService } from 'src/company/company.service';
+import { UserService } from 'src/users/user.service';
+
+import { OfferService } from './offer.service';
 import { CompanyEntity, UserEntity } from '@repo/entities';
 
 @Controller('offer')
@@ -24,12 +27,18 @@ export class OfferController {
     let company: CompanyEntity | undefined = undefined;
 
     if (user.companyId !== undefined) {
-      company = await this.companyService.findByIdOrFail(user.companyId);
+      company = await this.companyService.findByIdOrFail(user.companyId ?? '');
+      const { description, location, salaryRange, skills, title } =
+        payload.createOffer;
     }
     const offer = await this.offerService.create({
-      ...payload.createOffer,
       company: company,
       companyId: company?.id,
+      description,
+      location,
+      salaryRange,
+      skills,
+      title,
     });
 
     return offer;
@@ -45,8 +54,8 @@ export class OfferController {
   @MessagePattern('core.offer.find-by-company-id')
   async findByCompanyId(@Payload() id: string): Promise<Offer[]> {
     return await this.offerService.findAll({
-      where: { companyId: id },
       relations: ['company'],
+      where: { companyId: id },
     });
   }
 
@@ -60,8 +69,23 @@ export class OfferController {
     @Payload() payload: { id: string; updateOffer: UpdateOffer },
   ): Promise<Offer> {
     const offer = await this.offerService.findByIdOrFail(payload.id);
+    const {
+      companyId,
+      description,
+      filesIds,
+      location,
+      salaryRange,
+      skills,
+      title,
+    } = payload.updateOffer;
     await this.offerService.update(offer.id, {
-      ...payload.updateOffer,
+      companyId,
+      description,
+      filesIds,
+      location,
+      salaryRange,
+      skills,
+      title,
       updatedAt: new Date(),
     });
 
@@ -71,7 +95,7 @@ export class OfferController {
   @MessagePattern('core.offer.delete')
   async delete(@Payload() id: string): Promise<{ success: boolean }> {
     const offer = await this.offerService.findByIdOrFail(id);
-    this.offerService.remove(offer.id);
+    void this.offerService.remove(offer.id);
     return { success: true };
   }
 }

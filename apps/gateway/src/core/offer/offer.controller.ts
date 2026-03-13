@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { CurrentUser } from '@repo/commun';
+import { CurrentUser, Public } from '@repo/commun';
 import {
   CreateOffer,
   CreateOfferDTO,
@@ -41,42 +41,45 @@ export class OfferController {
     @CurrentUser() user: UserDTO,
   ): Promise<OfferDTO> {
     const createOffer = plainToInstance(CreateOffer, createOfferDto);
-    const offer = (await firstValueFrom(
+    const offer = await firstValueFrom<Offer>(
       this.coreService.send('core.offer.create', {
-        userId: getUserId(user),
         createOffer: createOffer,
+        userId: getUserId(user),
       }),
-    )) as Offer;
+    );
     return plainToInstance(OfferDTO, offer);
   }
 
   @ApiOperation({ summary: 'Récupérer toutes les offres' })
   @ApiResponse({ status: 201, description: 'Offres réucpérées' })
   @Get()
+  @Public()
   async findAll(): Promise<OfferDTO[]> {
-    const offers = (await firstValueFrom(
+    const offers = await firstValueFrom<Offer[]>(
       this.coreService.send('core.offer.find-all', {}),
-    )) as Offer[];
+    );
     return offers.map((offer: Offer) => plainToInstance(OfferDTO, offer));
   }
 
   @ApiOperation({ summary: "Récupérer les offres par l'id d'une entreprise" })
   @ApiResponse({ status: 201, description: 'Offres récupérées' })
   @Get('company/:id')
+  @Public()
   async findByCompanyId(@Param('id') id: string): Promise<OfferDTO[]> {
-    const offers = (await firstValueFrom(
+    const offers = await firstValueFrom<Offer[]>(
       this.coreService.send('core.offer.find-by-company-id', id),
-    )) as Offer[];
+    );
     return offers.map((offer: Offer) => plainToInstance(OfferDTO, offer));
   }
 
   @ApiOperation({ summary: 'Récupérer une offre' })
   @ApiResponse({ status: 201, description: 'Offre récupérée' })
   @Get(':id')
+  @Public()
   async findOne(@Param('id') id: string): Promise<OfferDTO | null> {
-    const offer = (await firstValueFrom(
+    const offer = await firstValueFrom<Offer | null>(
       this.coreService.send('core.offer.find-one', id),
-    )) as Offer;
+    );
     return offer ? plainToInstance(OfferDTO, offer) : null;
   }
 
@@ -88,9 +91,9 @@ export class OfferController {
     @Body() updateOfferDto: UpdateOfferDTO,
   ): Promise<OfferDTO> {
     const updateOffer = plainToInstance(UpdateOffer, updateOfferDto);
-    const offer = (await firstValueFrom(
+    const offer = await firstValueFrom<Offer>(
       this.coreService.send('core.offer.update', { id, updateOffer }),
-    )) as Offer;
+    );
     return plainToInstance(OfferDTO, offer);
   }
 
