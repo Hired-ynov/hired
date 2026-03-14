@@ -1,10 +1,13 @@
 import { Controller } from '@nestjs/common';
+import { OfferService } from './offer.service';
+import { CreateOffer, Offer, UpdateOffer } from '@repo/models';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { CreateOffer, Offer, UpdateOffer } from '@repo/models';
 import { CompanyService } from 'src/company/company.service';
 import { UserService } from 'src/users/user.service';
 
 import { OfferService } from './offer.service';
+import { CompanyEntity, UserEntity } from '@repo/entities';
 
 @Controller('offer')
 export class OfferController {
@@ -18,15 +21,19 @@ export class OfferController {
   async create(
     @Payload() payload: { userId: string; createOffer: CreateOffer },
   ): Promise<Offer> {
-    const user = await this.userService.findByIdOrFail(payload.userId);
-    const company = await this.companyService.findByIdOrFail(
-      user.companyId ?? '',
+    const user: UserEntity = await this.userService.findByIdOrFail(
+      payload.userId,
     );
-    const { description, location, salaryRange, skills, title } =
-      payload.createOffer;
+    let company: CompanyEntity | undefined = undefined;
+
+    if (user.companyId !== undefined) {
+      company = await this.companyService.findByIdOrFail(user.companyId ?? '');
+      const { description, location, salaryRange, skills, title } =
+        payload.createOffer;
+    }
     const offer = await this.offerService.create({
       company: company,
-      companyId: company.id,
+      companyId: company?.id,
       description,
       location,
       salaryRange,

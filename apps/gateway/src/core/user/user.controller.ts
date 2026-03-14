@@ -9,7 +9,8 @@ import {
   Put,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { Public, Roles } from '@repo/commun';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Public, Roles, CurrentUser } from '@repo/commun';
 import {
   CreateUserDTO,
   UserDTO,
@@ -24,6 +25,7 @@ import { microservices } from '@repo/rabbitmq-config';
 import { plainToInstance } from 'class-transformer';
 import { firstValueFrom } from 'rxjs';
 
+@ApiTags('user')
 @Controller('user')
 export class UserController {
   constructor(
@@ -31,6 +33,8 @@ export class UserController {
     private readonly userService: ClientProxy,
   ) {}
 
+  @ApiOperation({ summary: 'Créer un utilisateur' })
+  @ApiResponse({ description: 'Utilisateur créé', status: 201 })
   @Post()
   @Public()
   async create(@Body() createUserDto: CreateUserDTO): Promise<UserDTO> {
@@ -41,6 +45,8 @@ export class UserController {
     return plainToInstance(UserDTO, user);
   }
 
+  @ApiOperation({ summary: 'Récupérer tous les utilisateurs' })
+  @ApiResponse({ description: 'Utilisateurs récupérés', status: 201 })
   @Get()
   @Roles(Role.admin)
   async findAll(): Promise<UserDTO[]> {
@@ -50,6 +56,8 @@ export class UserController {
     return users.map((user) => plainToInstance(UserDTO, user));
   }
 
+  @ApiOperation({ summary: 'Récupérer un utilisateur par son email' })
+  @ApiResponse({ description: 'Utilisateur récupéré', status: 201 })
   @Get('email/:email')
   async findOneByEmail(@Param('email') email: string): Promise<UserDTO | null> {
     const user = await firstValueFrom(
@@ -60,6 +68,8 @@ export class UserController {
     return user ? plainToInstance(UserDTO, user) : null;
   }
 
+  @ApiOperation({ summary: 'Récupérer un utilisateur' })
+  @ApiResponse({ description: 'Utilisateur récupéré', status: 201 })
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<UserDTO | null> {
     const user = await firstValueFrom(
@@ -68,6 +78,8 @@ export class UserController {
     return user ? plainToInstance(UserDTO, user) : null;
   }
 
+  @ApiOperation({ summary: "Mettre à jour le mdp d'un utilisateur" })
+  @ApiResponse({ description: 'Mdp mis à jour', status: 201 })
   @Put(':id/change-password')
   @Roles(Role.user, Role.admin)
   async changePassword(
@@ -83,6 +95,8 @@ export class UserController {
     );
   }
 
+  @ApiOperation({ summary: 'Mettre à jour un utilisateur' })
+  @ApiResponse({ description: 'Utilisateur mis à jour', status: 201 })
   @Put(':id')
   async update(
     @Param('id') id: string,
@@ -95,6 +109,8 @@ export class UserController {
     return plainToInstance(UserDTO, user);
   }
 
+  @ApiOperation({ summary: 'Supprimer un utilisateur' })
+  @ApiResponse({ description: 'Utilisateur supprimé', status: 201 })
   @Delete(':id')
   async remove(@Param('id') id: string): Promise<void> {
     await firstValueFrom(
