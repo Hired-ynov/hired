@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsString,
   IsEmail,
@@ -9,7 +10,6 @@ import {
 } from 'class-validator';
 
 import { Role, Skill } from '../../domain';
-import { ApiProperty } from '@nestjs/swagger';
 import { BaseDTO } from '../utils/BaseDTO';
 
 export class UserDTO extends BaseDTO {

@@ -1,6 +1,6 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Transform, type TransformFnParams } from 'class-transformer';
 import { IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
 
 function sanitizeMessageContent({ value }: TransformFnParams): string {
   if (typeof value === 'string') {

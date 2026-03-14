@@ -1,11 +1,11 @@
 import { Body, Controller, Inject, Post } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Public } from '@repo/commun';
 import { LoginDTO, RegisterDTO, Login, Register } from '@repo/models';
 import { microservices } from '@repo/rabbitmq-config';
 import { plainToInstance } from 'class-transformer';
 import { firstValueFrom } from 'rxjs';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -16,7 +16,7 @@ export class AuthController {
   ) {}
 
   @ApiOperation({ summary: 'Connexion utilisateur' })
-  @ApiResponse({ status: 201, description: 'Connexion réussie' })
+  @ApiResponse({ description: 'Connexion réussie', status: 201 })
   @Post('login')
   @Public()
   async login(@Body() loginDto: LoginDTO): Promise<{ access_token: string }> {
@@ -27,7 +27,7 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Inscription utilisateur' })
-  @ApiResponse({ status: 201, description: 'Inscription réussie' })
+  @ApiResponse({ description: 'Inscription réussie', status: 201 })
   @Post('register')
   @Public()
   async register(
@@ -43,7 +43,7 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: "Vérification du token de l'utilisateur" })
-  @ApiResponse({ status: 201, description: 'Vérification validée' })
+  @ApiResponse({ description: 'Vérification validée', status: 201 })
   @Post('verify')
   @Public()
   async verifyToken(@Body() data: { token: string }): Promise<{ sub: number }> {

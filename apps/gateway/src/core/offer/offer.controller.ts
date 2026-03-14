@@ -51,7 +51,7 @@ export class OfferController {
   }
 
   @ApiOperation({ summary: 'Récupérer toutes les offres' })
-  @ApiResponse({ status: 201, description: 'Offres réucpérées' })
+  @ApiResponse({ description: 'Offres réucpérées', status: 201 })
   @Get()
   @Public()
   async findAll(): Promise<OfferDTO[]> {
@@ -62,7 +62,7 @@ export class OfferController {
   }
 
   @ApiOperation({ summary: "Récupérer les offres par l'id d'une entreprise" })
-  @ApiResponse({ status: 201, description: 'Offres récupérées' })
+  @ApiResponse({ description: 'Offres récupérées', status: 201 })
   @Get('company/:id')
   @Public()
   async findByCompanyId(@Param('id') id: string): Promise<OfferDTO[]> {
@@ -73,7 +73,7 @@ export class OfferController {
   }
 
   @ApiOperation({ summary: 'Récupérer une offre' })
-  @ApiResponse({ status: 201, description: 'Offre récupérée' })
+  @ApiResponse({ description: 'Offre récupérée', status: 201 })
   @Get(':id')
   @Public()
   async findOne(@Param('id') id: string): Promise<OfferDTO | null> {
@@ -84,7 +84,7 @@ export class OfferController {
   }
 
   @ApiOperation({ summary: 'Mettre à jour une offre' })
-  @ApiResponse({ status: 201, description: 'Offre mise à jour' })
+  @ApiResponse({ description: 'Offre mise à jour', status: 201 })
   @Put(':id')
   async update(
     @Param('id') id: string,
@@ -98,7 +98,7 @@ export class OfferController {
   }
 
   @ApiOperation({ summary: 'Supprimer une offre' })
-  @ApiResponse({ status: 201, description: 'Offre supprimée' })
+  @ApiResponse({ description: 'Offre supprimée', status: 201 })
   @Delete(':id')
   async remove(@Param('id') id: string): Promise<void> {
     return firstValueFrom(this.coreService.send('core.offer.delete', id));

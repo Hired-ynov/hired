@@ -1,7 +1,7 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { IsString } from 'class-validator';
 
 import { BaseDTO } from '../utils/BaseDTO';
-import { ApiProperty } from '@nestjs/swagger';
 
 export class CompanyDTO extends BaseDTO {
   @ApiProperty({

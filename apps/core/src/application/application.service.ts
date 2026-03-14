@@ -46,4 +46,19 @@ export class ApplicationService extends BaseService<ApplicationEntity> {
       );
     }
   }
+
+  /**
+   * Vérifie si l'utilisateur peut postuler à une offre
+   * L'utilisateur peut postuler si :
+   * - Il n'appartient pas à la company qui a créé l'offre (recruteur)
+   */
+  validateUserCanApplyToOffer(user: UserEntity, offer: Offer): void {
+    const isCompanyOwner = offer.companyId === user.companyId;
+
+    if (isCompanyOwner) {
+      throw new BadRequestException(
+        'You cant apply to offers from your company',
+      );
+    }
+  }
 }

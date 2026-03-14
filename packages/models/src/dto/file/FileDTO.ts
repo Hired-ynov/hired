@@ -1,9 +1,9 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsOptional, IsString } from 'class-validator';
 
 import { BaseDTO } from '../utils/BaseDTO';
 import { MetadataDTO } from '../utils/MetadataDTO';
-import { ApiProperty } from '@nestjs/swagger';
 
 export class FileDTO extends BaseDTO {
   @ApiProperty({
@@ -30,8 +30,8 @@ export class FileDTO extends BaseDTO {
   @ApiProperty({
     description: 'Données du fichier',
     example: {
-      size: 548_785,
       hash: '',
+      size: 548_785,
     },
   })
   @IsOptional()

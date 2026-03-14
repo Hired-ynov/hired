@@ -1,7 +1,7 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { IsArray, IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
 
 import { ApplicationStatus } from '../../entry';
-import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateApplicationDTO {
   @ApiProperty({

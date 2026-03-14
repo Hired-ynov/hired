@@ -54,16 +54,20 @@ export class AuthGuard implements CanActivate {
     } catch {
       throw new UnauthorizedException('Token invalide');
     }
+    if (payload.role === Role.admin) {
+      return true;
+    }
+    const requiredRoles =
+      this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
+        context.getHandler(),
+        context.getClass(),
+      ]) ?? [];
 
-    const requiredRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
+    if (requiredRoles.length === 0) {
+      requiredRoles.push(Role.user);
+    }
 
-    if (
-      requiredRoles.length > 0 &&
-      (!payload.role || !requiredRoles.includes(payload.role))
-    ) {
+    if (!payload.role || !requiredRoles.includes(payload.role)) {
       throw new UnauthorizedException(
         `Rôle requis: ${requiredRoles.join(', ')}, rôle actuel: ${String(payload.role)}`,
       );

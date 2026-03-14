@@ -12,7 +12,14 @@ import {
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { CurrentUser } from '@repo/commun';
 import {
   UserDTO,
@@ -27,19 +34,8 @@ import { plainToInstance } from 'class-transformer';
 import { firstValueFrom } from 'rxjs';
 import { getUserId } from 'src/utils/user-id.utils';
 
-interface MulterFile {
-  buffer: Buffer;
-  destination: string;
-  encoding: string;
-  fieldname: string;
-  filename: string;
-  mimetype: string;
-  originalname: string;
-  path: string;
-  size: number;
-}
-
 @ApiTags('application')
+@ApiBearerAuth('access-token')
 @Controller('application')
 export class ApplicationController {
   constructor(
@@ -47,14 +43,31 @@ export class ApplicationController {
     private readonly coreService: ClientProxy,
   ) {}
 
+  @ApiConsumes('multipart/form-data')
   @ApiOperation({ summary: 'Créer une application pour une offre' })
-  @ApiResponse({ status: 201, description: 'Application créée' })
+  @ApiResponse({ description: 'Application créée', status: 201 })
+  @ApiBody({
+    schema: {
+      properties: {
+        files: {
+          items: {
+            format: 'binary',
+            type: 'string',
+          },
+          type: 'array',
+        },
+        firstMessage: { type: 'string' },
+        offerId: { type: 'string' },
+      },
+      type: 'object',
+    },
+  })
   @Post()
   @UseInterceptors(FilesInterceptor('files'))
   async create(
     @Body() body: CreateApplicationDTO,
     @CurrentUser() user: UserDTO,
-    @UploadedFiles() files?: MulterFile[],
+    @UploadedFiles() files?: Express.Multer.File[],
   ): Promise<ApplicationDTO> {
     const createApplication = plainToInstance(CreateApplication, body);
     const application = await firstValueFrom<ApplicationDTO>(
@@ -68,7 +81,7 @@ export class ApplicationController {
   }
 
   @ApiOperation({ summary: 'Récupérer toutes les applications' })
-  @ApiResponse({ status: 201, description: 'Applications récupérées' })
+  @ApiResponse({ description: 'Applications récupérées', status: 201 })
   @Get()
   async findAll(): Promise<ApplicationDTO[]> {
     const applications = await firstValueFrom<ApplicationDTO[]>(
@@ -80,7 +93,7 @@ export class ApplicationController {
   }
 
   @ApiOperation({ summary: 'Récupérer mes applications' })
-  @ApiResponse({ status: 201, description: 'Applications récupérées' })
+  @ApiResponse({ description: 'Applications récupérées', status: 201 })
   @Get('me')
   async findMyApplications(
     @CurrentUser() user: UserDTO,
@@ -97,7 +110,7 @@ export class ApplicationController {
   }
 
   @ApiOperation({ summary: 'Récupérer une application pour une offre' })
-  @ApiResponse({ status: 201, description: 'Application récupérée' })
+  @ApiResponse({ description: 'Application récupérée', status: 201 })
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<ApplicationDTO> {
     const application = await firstValueFrom<ApplicationDTO>(
@@ -107,7 +120,7 @@ export class ApplicationController {
   }
 
   @ApiOperation({ summary: "Récupérer une application par l'id d'une offre" })
-  @ApiResponse({ status: 201, description: 'Application récupérée' })
+  @ApiResponse({ description: 'Application récupérée', status: 201 })
   @Get('/offer/:id')
   async findByOfferId(
     @Param('id') id: string,
@@ -125,14 +138,35 @@ export class ApplicationController {
   }
 
   @ApiOperation({ summary: 'Mettre à jour une application' })
-  @ApiResponse({ status: 201, description: 'Application mise à jour' })
+  @ApiResponse({ description: 'Application mise à jour', status: 201 })
+  @ApiBody({
+    schema: {
+      properties: {
+        files: {
+          items: {
+            format: 'binary',
+            type: 'string',
+          },
+          type: 'array',
+        },
+        firstMessage: { type: 'string' },
+        status: {
+          enum: ['pending', 'reviewed', 'accepted', 'rejected'],
+          type: 'string',
+        },
+      },
+      type: 'object',
+    },
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiBearerAuth('access-token')
   @Put(':id')
   @UseInterceptors(FilesInterceptor('files'))
   async updateApplication(
     @Param('id') id: string,
     @Body() body: UpdateApplicationDTO,
     @CurrentUser() user: UserDTO,
-    @UploadedFiles() files?: MulterFile[],
+    @UploadedFiles() files?: Express.Multer.File[],
   ): Promise<ApplicationDTO> {
     const updateApplication = plainToInstance(UpdateApplication, body);
     const application = await firstValueFrom<ApplicationDTO>(
@@ -147,7 +181,7 @@ export class ApplicationController {
   }
 
   @ApiOperation({ summary: 'Supprimer une application' })
-  @ApiResponse({ status: 201, description: 'Application supprimée' })
+  @ApiResponse({ description: 'Application supprimée', status: 201 })
   @Delete(':id')
   delete(@Param('id') id: string, @CurrentUser() user: UserDTO): Promise<void> {
     return firstValueFrom(

@@ -10,6 +10,10 @@ const nextConfig = {
     config.resolve = config.resolve || {};
     config.resolve.alias = {
       ...config.resolve.alias,
+      '@nestjs/swagger': path.resolve(
+        __dirname,
+        'shims/nestjs-swagger-shim.js',
+      ),
       'class-transformer/storage': 'class-transformer/cjs/storage.js',
       'file-type': path.resolve(__dirname, 'shims/file-type-shim.js'),
     };
@@ -17,7 +21,10 @@ const nextConfig = {
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
+        async_hooks: false,
         fs: false,
+        os: false,
+        perf_hooks: false,
       };
     }
 

@@ -21,4 +21,9 @@ export class AppController {
   async getMessages() {
     return await this.appService.findAll();
   }
+
+  @MessagePattern('message.findOne')
+  async getMessage(@Payload() data: { id: string }) {
+    return await this.appService.findOne({ id: data.id });
+  }
 }

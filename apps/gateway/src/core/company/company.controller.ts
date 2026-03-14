@@ -31,7 +31,7 @@ export class CompanyController {
   ) {}
 
   @ApiOperation({ summary: 'Créer une entreprise' })
-  @ApiResponse({ status: 201, description: 'Entreprise créée' })
+  @ApiResponse({ description: 'Entreprise créée', status: 201 })
   @Post()
   async create(
     @Body() createCompanyDto: CreateCompanyDTO,
@@ -48,7 +48,7 @@ export class CompanyController {
   }
 
   @ApiOperation({ summary: 'Récupérer toutes les entreprises' })
-  @ApiResponse({ status: 201, description: 'Entreprises récupérées' })
+  @ApiResponse({ description: 'Entreprises récupérées', status: 201 })
   @Get('all')
   @Roles(Role.admin)
   async findAll(): Promise<CompanyDTO[]> {
@@ -59,7 +59,7 @@ export class CompanyController {
   }
 
   @ApiOperation({ summary: 'Récupérer une entreprise' })
-  @ApiResponse({ status: 201, description: 'Entreprise récupérée' })
+  @ApiResponse({ description: 'Entreprise récupérée', status: 201 })
   @Get(':id')
   @Public()
   async findOne(@Param('id') id: string): Promise<CompanyDTO> {
@@ -70,7 +70,7 @@ export class CompanyController {
   }
 
   @ApiOperation({ summary: 'Mettre à jour une entreprise' })
-  @ApiResponse({ status: 201, description: 'Entreprise mise à jour' })
+  @ApiResponse({ description: 'Entreprise mise à jour', status: 201 })
   @Put(':id')
   async update(
     @Param('id') id: string,
@@ -87,7 +87,7 @@ export class CompanyController {
   }
 
   @ApiOperation({ summary: 'Supprimer une entreprise' })
-  @ApiResponse({ status: 201, description: 'Entreprise supprimée' })
+  @ApiResponse({ description: 'Entreprise supprimée', status: 201 })
   @Delete(':id')
   async remove(@Param('id') id: string): Promise<void> {
     await firstValueFrom(this.coreService.send('company.delete', { id }));
