@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsEmail,
   IsString,
@@ -7,6 +8,10 @@ import {
 } from 'class-validator';
 
 export class RegisterDTO {
+  @ApiProperty({
+    description: "Mail de l'utilisateur",
+    example: 'val.peyratout@sfr.fr',
+  })
   @IsEmail({
     allow_ip_domain: false,
     allow_utf8_local_part: false,
@@ -14,6 +19,10 @@ export class RegisterDTO {
   })
   email: string;
 
+  @ApiProperty({
+    description: "Mot de passe de l'utilisateur",
+    example: 'DoudouLove33!',
+  })
   @IsStrongPassword({
     minLength: 8,
     minLowercase: 1,
@@ -23,12 +32,24 @@ export class RegisterDTO {
   })
   password: string;
 
+  @ApiProperty({
+    description: "Prénom de l'utilisateur",
+    example: 'Valentin',
+  })
   @IsString()
   firstName: string;
 
+  @ApiProperty({
+    description: "Nom de l'utilisateur",
+    example: 'Peyratout',
+  })
   @IsString()
   lastName: string;
 
+  @ApiProperty({
+    description: "Numéro de téléphone de l'utilisateur",
+    example: '+33685476215',
+  })
   @IsPhoneNumber()
   @ValidateIf(
     (o: { phoneNumber?: string | null }) =>

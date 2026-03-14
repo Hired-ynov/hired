@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Transform, type TransformFnParams } from 'class-transformer';
 import { IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator';
 
@@ -10,6 +11,10 @@ function sanitizeMessageContent({ value }: TransformFnParams): string {
 }
 
 export class CreateMessageDTO {
+  @ApiProperty({
+    description: 'Message MQTT',
+    example: 'Voici mon message',
+  })
   @IsString()
   @IsNotEmpty({ message: 'Message content cannot be empty' })
   @MinLength(1, { message: 'Message must contain at least 1 character' })

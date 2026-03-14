@@ -35,6 +35,7 @@
   },
   "devDependencies": {
     "@nestjs/mapped-types": "^2.0.0",
+    "@nestjs/swagger": "*",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^22.10.7",
