@@ -17,19 +17,18 @@ export class MinioService {
     const useSSL = this.configService.get<string>('MINIO_USE_SSL', 'true');
 
     this.minioClient = new Minio.Client({
-      endPoint: this.configService.get<string>('MINIO_ENDPOINT', 'localhost'),
-      port: this.configService.get<number>('MINIO_PORT', 9000),
-      useSSL: useSSL === 'true',
       accessKey: this.configService.get<string>(
         'MINIO_ROOT_USER',
         'minioadmin',
       ),
+      endPoint: this.configService.get<string>('MINIO_ENDPOINT', 'localhost'),
+      port: this.configService.get<number>('MINIO_PORT', 9000),
       secretKey: this.configService.get<string>(
         'MINIO_ROOT_PASSWORD',
-        'minioadmin',
+        'minioadmin123',
       ),
+      useSSL: useSSL === 'true',
     });
-
     this.ensureBucketExists();
   }
 
@@ -50,9 +49,10 @@ export class MinioService {
     fileName: string,
   ): Promise<{ url: string; etag: string }> {
     try {
+      // Ensure metadata values are ASCII safe (encodeURIComponent handles this)
       const metaData = {
         'Content-Type': file.mimetype,
-        'Original-Name': file.originalname,
+        'Original-Name': encodeURIComponent(file.originalname),
       };
 
       const result = await this.minioClient.putObject(
@@ -66,8 +66,8 @@ export class MinioService {
       const url = await this.getFileUrl(fileName);
       this.logger.log(`File '${fileName}' uploaded successfully`);
       return {
-        url,
         etag: result.etag,
+        url,
       };
     } catch (error) {
       throw error;

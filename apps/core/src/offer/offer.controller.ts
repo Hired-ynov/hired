@@ -1,13 +1,10 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { CompanyEntity, UserEntity } from '@repo/entities';
 import { CreateOffer, Offer, UpdateOffer } from '@repo/models';
 import { CompanyService } from 'src/company/company.service';
 import { UserService } from 'src/users/user.service';
 
 import { OfferService } from './offer.service';
-
-
 
 @Controller('offer')
 export class OfferController {
@@ -21,26 +18,13 @@ export class OfferController {
   async create(
     @Payload() payload: { userId: string; createOffer: CreateOffer },
   ): Promise<Offer> {
-    const user: UserEntity = await this.userService.findByIdOrFail(
-      payload.userId,
-    );
-    let company: CompanyEntity | undefined = undefined;
-
-    if (user.companyId !== undefined) {
-      company = await this.companyService.findByIdOrFail(user.companyId ?? '');
-      const { description, location, salaryRange, skills, title } =
-        payload.createOffer;
-    }
+    const user = await this.userService.findByIdOrFail(payload.userId);
+    const company = await this.companyService.findByIdOrFail(user.companyId);
     const offer = await this.offerService.create({
+      ...payload.createOffer,
       company: company,
-      companyId: company?.id,
-      description,
-      location,
-      salaryRange,
-      skills,
-      title,
+      companyId: company.id,
     });
-
     return offer;
   }
 
@@ -69,23 +53,8 @@ export class OfferController {
     @Payload() payload: { id: string; updateOffer: UpdateOffer },
   ): Promise<Offer> {
     const offer = await this.offerService.findByIdOrFail(payload.id);
-    const {
-      companyId,
-      description,
-      filesIds,
-      location,
-      salaryRange,
-      skills,
-      title,
-    } = payload.updateOffer;
     await this.offerService.update(offer.id, {
-      companyId,
-      description,
-      filesIds,
-      location,
-      salaryRange,
-      skills,
-      title,
+      ...payload.updateOffer,
       updatedAt: new Date(),
     });
 

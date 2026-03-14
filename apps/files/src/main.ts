@@ -1,22 +1,33 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { ConfigService } from '@nestjs/config';
-import { microservices } from '@repo/rabbitmq-config';
 import { ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { microservices } from '@repo/rabbitmq-config';
+
+import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get<ConfigService>(ConfigService);
   const rabbitmqUrl = configService.get<string>('RABBITMQ_URL');
-  const port = configService.get<number>('PORT') || 3003;
+  const port = configService.get<number>('PORT') ?? 3003;
 
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true,
       forbidNonWhitelisted: true,
       transform: true,
+      whitelist: true,
     }),
   );
+
+  // Setup Swagger
+  const config = new DocumentBuilder()
+    .setTitle('Files Service API')
+    .setDescription('Microservice for handling file uploads and management')
+    .setVersion('1.0')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('swagger', app, document);
 
   app.connectMicroservice(
     microservices.FILES_SERVICE({

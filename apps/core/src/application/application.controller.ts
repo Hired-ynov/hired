@@ -2,30 +2,17 @@ import { BadRequestException, Controller, Inject } from '@nestjs/common';
 import { ClientProxy, MessagePattern, Payload } from '@nestjs/microservices';
 import { ApplicationEntity } from '@repo/entities';
 import {
-  ApplicationDTO,
-  CreateApplication,
   Application,
-  UpdateApplication,
   ApplicationStatus,
+  CreateApplication,
+  UpdateApplication,
 } from '@repo/models';
+import { microservices } from '@repo/rabbitmq-config';
 import { firstValueFrom } from 'rxjs';
-
-import { ApplicationService } from './application.service';
 import { OfferService } from 'src/offer/offer.service';
 import { UserService } from 'src/users/user.service';
-import { microservices } from '@repo/rabbitmq-config';
 
-interface MulterFile {
-  buffer: Buffer;
-  destination: string;
-  encoding: string;
-  fieldname: string;
-  filename: string;
-  mimetype: string;
-  originalname: string;
-  path: string;
-  size: number;
-}
+import { ApplicationService } from './application.service';
 
 @Controller('application')
 export class ApplicationController {
@@ -43,7 +30,7 @@ export class ApplicationController {
     payload: {
       createApplication: CreateApplication;
       userId: string;
-      files: MulterFile[];
+      files: Express.Multer.File[];
     },
   ): Promise<Application> {
     const user = await this.userService.findByIdOrFail(payload.userId);
@@ -51,9 +38,10 @@ export class ApplicationController {
     const offer = await this.offerService.findOrFail({
       id: payload.createApplication.offerId,
     });
-
+    this.applicationService.validateUserCanViewOfferApplications(user, offer);
+    this.applicationService.validateUserCanApplyToOffer(user, offer);
     const existingApplication = await this.applicationService.findOne({
-      offerId: payload.createApplication.offerId,
+      offerId: offer.id,
       userId: user.id,
     });
 
@@ -61,11 +49,9 @@ export class ApplicationController {
       throw new BadRequestException('You have already applied to this offer');
     }
 
-    const { filesIds, firstMessage, offerId } = payload.createApplication;
     const applicationData: Partial<ApplicationEntity> = {
-      filesIds,
-      firstMessage,
-      offerId,
+      ...payload.createApplication,
+      offerId: offer.id,
       status: ApplicationStatus.PENDING,
       userId: user.id,
     };
@@ -73,14 +59,15 @@ export class ApplicationController {
     if (payload.files && payload.files.length > 0) {
       const uploadedFiles = await Promise.all(
         payload.files.map((file) =>
-          firstValueFrom(this.fileService.send('file.file.uploadFile', file)),
+          firstValueFrom(
+            this.fileService.send('file.file.uploadFile', { file }),
+          ),
         ),
       );
       applicationData.filesIds = uploadedFiles.map((file) => file.id);
     }
 
-    const saved = await this.applicationService.create(applicationData);
-    return saved;
+    return await this.applicationService.create(applicationData);
   }
 
   @MessagePattern('core.application.findAll')
@@ -112,7 +99,7 @@ export class ApplicationController {
     this.applicationService.validateUserCanViewOfferApplications(user, offer);
 
     return this.applicationService.findAll({
-      where: { offerId: payload.offerId },
+      where: { offerId: offer.id },
     });
   }
 
@@ -123,7 +110,7 @@ export class ApplicationController {
       id: string;
       updateApplication: UpdateApplication;
       userId: string;
-      files: MulterFile[];
+      files?: Express.Multer.File[];
     },
   ): Promise<Application> {
     const user = await this.userService.findByIdOrFail(payload.userId);
@@ -140,11 +127,27 @@ export class ApplicationController {
       offer,
     );
 
-    const { filesIds, firstMessage, status } = payload.updateApplication;
-    await this.applicationService.update(payload.id, {
-      filesIds,
-      firstMessage,
-      status,
+    const { filesIds, ...updateData } = payload.updateApplication;
+
+    // Begin files logic
+    let updatedFilesIds = filesIds || application.filesIds || [];
+
+    if (payload.files && payload.files.length > 0) {
+      const uploadedFiles = await Promise.all(
+        payload.files.map((file) =>
+          firstValueFrom(
+            this.fileService.send('file.file.uploadFile', { file }),
+          ),
+        ),
+      );
+      const newFileIds = uploadedFiles.map((file) => file.id);
+      updatedFilesIds = [...updatedFilesIds, ...newFileIds];
+    }
+    // End files logic
+
+    await this.applicationService.update(application.id, {
+      ...updateData,
+      filesIds: updatedFilesIds,
       updatedAt: new Date(),
     });
 
@@ -164,7 +167,22 @@ export class ApplicationController {
         'You can only delete your own applications',
       );
     }
-    void this.applicationService.remove(payload.id);
+
+    // Delete associated files
+    if (application.filesIds.length > 0) {
+      console.log('Deleting files associated with application...');
+      await Promise.allSettled(
+        application.filesIds.map((fileId) =>
+          firstValueFrom(
+            this.fileService.send('file.file.deleteFile', { id: fileId }),
+          ).catch((error) => {
+            console.error(`Failed to delete file ${fileId}:`, error);
+          }),
+        ),
+      );
+    }
+
+    await this.applicationService.remove(application.id);
     return { success: true };
   }
 }

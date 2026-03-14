@@ -1,16 +1,8 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload, RpcException } from '@nestjs/microservices';
-import { FilesService } from './files.service';
 import { File } from '@repo/models';
 
-interface UploadFilePayload {
-  file: {
-    originalname: string;
-    mimetype: string;
-    size: number;
-    buffer: Buffer;
-  };
-}
+import { FilesService } from './files.service';
 
 interface FindOnePayload {
   id: string;
@@ -29,28 +21,22 @@ export class FilesMicroserviceController {
   constructor(private readonly filesService: FilesService) {}
 
   @MessagePattern('file.file.uploadFile')
-  async uploadFile(@Payload() payload: UploadFilePayload): Promise<File> {
+  async uploadFile(
+    @Payload() payload: { file: Express.Multer.File },
+  ): Promise<File> {
     const { file } = payload;
-
     if (!file) {
       throw new RpcException('No file provided');
     }
 
     try {
-      const multerFile: Express.Multer.File = {
-        fieldname: 'file',
-        originalname: file.originalname,
-        encoding: '7bit',
-        mimetype: file.mimetype,
-        size: file.size,
-        buffer: file.buffer,
-        stream: null as any,
-        destination: '',
-        filename: '',
-        path: '',
-      };
+      const fileBuffer = Buffer.from((file.buffer as any).data);
 
-      return await this.filesService.uploadFile(multerFile);
+      const fileWithBuffer: Express.Multer.File = {
+        ...file,
+        buffer: fileBuffer,
+      };
+      return await this.filesService.uploadFile(fileWithBuffer);
     } catch (error) {
       throw new RpcException(
         `Failed to upload file: ${error instanceof Error ? error.message : 'Unknown error'}`,

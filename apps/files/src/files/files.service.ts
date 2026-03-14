@@ -1,11 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { FileEntity } from '@repo/entities';
 import { File } from '@repo/models';
 import { BaseService } from '@repo/nest-service';
 import { Repository } from 'typeorm';
+
 import { MinioService } from './minio.service';
-import { plainToInstance } from 'class-transformer';
-import { FileEntity } from '@repo/entities';
 
 @Injectable()
 export class FilesService extends BaseService<FileEntity> {
@@ -22,20 +22,23 @@ export class FilesService extends BaseService<FileEntity> {
    */
   async uploadFile(file: Express.Multer.File): Promise<File> {
     const timestamp = Date.now();
-    const fileName = `${timestamp}-${file.originalname}`;
+    const safeOriginalName = file.originalname.replaceAll(
+      /[^a-zA-Z0-9.-]/g,
+      '_',
+    );
+    const fileName = `${timestamp}-${safeOriginalName}`;
 
     const { url } = await this.minioService.uploadFile(file, fileName);
-    const fileEntity = await this.create({
+
+    return await this.create({
+      metadata: {
+        hash: fileName,
+        size: file.size,
+      },
       name: file.originalname,
       path: url,
       type: file.mimetype,
-      metadata: {
-        size: file.size,
-        hash: fileName,
-      },
     });
-
-    return fileEntity;
   }
 
   /**
@@ -89,7 +92,7 @@ export class FilesService extends BaseService<FileEntity> {
     }
 
     const stream = await this.minioService.getFileStream(fileName);
-    return { stream, file };
+    return { file, stream };
   }
 
   /**
@@ -114,12 +117,10 @@ export class FilesService extends BaseService<FileEntity> {
   async getFilesByIds(ids: string[]): Promise<File[]> {
     const files = await Promise.all(
       ids.map(async (id) => {
-        const file = await this.findOne({ id });
-        return file;
+        return await this.findOne({ id });
       }),
     );
 
-    const validFiles = files.filter((file) => file !== null);
-    return validFiles;
+    return files.filter((file) => file !== null);
   }
 }

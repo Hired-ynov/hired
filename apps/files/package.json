@@ -21,6 +21,7 @@
     "@nestjs/microservices": "^11.1.14",
     "@nestjs/platform-express": "^11.1.11",
     "@nestjs/typeorm": "^11.0.0",
+    "@nestjs/swagger": "^11.2.6",
     "@repo/api": "workspace:*",
     "@repo/entities": "workspace:*",
     "@repo/models": "workspace:*",

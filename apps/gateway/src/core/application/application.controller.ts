@@ -12,7 +12,14 @@ import {
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { CurrentUser } from '@repo/commun';
 import {
   UserDTO,
@@ -27,19 +34,8 @@ import { plainToInstance } from 'class-transformer';
 import { firstValueFrom } from 'rxjs';
 import { getUserId } from 'src/utils/user-id.utils';
 
-interface MulterFile {
-  buffer: Buffer;
-  destination: string;
-  encoding: string;
-  fieldname: string;
-  filename: string;
-  mimetype: string;
-  originalname: string;
-  path: string;
-  size: number;
-}
-
 @ApiTags('application')
+@ApiBearerAuth('access-token')
 @Controller('application')
 export class ApplicationController {
   constructor(
@@ -47,14 +43,31 @@ export class ApplicationController {
     private readonly coreService: ClientProxy,
   ) {}
 
+  @ApiConsumes('multipart/form-data')
   @ApiOperation({ summary: 'Créer une application pour une offre' })
   @ApiResponse({ description: 'Application créée', status: 201 })
+  @ApiBody({
+    schema: {
+      properties: {
+        files: {
+          items: {
+            format: 'binary',
+            type: 'string',
+          },
+          type: 'array',
+        },
+        firstMessage: { type: 'string' },
+        offerId: { type: 'string' },
+      },
+      type: 'object',
+    },
+  })
   @Post()
   @UseInterceptors(FilesInterceptor('files'))
   async create(
     @Body() body: CreateApplicationDTO,
     @CurrentUser() user: UserDTO,
-    @UploadedFiles() files?: MulterFile[],
+    @UploadedFiles() files?: Express.Multer.File[],
   ): Promise<ApplicationDTO> {
     const createApplication = plainToInstance(CreateApplication, body);
     const application = await firstValueFrom<ApplicationDTO>(
@@ -126,13 +139,34 @@ export class ApplicationController {
 
   @ApiOperation({ summary: 'Mettre à jour une application' })
   @ApiResponse({ description: 'Application mise à jour', status: 201 })
+  @ApiBody({
+    schema: {
+      properties: {
+        files: {
+          items: {
+            format: 'binary',
+            type: 'string',
+          },
+          type: 'array',
+        },
+        firstMessage: { type: 'string' },
+        status: {
+          enum: ['pending', 'reviewed', 'accepted', 'rejected'],
+          type: 'string',
+        },
+      },
+      type: 'object',
+    },
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiBearerAuth('access-token')
   @Put(':id')
   @UseInterceptors(FilesInterceptor('files'))
   async updateApplication(
     @Param('id') id: string,
     @Body() body: UpdateApplicationDTO,
     @CurrentUser() user: UserDTO,
-    @UploadedFiles() files?: MulterFile[],
+    @UploadedFiles() files?: Express.Multer.File[],
   ): Promise<ApplicationDTO> {
     const updateApplication = plainToInstance(UpdateApplication, body);
     const application = await firstValueFrom<ApplicationDTO>(

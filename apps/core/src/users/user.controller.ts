@@ -21,8 +21,7 @@ export class UserController {
 
   @MessagePattern('core.user.create')
   async create(@Payload() createUser: CreateUser): Promise<User> {
-    const { password, ...rest } = createUser;
-    if (!password?.trim()) {
+    if (!createUser.password?.trim()) {
       throw new BadRequestException('Password is required');
     }
 
@@ -39,9 +38,10 @@ export class UserController {
     const passwordHash = await this.userService.generatePasswordHash(
       createUser.password,
     );
-    const user = await this.userService.create(
-      Object.assign({}, createUser, { passwordHash }),
-    );
+    const user = await this.userService.create({
+      ...createUser,
+      passwordHash,
+    });
 
     return user;
   }
@@ -110,8 +110,8 @@ export class UserController {
       }
     }
 
-    await this.userService.update(payload.id, payload.updateUser);
-    const user = await this.userService.findById(payload.id);
+    await this.userService.update(existingUser.id, payload.updateUser);
+    const user = await this.userService.findById(existingUser.id);
 
     if (!user) {
       throw new NotFoundException('User not found');
@@ -179,6 +179,6 @@ export class UserController {
       throw new NotFoundException('User not found');
     }
 
-    await this.userService.remove(payload.id);
+    await this.userService.remove(user.id);
   }
 }
