@@ -5,6 +5,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { microservices } from '@repo/rabbitmq-config';
 
 import { AppModule } from './app.module';
+import { AllRpcExceptionsFilter } from './filters/rpc-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -20,6 +21,8 @@ async function bootstrap() {
     }),
   );
 
+  app.useGlobalFilters(new AllRpcExceptionsFilter());
+
   // Setup Swagger
   const config = new DocumentBuilder()
     .setTitle('Files Service API')
@@ -33,6 +36,9 @@ async function bootstrap() {
     microservices.FILES_SERVICE({
       RABBITMQ_URL: rabbitmqUrl,
     }),
+    {
+      inheritAppConfig: true,
+    },
   );
 
   await app.startAllMicroservices();

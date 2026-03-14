@@ -27,6 +27,9 @@ async function bootstrap() {
     microservices.CORE_SERVICE({
       RABBITMQ_URL: rabbitmqUrl,
     }),
+    {
+      inheritAppConfig: true,
+    },
   );
 
   await app.startAllMicroservices();

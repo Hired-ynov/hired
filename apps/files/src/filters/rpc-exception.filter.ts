@@ -131,7 +131,6 @@ export class AllRpcExceptionsFilter implements RpcExceptionFilter {
       }
     }
 
-    // Never leak internals for 5xx across microservice boundaries.
     if (statusCode >= HttpStatus.INTERNAL_SERVER_ERROR) {
       message = 'Internal server error';
     }
