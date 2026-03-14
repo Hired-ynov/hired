@@ -2,10 +2,10 @@ import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { AllRpcExceptionsFilter } from '@repo/nest-service';
 import { microservices } from '@repo/rabbitmq-config';
 
 import { AppModule } from './app.module';
-import { AllRpcExceptionsFilter } from './filters/rpc-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

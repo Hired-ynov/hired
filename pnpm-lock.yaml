@@ -156,6 +156,9 @@ importers:
       '@repo/models':
         specifier: workspace:^
         version: link:../../packages/models
+      '@repo/nest-service':
+        specifier: workspace:^
+        version: link:../../packages/nest-service
       '@repo/rabbitmq-config':
         specifier: workspace:^
         version: link:../../packages/rabbitmq-config
@@ -960,6 +963,9 @@ importers:
       '@nestjs/microservices':
         specifier: ^11.0.0
         version: 11.1.14(@nestjs/common@11.1.14)(@nestjs/core@11.1.14)(amqp-connection-manager@5.0.0)(amqplib@0.10.9)(cache-manager@7.2.8)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      rxjs:
+        specifier: ^7.8.0
+        version: 7.8.2
     devDependencies:
       '@nestjs/common':
         specifier: ^11.1.11
