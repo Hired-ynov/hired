@@ -20,7 +20,7 @@ import { AuthModule } from './auth/auth.module';
       inject: [ConfigService],
       isGlobal: true,
       useFactory: (configService: ConfigService) => {
-        return cache.REDIS({
+        return cache.AUTO({
           REDIS_URL: configService.get<string>('REDIS_URL'),
         });
       },
