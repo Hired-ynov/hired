@@ -26,4 +26,11 @@ export class AuthController {
   ): Promise<{ sub: number }> {
     return await this.authService.verifyToken(data.token);
   }
+
+  @MessagePattern('auth.auth.logout')
+  async logout(
+    @Payload() data: { token: string },
+  ): Promise<{ success: boolean }> {
+    return await this.authService.logout(data.token);
+  }
 }

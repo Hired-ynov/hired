@@ -13,11 +13,10 @@ async function bootstrap() {
   const rabbitmqUrl = configService.get<string>('RABBITMQ_URL');
   const port = configService.get<number>('PORT') ?? 3003;
 
+  // Global validation pipe (transform only — whitelist belongs to the public gateway)
   app.useGlobalPipes(
     new ValidationPipe({
-      forbidNonWhitelisted: true,
       transform: true,
-      whitelist: true,
     }),
   );
 

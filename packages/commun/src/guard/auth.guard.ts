@@ -1,13 +1,17 @@
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import {
+  Inject,
   CanActivate,
   ExecutionContext,
   Injectable,
+  Optional,
   SetMetadata,
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { Role } from '@repo/models';
+import { Cache } from 'cache-manager';
 
 interface JwtPayload extends Record<string, unknown> {
   role?: Role;
@@ -26,9 +30,14 @@ export const Roles = (...roles: Role[]) => SetMetadata(ROLES_KEY, roles);
 
 @Injectable()
 export class AuthGuard implements CanActivate {
+  private static readonly REVOKED_TOKEN_PREFIX = 'revoked_token:';
+
   constructor(
     private readonly jwtService: JwtService,
     private readonly reflector: Reflector,
+    @Optional()
+    @Inject(CACHE_MANAGER)
+    private readonly cacheManager?: Cache,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -49,6 +58,7 @@ export class AuthGuard implements CanActivate {
 
     let payload: JwtPayload;
     try {
+      await this.assertTokenNotRevoked(token);
       payload = await this.jwtService.verifyAsync<JwtPayload>(token);
       request.user = payload;
     } catch {
@@ -88,5 +98,19 @@ export class AuthGuard implements CanActivate {
 
     const [type, token] = authorization.split(' ');
     return type === 'Bearer' ? token : undefined;
+  }
+
+  private async assertTokenNotRevoked(token: string): Promise<void> {
+    if (!this.cacheManager) {
+      return;
+    }
+
+    const revoked = await this.cacheManager.get<string>(
+      `${AuthGuard.REVOKED_TOKEN_PREFIX}${token}`,
+    );
+
+    if (revoked) {
+      throw new UnauthorizedException('Token révoqué');
+    }
   }
 }
