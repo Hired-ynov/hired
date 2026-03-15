@@ -9,9 +9,8 @@ import {
 import { ClientProxy } from '@nestjs/microservices';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Public } from '@repo/commun';
-import { LoginDTO, RegisterDTO, Login, Register } from '@repo/models';
+import { LoginDTO, RegisterDTO } from '@repo/models';
 import { microservices } from '@repo/rabbitmq-config';
-import { plainToInstance } from 'class-transformer';
 import { firstValueFrom } from 'rxjs';
 
 @ApiTags('auth')
@@ -27,9 +26,11 @@ export class AuthController {
   @Post('login')
   @Public()
   async login(@Body() loginDto: LoginDTO): Promise<{ access_token: string }> {
-    const login = plainToInstance(Login, loginDto);
     return firstValueFrom(
-      this.authService.send<{ access_token: string }>('auth.auth.login', login),
+      this.authService.send<{ access_token: string }>(
+        'auth.auth.login',
+        loginDto,
+      ),
     );
   }
 
@@ -40,11 +41,10 @@ export class AuthController {
   async register(
     @Body() registerDto: RegisterDTO,
   ): Promise<{ access_token: string }> {
-    const register = plainToInstance(Register, registerDto);
     return firstValueFrom(
       this.authService.send<{ access_token: string }>(
         'auth.auth.register',
-        register,
+        registerDto,
       ),
     );
   }

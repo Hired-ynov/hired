@@ -44,15 +44,9 @@ importers:
 
   apps/api:
     dependencies:
-      '@nestjs/cache-manager':
-        specifier: ^3.1.0
-        version: 3.1.0(@nestjs/common@11.1.14)(@nestjs/core@11.1.14)(cache-manager@7.2.8)(keyv@5.6.0)(rxjs@7.8.2)
       '@nestjs/common':
         specifier: ^11.1.11
         version: 11.1.14(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)
-      '@nestjs/config':
-        specifier: ^4.0.2
-        version: 4.0.3(@nestjs/common@11.1.14)(rxjs@7.8.2)
       '@nestjs/core':
         specifier: ^11.1.11
         version: 11.1.14(@nestjs/common@11.1.14)(@nestjs/microservices@11.1.14)(@nestjs/platform-express@11.1.14)(reflect-metadata@0.2.2)(rxjs@7.8.2)
@@ -65,12 +59,6 @@ importers:
       '@repo/api':
         specifier: workspace:*
         version: link:../../packages/api
-      '@repo/redis-config':
-        specifier: workspace:^
-        version: link:../../packages/redis-config
-      cache-manager:
-        specifier: ^7.2.8
-        version: 7.2.8
       pg:
         specifier: ^8.18.0
         version: 8.19.0
@@ -1062,10 +1050,7 @@ importers:
     dependencies:
       '@nestjs/microservices':
         specifier: ^11.0.0
-        version: 11.1.14(@nestjs/common@11.1.14)(@nestjs/core@11.1.14)(amqp-connection-manager@5.0.0)(amqplib@0.10.9)(cache-manager@7.2.8)(reflect-metadata@0.2.2)(rxjs@7.8.2)
-      cache-manager:
-        specifier: '*'
-        version: 7.2.8
+        version: 11.1.14(@nestjs/common@11.1.14)(@nestjs/core@11.1.14)(amqp-connection-manager@5.0.0)(amqplib@0.10.9)(reflect-metadata@0.2.2)(rxjs@7.8.2)
     devDependencies:
       '@repo/eslint-config':
         specifier: workspace:*

@@ -2,7 +2,7 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Injectable, UnauthorizedException, Inject } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ClientProxy } from '@nestjs/microservices';
-import { Login, Register, UserDTO } from '@repo/models';
+import { Login, Register, User, UserDTO } from '@repo/models';
 import { microservices } from '@repo/rabbitmq-config';
 import { Cache } from 'cache-manager';
 import { firstValueFrom } from 'rxjs';
@@ -21,7 +21,7 @@ export class AuthService {
 
   async login(login: Login): Promise<{ access_token: string }> {
     const user = await firstValueFrom(
-      this.coreService.send<UserDTO | null>(
+      this.coreService.send<User | null>(
         'core.user.find-one-by-email-with-password',
         {
           email: login.email,
@@ -59,7 +59,7 @@ export class AuthService {
 
   async register(register: Register): Promise<{ access_token: string }> {
     const user = await firstValueFrom(
-      this.coreService.send<UserDTO>('core.user.create', {
+      this.coreService.send<User>('core.user.create', {
         ...register,
       }),
     );

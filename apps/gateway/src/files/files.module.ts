@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ClientsModule } from '@nestjs/microservices';
+import { ClientProvider, ClientsModule } from '@nestjs/microservices';
 import { microservices } from '@repo/rabbitmq-config';
 
 import { FilesController } from './files.controller';
@@ -16,7 +16,7 @@ import { FilesController } from './files.controller';
         useFactory: (configService: ConfigService) => {
           return microservices.COMMUNICATION_SERVICE({
             RABBITMQ_URL: configService.get<string>('RABBITMQ_URL'),
-          });
+          }) as unknown as ClientProvider;
         },
       },
     ]),
