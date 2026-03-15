@@ -9,7 +9,12 @@ import {
   Put,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { CurrentUser, Public, Roles } from '@repo/commun';
 import {
   UserDTO,
@@ -31,6 +36,7 @@ export class CompanyController {
   ) {}
 
   @ApiOperation({ summary: 'Créer une entreprise' })
+  @ApiBearerAuth('access-token')
   @ApiResponse({ description: 'Entreprise créée', status: 201 })
   @Post()
   async create(
@@ -70,6 +76,7 @@ export class CompanyController {
   }
 
   @ApiOperation({ summary: 'Mettre à jour une entreprise' })
+  @ApiBearerAuth('access-token')
   @ApiResponse({ description: 'Entreprise mise à jour', status: 201 })
   @Put(':id')
   async update(
@@ -87,6 +94,7 @@ export class CompanyController {
   }
 
   @ApiOperation({ summary: 'Supprimer une entreprise' })
+  @ApiBearerAuth('access-token')
   @ApiResponse({ description: 'Entreprise supprimée', status: 201 })
   @Delete(':id')
   async remove(@Param('id') id: string): Promise<void> {

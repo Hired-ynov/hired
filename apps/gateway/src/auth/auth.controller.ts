@@ -7,7 +7,12 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Public } from '@repo/commun';
 import { LoginDTO, RegisterDTO } from '@repo/models';
 import { microservices } from '@repo/rabbitmq-config';
@@ -60,6 +65,7 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Déconnexion utilisateur' })
+  @ApiBearerAuth('access-token')
   @ApiResponse({ description: 'Déconnexion réussie', status: 201 })
   @Post('logout')
   async logout(
