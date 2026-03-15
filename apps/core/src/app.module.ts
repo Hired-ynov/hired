@@ -1,3 +1,4 @@
+import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -7,6 +8,7 @@ import {
   ApplicationEntity,
   OfferEntity,
 } from '@repo/entities';
+import { cache } from '@repo/redis-config';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -21,6 +23,16 @@ import { UserModule } from './users/user.module';
     ConfigModule.forRoot({
       envFilePath: '.env',
       isGlobal: true,
+    }),
+    CacheModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      isGlobal: true,
+      useFactory: (configService: ConfigService) => {
+        return cache.AUTO({
+          REDIS_URL: configService.get<string>('REDIS_URL'),
+        });
+      },
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],

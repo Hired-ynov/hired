@@ -1,18 +1,29 @@
 import KeyvRedis from '@keyv/redis';
 import Keyv, { KeyvStoreAdapter } from 'keyv';
 
+type CacheEnvs = Pick<NodeJS.ProcessEnv, 'REDIS_URL'>;
+
 export const cache = {
-  base: (store: KeyvStoreAdapter | Keyv) => {
+  AUTO: (envs: CacheEnvs) => {
+    if (!envs.REDIS_URL) {
+      return cache.LOCAL();
+    }
+
+    return cache.REDIS(envs);
+  },
+  base: (store?: KeyvStoreAdapter) => {
     return {
       stores: [
-        new Keyv({
-          store,
-        }),
+        store
+          ? new Keyv({
+              store,
+            })
+          : new Keyv(),
       ],
     };
   },
   LOCAL: () => {
-    return cache.base(new Keyv());
+    return cache.base();
   },
   REDIS: (envs: NodeJS.ProcessEnv) => {
     return cache.base(
