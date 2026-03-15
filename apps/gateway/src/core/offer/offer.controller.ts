@@ -9,7 +9,12 @@ import {
   Put,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { CurrentUser, Public } from '@repo/commun';
 import {
   CreateOffer,
@@ -34,6 +39,7 @@ export class OfferController {
   ) {}
 
   @ApiOperation({ summary: 'Créer une offre' })
+  @ApiBearerAuth('access-token')
   @ApiResponse({ description: 'Offre créée', status: 201 })
   @Post()
   async create(
@@ -84,6 +90,7 @@ export class OfferController {
   }
 
   @ApiOperation({ summary: 'Mettre à jour une offre' })
+  @ApiBearerAuth('access-token')
   @ApiResponse({ description: 'Offre mise à jour', status: 201 })
   @Put(':id')
   async update(
@@ -98,6 +105,7 @@ export class OfferController {
   }
 
   @ApiOperation({ summary: 'Supprimer une offre' })
+  @ApiBearerAuth('access-token')
   @ApiResponse({ description: 'Offre supprimée', status: 201 })
   @Delete(':id')
   async remove(@Param('id') id: string): Promise<void> {

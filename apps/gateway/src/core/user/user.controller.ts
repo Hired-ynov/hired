@@ -9,7 +9,12 @@ import {
   Put,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Public, Roles, CurrentUser } from '@repo/commun';
 import {
   CreateUserDTO,
@@ -46,6 +51,7 @@ export class UserController {
   }
 
   @ApiOperation({ summary: 'Récupérer tous les utilisateurs' })
+  @ApiBearerAuth('access-token')
   @ApiResponse({ description: 'Utilisateurs récupérés', status: 201 })
   @Get()
   @Roles(Role.admin)
@@ -57,6 +63,7 @@ export class UserController {
   }
 
   @ApiOperation({ summary: 'Récupérer un utilisateur par son email' })
+  @ApiBearerAuth('access-token')
   @ApiResponse({ description: 'Utilisateur récupéré', status: 201 })
   @Get('email/:email')
   async findOneByEmail(@Param('email') email: string): Promise<UserDTO | null> {
@@ -69,6 +76,7 @@ export class UserController {
   }
 
   @ApiOperation({ summary: 'Récupérer un utilisateur' })
+  @ApiBearerAuth('access-token')
   @ApiResponse({ description: 'Utilisateur récupéré', status: 201 })
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<UserDTO | null> {
@@ -79,6 +87,7 @@ export class UserController {
   }
 
   @ApiOperation({ summary: "Mettre à jour le mdp d'un utilisateur" })
+  @ApiBearerAuth('access-token')
   @ApiResponse({ description: 'Mdp mis à jour', status: 201 })
   @Put(':id/change-password')
   @Roles(Role.user, Role.admin)
@@ -96,6 +105,7 @@ export class UserController {
   }
 
   @ApiOperation({ summary: 'Mettre à jour un utilisateur' })
+  @ApiBearerAuth('access-token')
   @ApiResponse({ description: 'Utilisateur mis à jour', status: 201 })
   @Put(':id')
   async update(
@@ -110,6 +120,7 @@ export class UserController {
   }
 
   @ApiOperation({ summary: 'Supprimer un utilisateur' })
+  @ApiBearerAuth('access-token')
   @ApiResponse({ description: 'Utilisateur supprimé', status: 201 })
   @Delete(':id')
   async remove(@Param('id') id: string): Promise<void> {
