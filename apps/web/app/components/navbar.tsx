@@ -34,9 +34,12 @@ export default function Navbar() {
   };
 
   const handleLogout = async () => {
-    await authClient.logout();
-    setUser(null);
-    setIsProfileMenuOpen(false);
+    try {
+      await authClient.logout();
+    } finally {
+      setUser(null);
+      setIsProfileMenuOpen(false);
+    }
   };
 
   return (

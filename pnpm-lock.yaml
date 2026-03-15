@@ -132,9 +132,15 @@ importers:
 
   apps/auth:
     dependencies:
+      '@nestjs/cache-manager':
+        specifier: ^3.1.0
+        version: 3.1.0(@nestjs/common@11.1.14)(@nestjs/core@11.1.14)(cache-manager@7.2.8)(keyv@5.6.0)(rxjs@7.8.2)
       '@nestjs/common':
         specifier: ^11.1.11
         version: 11.1.14(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/config':
+        specifier: ^4.0.2
+        version: 4.0.3(@nestjs/common@11.1.14)(rxjs@7.8.2)
       '@nestjs/core':
         specifier: ^11.1.11
         version: 11.1.14(@nestjs/common@11.1.14)(@nestjs/microservices@11.1.14)(@nestjs/platform-express@11.1.14)(reflect-metadata@0.2.2)(rxjs@7.8.2)
@@ -162,6 +168,12 @@ importers:
       '@repo/rabbitmq-config':
         specifier: workspace:^
         version: link:../../packages/rabbitmq-config
+      '@repo/redis-config':
+        specifier: workspace:^
+        version: link:../../packages/redis-config
+      cache-manager:
+        specifier: ^7.2.8
+        version: 7.2.8
       pg:
         specifier: ^8.18.0
         version: 8.19.0
@@ -793,6 +805,9 @@ importers:
         specifier: workspace:*
         version: link:../models
     devDependencies:
+      '@nestjs/cache-manager':
+        specifier: ^3.1.0
+        version: 3.1.0(@nestjs/common@11.1.14)(@nestjs/core@11.1.14)(cache-manager@7.2.8)(keyv@5.6.0)(rxjs@7.8.2)
       '@nestjs/mapped-types':
         specifier: ^2.0.0
         version: 2.1.0(@nestjs/common@11.1.14)(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)
@@ -805,6 +820,9 @@ importers:
       '@types/node':
         specifier: ^22.10.7
         version: 22.19.12
+      cache-manager:
+        specifier: ^7.2.8
+        version: 7.2.8
       ts-loader:
         specifier: ^9.4.3
         version: 9.5.4(typescript@5.8.2)(webpack@5.105.3)
@@ -3065,7 +3083,6 @@ packages:
       cache-manager: 7.2.8
       keyv: 5.6.0
       rxjs: 7.8.2
-    dev: false
 
   /@nestjs/cli@11.0.16(@types/node@22.19.12):
     resolution:

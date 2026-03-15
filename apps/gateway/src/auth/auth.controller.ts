@@ -1,4 +1,11 @@
-import { Body, Controller, Inject, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Headers,
+  Inject,
+  Post,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Public } from '@repo/commun';
@@ -50,5 +57,33 @@ export class AuthController {
     return firstValueFrom(
       this.authService.send<{ sub: number }>('auth.auth.verify', data),
     );
+  }
+
+  @ApiOperation({ summary: 'Déconnexion utilisateur' })
+  @ApiResponse({ description: 'Déconnexion réussie', status: 201 })
+  @Post('logout')
+  async logout(
+    @Headers('authorization') authorization?: string,
+  ): Promise<{ success: boolean }> {
+    const token = this.extractBearerToken(authorization);
+
+    if (!token) {
+      throw new UnauthorizedException('Token manquant');
+    }
+
+    return firstValueFrom(
+      this.authService.send<{ success: boolean }>('auth.auth.logout', {
+        token,
+      }),
+    );
+  }
+
+  private extractBearerToken(authorization?: string): string | undefined {
+    if (!authorization) {
+      return undefined;
+    }
+
+    const [type, token] = authorization.split(' ');
+    return type === 'Bearer' ? token : undefined;
   }
 }

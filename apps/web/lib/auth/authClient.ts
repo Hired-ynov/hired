@@ -25,12 +25,10 @@ export async function login(loginDTO: LoginDTO) {
 
 export async function logout() {
   try {
-    const res = await apiFetch('/auth/logout', { method: 'POST' });
+    return await apiFetch('/auth/logout', { method: 'POST' });
+  } finally {
+    // Always clear local session even if logout RPC fails.
     setAuthToken(null);
-    return res;
-  } catch (error) {
-    setAuthToken(null);
-    throw error;
   }
 }
 
